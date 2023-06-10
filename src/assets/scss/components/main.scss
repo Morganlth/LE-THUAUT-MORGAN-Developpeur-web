@@ -1,0 +1,37 @@
+/* #MAIN */
+
+@use '../styles/flex.scss' as *;
+@use '../styles/position.scss' as *;
+@use '../styles/size.scss' as *;
+
+main
+{
+    will-change: scroll-position;
+
+    &
+    >div:nth-child(1)
+    {
+        .wrapper
+        {
+            @include flex;
+            @include sticky;
+
+            width: 300vw;
+            height: 100vh;
+
+            &
+            >* { flex-shrink: 0; }
+        }
+    }
+
+    &
+    >div:nth-child(2)
+    {
+        .wrapper
+        {
+            @include any-h;
+
+            overflow: clip; /* clip die */
+        }
+    }
+}

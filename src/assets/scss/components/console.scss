@@ -1,0 +1,105 @@
+/* #CONSOLE */
+
+@use '../../../../static/variables.scss' as *;
+@use '../styles/flex.scss' as *;
+@use '../styles/position.scss' as *;
+@use '../styles/size.scss' as *;
+@use '../styles/font.scss' as *;
+@use '../styles/cursor.scss' as *;
+
+/* #GROUPS */
+
+.line
+{
+    @include f-a-center;
+
+    padding: 0px 10px 0px 30px;
+
+    box-sizing: border-box;
+
+    &,
+    .mirror
+    { @include flex; }
+
+    .line-indicator
+    {
+        @include font-command;
+    
+        width: 30px;
+
+        color: $secondary;
+        font-size: 22px;
+        font-weight: 900;
+    }
+
+    .line-content,
+    .mirror
+    {
+        padding: 8px;
+
+        box-sizing: border-box
+    }
+
+    .line-content
+    {
+        @include relative;
+        @include any-w;
+
+        overflow: hidden;
+
+        height: 40px;
+    }
+
+    input,
+    .mirror,
+    .console-success,
+    .console-error,
+    .console-result
+    {
+        @include any;
+        @include text-command;
+    }
+
+    input
+    {
+        background-color: transparent;
+
+        border: none;
+        outline: none;
+
+        color: transparent;
+
+        caret-color: $primary;
+    }
+
+    .mirror,
+    .console-result
+    {
+        @include no-event;
+
+        color: $light;
+    }
+
+    .mirror
+    {
+        @include xy-start(true);
+
+        z-index: -1;
+
+        background-color: $dark;
+
+        white-space: nowrap;
+
+        .app-context { color: $primary !important; }
+
+        .func-context
+        {
+            color: $secondary !important;
+
+            span { color: $light; }
+        }
+    }
+
+    .console-error { color: $indicator; }
+    .console-success { color: $primary; }
+}

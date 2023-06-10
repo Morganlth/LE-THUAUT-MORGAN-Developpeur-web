@@ -1,0 +1,82 @@
+/* #BACKGROUND */
+
+/* #USE */
+
+@use './position.scss' as *;
+@use './size.scss' as *;
+
+/* #MIXIN */
+
+@mixin glitch($repeat: true, $radial: false)
+{
+    @if $repeat
+    {
+        @if $radial
+        {
+            background: url('./src/assets/images/glitch_1920.jpg') left / auto repeat, radial-gradient(circle, $radial);
+        }
+        @else
+        {
+            background: url('./src/assets/images/glitch_1920.jpg') left / auto repeat;
+        }
+    }
+    @else
+    {
+        @if $radial
+        {
+            background: url('./src/assets/images/glitch_1920.jpg') center / cover no-repeat, radial-gradient(circle, $radial);
+        }
+        @else
+        {
+            background: url('./src/assets/images/glitch_1920.jpg') center / cover no-repeat;
+        }
+    }
+
+    background-color: $s-dark;
+    background-blend-mode: overlay;
+}
+
+@mixin glow($gap: 0px)
+{
+    &::after
+    {
+        @include absolute;
+        @include any-h;
+
+        content: '';
+
+        will-change: contents; /* glow genère des bugs sous chrome lié a l'animation / voir pour passer sous une animation javascript */
+
+        top: 0;
+        left: -$gap;
+
+        opacity: var(--effect-opacity);
+
+        width: calc(200% + $gap);
+
+        background:
+        radial-gradient(circle, $primary 0%, transparent 40%) left / 25% 100% repeat,
+        linear-gradient(0, transparent 0, $secondary 20%, transparent 50%, $secondary 80%, transparent 100%);
+        mix-blend-mode: color-dodge;
+
+        animation: scan linear infinite 20s;
+
+        @media (prefers-reduced-motion: reduce) { animation: none;  }
+    }
+
+    @keyframes scan
+    {
+        0% { transform: translateX(-50%) scaleY(.4); }
+        25% { transform: translateX(-37.5%) scaleY(1.2); }
+        50% { transform: translateX(-25%) scaleY(.4); }
+        75% { transform: translateX(-12.5%) scaleY(1.2); }
+        100% { transform: translateX(0%) scaleY(.4); }    
+    }
+}
+
+@mixin black-glass($filter: false)
+{
+    background-color: rgba($dark, .5);
+
+    @if $filter { backdrop-filter: $filter; }
+}

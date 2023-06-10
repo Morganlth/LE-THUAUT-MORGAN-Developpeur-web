@@ -1,0 +1,10 @@
+/* #SIZE */
+
+@mixin any-w { width: 100%; }
+@mixin any-h { height: 100%; }
+
+@mixin any
+{
+    @include any-w;
+    @include any-h;
+}

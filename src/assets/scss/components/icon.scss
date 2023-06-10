@@ -1,0 +1,5 @@
+/* #ICON */
+
+@use '../styles/size.scss' as *;
+
+.icon>svg { @include any-h; }

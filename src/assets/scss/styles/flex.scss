@@ -1,0 +1,16 @@
+/* #FLEX */
+
+@mixin flex { display: flex; }
+
+@mixin f-column { flex-direction: column; }
+
+@mixin f-j-center { justify-content: center }
+
+@mixin f-a-center { align-items: center; }
+
+@mixin f-center($flex: false)
+{
+    @if $flex { @include flex }
+    @include f-j-center;
+    @include f-a-center;
+}

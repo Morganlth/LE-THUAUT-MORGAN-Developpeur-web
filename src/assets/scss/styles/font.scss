@@ -1,0 +1,54 @@
+/* #FONT */
+
+@mixin font-primary { font-family: 'Montserrat'; }
+@mixin font-secondary { font-family: 'Cremona'; }
+@mixin font-command {  font-family: 'AnonymousPro'; }
+
+@mixin title-3($color: $light)
+{
+    @include font-primary;
+
+    color: $color;
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 40px;
+}
+
+@mixin text-secondary($color: $secondary)
+{
+    @include font-secondary;
+
+    color: $color;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    line-height: 15px;
+}
+
+@mixin text-info
+{
+    @include font-secondary;
+
+    color: $s-light;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+@mixin text-command
+{
+    @include font-command;
+
+    font-size: 24px;
+    font-weight: 100;
+    line-height: 24px;
+}
+
+@mixin link
+{
+    @include font-secondary;
+
+    color: $secondary;
+    font-size: 22px;
+    font-weight: 900;
+    text-decoration: none;
+}

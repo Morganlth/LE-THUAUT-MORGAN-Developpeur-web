@@ -1,0 +1,43 @@
+/*? #CSS-CLASS */
+
+    /* #DISPLAY */
+
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .grid { display: grid; }
+
+    /* #FLEX-PROPERTIES */
+
+    .f-column { flex-direction: column; }
+    .f-center { justify-content: center; align-items: center; }
+    .f-j-center { justify-content: center; }
+    .f-a-center { align-items: center; }
+
+    .f-end { align-self: flex-end; }
+
+    /* #POSITION */
+
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .sticky { position: sticky; }
+
+    .xy-start { top: 0; left: 0; }
+    .xy-middle { top: 50%; left: 50%; }
+
+    /* #TRANSFORM */
+
+    .translate-50-50 { transform: translate(-50%, -50%); }
+
+    /* #OVERFLOW */
+
+    .o-hidden { overflow: hidden; }
+
+    /* #SIZE */
+
+    .any-w { width: 100%; }
+    .any-h { height: 100%; }
+
+    /* #CURSOR */
+
+    .pointer { cursor: pointer; }
+    .no-event { pointer-events: none; }

@@ -1,0 +1,17 @@
+@mixin absolute { position: absolute; }
+@mixin relative { position: relative; }
+
+@mixin xy-start($absolute: false)
+{
+    @if $absolute { @include absolute; }
+
+    top: 0;
+    left: 0;
+}
+
+@mixin sticky($start: true)
+{
+    @if $start { @include xy-start; }
+
+    position: sticky;
+}

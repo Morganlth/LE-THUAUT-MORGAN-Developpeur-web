@@ -1,0 +1,8 @@
+@use './styles/size.scss' as *;
+
+#app
+{
+    @include any;
+
+    overflow: hidden;
+}

@@ -1,0 +1,22 @@
+/* #COLOR */
+
+$dark: #141414;
+$s-dark: #100F1A;
+$light: #F8F2F2;
+$s-light: #626D58;
+$primary: #A1E8AF;
+$o-primary: rgba(161, 232, 175, 0.5);
+$secondary: #645E9D;
+$indicator: #FF5964;
+
+$colors:
+(
+    dark $dark,
+    sDark $s-dark,
+    light $light,
+    sLight $s-light,
+    primary $primary,
+    oPrimary $o-primary,
+    secondary $secondary,
+    indicator $indicator
+)

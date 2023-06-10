@@ -1,0 +1,53 @@
+/* #ROOT */
+
+:root
+{
+    --effect-opacity: .4;
+}
+
+
+/* #RESET */
+
+body, h1, h2, h3, ul, p
+{
+    margin: 0;
+}
+ul, button, input
+{
+    padding: 0;
+}
+
+li { list-style: none; }
+
+/* #FONT */
+
+@font-face
+{
+    font-family: 'AnonymousPro';
+    src: url('../fonts/AnonymousPro/AnonymousPro.ttf');
+}
+@font-face
+{
+    font-family: 'Cremona';
+    src:
+    url('../fonts/Cremona/Cremona-Regular.ttf'),
+    url('../fonts/Cremona/CremonaBold-Bold.ttf');
+}
+@font-face
+{
+    font-family: 'Montserrat';
+    src:
+    url('../fonts/Montserrat/Montserrat-VariableFont_wght.ttf'),
+    url('../fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf');
+}
+
+/* #BODY */
+
+body
+{
+    height: 100vh;
+
+    background-color: black;
+}
+
+#app { opacity: 0; }
