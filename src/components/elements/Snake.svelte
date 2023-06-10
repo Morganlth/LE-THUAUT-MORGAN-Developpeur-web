@@ -155,12 +155,11 @@
 
     function check()
     {
-        console.log('check')
         for (let i = 0; i < snake.length; i++)
         {
             const part = snake[i]
     
-            if (part[0] >= 0 && part[0] < columns && part[1] >= 0 && part[1] < rows) return outside = false
+            if (part[0] >= 0 && part[0] < columns && part[1] >= 0 && part[1] < rows) return false
         }
 
         return outside = true
@@ -168,7 +167,6 @@
 
     function draw()
     {
-        console.log('draw')
         if (outside) outside = false
 
         const [snakeX, snakeY] = [snake[0][0], snake[0][1]]
