@@ -126,7 +126,7 @@ on:mouseleave={mouseUp}
             />
 
             <Presentation
-            _grabbing={grabbing}
+            _lock={grabbing}
             _width={structures[0].e2 * 100 + structures[0].unit}
             {_colors}
             bind:scroll={scrollFunc[0]}

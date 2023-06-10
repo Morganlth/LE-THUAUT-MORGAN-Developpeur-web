@@ -5,7 +5,7 @@
 
         // #PROPS
         export let
-        _grabbing,
+        _lock,
         _width,
         _colors
 
@@ -53,8 +53,7 @@
             const j = i - 1
 
             cards[j < 0 ? cards.length - 1 : j].hidden()
-    
-            cards[i++].animation(xy[0], xy[1])
+            cards[i++].update(xy[0], xy[1])
         }
     }
 </script>
@@ -67,7 +66,7 @@ style:width={_width}
 >
     <Snake
     {_colors}
-    {_grabbing}
+    {_lock}
     bind:xy={xy}
     bind:scroll={scroll}
     bind:mouseMove={mouseMove}
@@ -81,7 +80,7 @@ style:width={_width}
             _title={card.title}
             _content={card.content}
             {_colors}
-            bind:animation={card.animation}
+            bind:update={card.update}
             bind:hidden={card.hidden}
             />
         {/each}

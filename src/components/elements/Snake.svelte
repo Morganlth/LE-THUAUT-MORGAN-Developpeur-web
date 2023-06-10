@@ -6,7 +6,7 @@
         // #PROPS
         export let
         _colors,
-        _grabbing = false
+        _lock = false
 
         // #BINDS
 
@@ -65,11 +65,17 @@
     clientX = 0,
     clientY = 0,
     x = 0,
-    y = 0
+    y = 0,
+    outside = true
 
     let
     score = 0,
     textOff = false
+
+    // #REACTIVES
+
+    $: xScope = x >= 0 && x < columns
+    $: yScope = y >= 0 && y < rows
 
     // #FUNCTIONS
 
@@ -135,7 +141,7 @@
 
     function move()
     {
-        if (_grabbing) return
+        if (_lock) return
 
         x = Math.floor((clientX - boundingClientRect.left) / blockSize)
         y = Math.floor((clientY - boundingClientRect.top) / blockSize)
@@ -144,11 +150,27 @@
 
         if (snake.length && snake[0][0] === x && snake[0][1] === y) return
     
-        draw()
+        return (!xScope || !yScope) && (outside || check()) ? null : draw() 
+    }
+
+    function check()
+    {
+        console.log('check')
+        for (let i = 0; i < snake.length; i++)
+        {
+            const part = snake[i]
+    
+            if (part[0] >= 0 && part[0] < columns && part[1] >= 0 && part[1] < rows) return outside = false
+        }
+
+        return outside = true
     }
 
     function draw()
     {
+        console.log('draw')
+        if (outside) outside = false
+
         const [snakeX, snakeY] = [snake[0][0], snake[0][1]]
 
         let
@@ -202,10 +224,6 @@
 
     function drawSnake(x, y)
     {
-        const
-        xScope = x >= 0 && x < columns,
-        yScope = y >= 0 && y < rows
-
         context.fillStyle = _colors.oPrimary
 
         for (let i = snake.length - 1; i > 0; i--)

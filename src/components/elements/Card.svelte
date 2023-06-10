@@ -11,7 +11,7 @@
 
         // #BIND
 
-        export async function animation(x, y)
+        export async function update(x, y)
         {
             const
             w = window.innerWidth,
@@ -35,17 +35,16 @@
 
             translateX = x
             translateY = y
-
             opacity = 1
         
-            update('clearRect')
+            animation('clearRect')
         }
 
         export async function hidden()
         {
             context.fillStyle = _colors.dark
 
-            setTimeout(() => opacity = 0, update('fillRect'))
+            setTimeout(() => opacity = 0, animation('fillRect'))
         }
 
     // #IMPORT
@@ -61,11 +60,11 @@
 
     let
     card,
-    opacity = 0,
     width,
     height,
     translateX = 0,
-    translateY = 0
+    translateY = 0,
+    opacity = 0
 
     let
     canvas,
@@ -105,7 +104,7 @@
         context.fillRect(0, 0, width, height)
     }
 
-    function update(action)
+    function animation(action)
     {
         let delay = 0
     
@@ -164,7 +163,6 @@ lang="scss"
 
     @import
     '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/size.scss',
     '../../assets/scss/styles/background.scss',
     '../../assets/scss/styles/font.scss';
 
