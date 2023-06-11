@@ -31,8 +31,8 @@
 
     // #IMPORTS
 
-        // #JS
-        import Success from '../../assets/js/success'
+        // #APP
+        import { app } from './Console.svelte'
 
         // #SVELTE
         import { onMount } from 'svelte'
@@ -76,7 +76,9 @@
 
     let
     score = 0,
-    translateX = 100
+    timeout = null,
+    translateX = 100,
+    snakeOff = false
 
     // #REACTIVES
 
@@ -87,19 +89,20 @@
 
     function addCommand()
     {
-        app.blockSize = (size) =>
+        app.add('setBlockSize', (size) =>
         {
-            if (isNaN(parseInt(size, 10))) app.log(new TypeError('la valeur doit être un nombre'))
-            else if (size < 10 || size > 50) app.log(new RangeError('nombre compris entre 10 et 50 inclus'))
+            const [r, err] = app.testRange(size, 10, 70)
+
+            if (!r) app.log(err)
             else
             {
                 blockSize = size
 
                 set()
     
-                app.log(new Success('blockSize = ' + size))
+                app.success('blockSize = ' + size)
             }
-        }
+        })
     }
 
     function set()
@@ -174,6 +177,7 @@
     function draw()
     {
         if (outside) outside = false
+        if (snakeOff) return clear()
 
         const [snakeX, snakeY] = [snake[0][0], snake[0][1]]
 
@@ -304,11 +308,17 @@
             case 0:
                 translateX = translateX ? 0 : 100
                 
-                if (!translateX) setTimeout(() => translateX = 100, 5000)
-            break
+                if (!translateX) timeout = setTimeout(() => { translateX = 100, timeout = null }, 5000)
+                else if (timeout) clearTimeout(timeout), timeout = null
+                break
             case 1:
                 textOff = !textOff
-            break
+                break
+            case 2:
+                snakeOff = !snakeOff
+                break
+            default:
+                break
         }
     }
 
@@ -346,6 +356,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
         </p>
 
         <Cell
+        _style="border: none; cursor: pointer"
         on:click={handleClick.bind(null, 0)}
         >
             <Icon
@@ -358,7 +369,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
 
         <nav
         style:transform="translateX({translateX}%)"
-        style:padding-right="{50 - offsetX}px"
+        style:padding="0 {50 - offsetX}px 0 {offsetX}px"
         >
             <ul>
                 <li>
@@ -367,6 +378,16 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
                     >
                         <Toggle>
                             MASQUER LE TEXTE
+                        </Toggle>
+                    </Cell>
+                </li>
+
+                <li>
+                    <Cell
+                    on:click={handleClick.bind(null, 2)}
+                    >
+                        <Toggle>
+                            DESACTIVER LE SERPENT
                         </Toggle>
                     </Cell>
                 </li>
@@ -420,6 +441,13 @@ lang="scss"
                 right: 0;
 
                 transition: transform 0.5s ease;
+            }
+
+            li
+            {
+                margin-bottom: 15px;
+    
+                text-align: right;
             }
         }
     }

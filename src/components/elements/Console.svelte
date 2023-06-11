@@ -1,20 +1,23 @@
 <!-- #SCRIPT -->
 
+<script context="module">
+    // #EXPORT
+
+        // #MODULE
+        export let app
+</script>
+
 <script>
     // #IMPORTS
-
-        // #JS
-        import Success from '../../assets/js/success'
 
         // #SCSS
         import '../../assets/scss/components/console.scss'
 
+        // #JS
+        import App from '../../assets/js/app'
+
         // #SVELTE
-        import { onMount } from "svelte"
-
-    // #CONSTANTE
-
-    const keyWords = ['blockSize', 'clear', 'darkSpace', 'effect', 'log', 'setNumber']
+        import { onMount } from 'svelte'
 
     // #VARIABLES
 
@@ -28,39 +31,7 @@
 
     // #FUNCTIONS
 
-    function set()
-    {
-        app.log = (msg) =>
-        {
-            const type = msg instanceof Success ? 'success' : msg instanceof Error ? 'error' : 'result'
-
-            cmd.lastChild.insertAdjacentHTML('beforebegin',
-            `
-                <div class="line">
-                    <div class="line-indicator"></div>
-                    <div class="line-content"><div class="console-${type}">${msg}</div></div>
-                </div>
-            `)
-        }
-
-        app.clear = () =>
-        {
-            const children = [...cmd.children]
-
-            for (let i = children.length - 2; i >= 0; i--) cmd.removeChild(children[i])
-        }
-
-        app.effect = (opacity) =>
-        {
-            if (isNaN(parseInt(opacity, 10))) app.log(new TypeError('la valeur doit être un nombre'))
-            else if (opacity < 0 || opacity > 1) app.log(new RangeError('nombre compris entre 0 et 1 inclus'))
-            else
-            {
-                document.querySelector(':root').style.setProperty('--effect-opacity', opacity)
-                app.log(new Success('effet = ' + opacity))
-            }
-        }
-    }
+    function set() { app = new App(cmd) }
 
     function writingEvent()
     {
@@ -101,7 +72,7 @@
             index = value.indexOf('('),
             absoluteValue = index > 0 ? value.substring(1, index) : value.replace('.', '')
 
-            if (keyWords.includes(absoluteValue))
+            if (app.keyWords.includes(absoluteValue))
             {
                 child_1.classList.add('func-context')
                 params = value.substring(index + 1, value.length - 1)

@@ -29,8 +29,8 @@
 
     // #IMPORTS
 
-        // #JS
-        import Success from '../../assets/js/success'
+        // #APP
+        import { app } from '../elements/Console.svelte'
 
         // #SVELTE
         import { onMount } from 'svelte'
@@ -98,8 +98,8 @@
 
     function set()
     {
-        app.setNumber = setNumber
-        app.darkSpace = darkSpace
+        app.add('setDieNumber', setNumber)
+        app.add('darkSpace', darkSpace)
 
         main = document.querySelector('main')
 
@@ -121,12 +121,13 @@
 
     function setNumber(n)
     {
-        if (isNaN(parseInt(n, 10))) app.log(new TypeError('la valeur doit être un nombre'))
-        else if (n < 1 || n > 10) app.log(new RangeError('nombre compris entre 1 et 10 inclus'))
+        const [r, err] = app.testRange(n, 1, 10)
+
+        if (!r) app.log(err)
         else
         {
             number = n
-            app.log(new Success('number = ' + n))
+            app.success('number = ' + n)
         }
     }
 
@@ -136,7 +137,7 @@
 
         for (let i = 0; i < satellites.length; i++) satellites[i]._color = _colors[dark ? 'dark' : colors[i]]
 
-        app.log(new Success('espace sur le thème ' + (dark ? 'sombre' : 'coloré')))
+        app.success('espace sur le thème ' + (dark ? 'sombre' : 'coloré'))
     }
 
     // #CYCLE

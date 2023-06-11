@@ -58,6 +58,8 @@
     {
         @include any;
         @include text-command;
+
+        white-space: nowrap;
     }
 
     input
@@ -87,8 +89,6 @@
         z-index: -1;
 
         background-color: $dark;
-
-        white-space: nowrap;
 
         .app-context { color: $primary !important; }
 
