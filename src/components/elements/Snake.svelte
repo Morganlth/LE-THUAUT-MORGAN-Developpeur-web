@@ -10,7 +10,9 @@
 
         // #BINDS
 
-        export let xy = []
+        export
+        let xy = [],
+        textOff = false
 
         export function scroll()
         {
@@ -38,8 +40,12 @@
         // #ELEMENT
         import Toggle from '../elements/Toggle.svelte'
 
-        // #COVER
+        // #COVERS
         import Cell from '../covers/Cell.svelte'
+        import Icon from '../covers/Icon.svelte'
+
+        // #ICON
+        import Side from '../icons/Side.svelte'
 
     // #CONSTANTES
 
@@ -50,11 +56,12 @@
     // #VARIABLES
 
     let
-    blockSize = 27,
+    blockSize = 30,
     offsetX = 0,
     offsetY = 0,
     width,
-    height
+    height,
+    outside = true
 
     let
     canvas,
@@ -65,12 +72,11 @@
     clientX = 0,
     clientY = 0,
     x = 0,
-    y = 0,
-    outside = true
+    y = 0
 
     let
     score = 0,
-    textOff = false
+    translateX = 100
 
     // #REACTIVES
 
@@ -193,7 +199,7 @@
     {
         const lastPart = snake[snake.length - 1]
 
-        xy = [lastPart[0] * blockSize, lastPart[1] * blockSize]
+        if (!textOff) xy = [lastPart[0] * blockSize, lastPart[1] * blockSize]
     
         initApple()
 
@@ -291,7 +297,20 @@
         else return null
     }
 
-    function handleClick() { textOff = !textOff }
+    function handleClick(id)
+    {
+        switch (id)
+        {
+            case 0:
+                translateX = translateX ? 0 : 100
+                
+                if (!translateX) setTimeout(() => translateX = 100, 5000)
+            break
+            case 1:
+                textOff = !textOff
+            break
+        }
+    }
 
     // #CYCLE
 
@@ -326,11 +345,25 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
             SCORE {score}
         </p>
 
-        <nav>
+        <Cell
+        on:click={handleClick.bind(null, 0)}
+        >
+            <Icon
+            _size="20px"
+            _color={_colors.sLight}
+            >
+                <Side />
+            </Icon>
+        </Cell>
+
+        <nav
+        style:transform="translateX({translateX}%)"
+        style:padding-right="{50 - offsetX}px"
+        >
             <ul>
                 <li>
                     <Cell
-                    on:click={handleClick}
+                    on:click={handleClick.bind(null, 1)}
                     >
                         <Toggle>
                             MASQUER LE TEXTE
@@ -370,6 +403,7 @@ lang="scss"
             @include any;
 
             justify-content: space-between;
+            align-items: flex-start;
 
             z-index: 2;
 
@@ -378,7 +412,15 @@ lang="scss"
 
             .score { @include text-info; }
 
-            ul { text-align: right; }
+            nav
+            {
+                @include absolute;
+
+                top: 10%;
+                right: 0;
+
+                transition: transform 0.5s ease;
+            }
         }
     }
 </style>

@@ -76,7 +76,7 @@
 
 @mixin black-glass($filter: false)
 {
-    background-color: rgba($dark, .5);
+    background-color: rgba($dark, .4);
 
     @if $filter { backdrop-filter: $filter; }
 }

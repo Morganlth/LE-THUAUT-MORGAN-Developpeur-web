@@ -36,11 +36,14 @@
 
     let
     xy = [],
-    i = 0
+    textOff
+    
+    let i = 0
 
-    // #REACTIVE
+    // #REACTIVES
 
     $: update(xy)
+    $: opacity = textOff ? 0 : 1
 
     // #FUNCTIONS
 
@@ -68,12 +71,14 @@ style:width={_width}
     {_colors}
     {_lock}
     bind:xy={xy}
+    bind:textOff={textOff}
     bind:scroll={scroll}
     bind:mouseMove={mouseMove}
     />
 
     <div
     class="card-container"
+    style:opacity={opacity}
     >
         {#each cards as card}
             <Card

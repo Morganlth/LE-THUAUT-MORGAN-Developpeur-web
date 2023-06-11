@@ -6,7 +6,7 @@
 
         export let
         _transform = '',
-        _opacity = 1,
+        _opacity = 1, /*tictactoe*/
         _size = null,
         _href = null,
         _alt = null,

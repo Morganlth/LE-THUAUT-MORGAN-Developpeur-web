@@ -51,7 +51,7 @@
     {
         max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 // (140vh + 200vw) - 140vh = 200vw
 
-        console.clear()
+        // console.clear()
     }
 
     function scroll()

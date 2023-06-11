@@ -44,7 +44,12 @@
         {
             context.fillStyle = _colors.dark
 
-            setTimeout(() => opacity = 0, animation('fillRect'))
+            setTimeout(function fade()
+            {
+                opacity -= 0.1
+
+                if (opacity > 0) requestAnimationFrame(fade)
+            }, animation('fillRect'))
         }
 
     // #IMPORT
