@@ -7,21 +7,44 @@
         import colors from './assets/scss/modules/variables.module.scss'
         import './assets/scss/app.scss'
 
+        // #APP-CONTEXT
+        import { app } from './components/elements/Console.svelte'
+
         // #SVELTE
         import { onMount } from 'svelte'
 
-        // #FIELD
+        // #FIELDS
         import Header from './components/field/Header.svelte'
         import Main from './components/field/Main.svelte'
 
-    // #FUNCTION
+    // #CONSTANTE
+
+    const storageKeys = ['effect']
+
+    // #FUNCTIONS
 
     function set()
     {
-        const app = document.body.firstElementChild
+        const appElement = document.body.firstElementChild
         
-        app.style.backgroundColor = colors.dark
-        app.style.opacity = 1
+        appElement.style.backgroundColor = colors.dark
+        appElement.style.opacity = 1
+
+        restore()
+    }
+
+    function restore()
+    {
+        for (let i = 0; i < storageKeys.length; i++)
+        {
+            const
+            key = storageKeys[i],
+            item = localStorage.getItem(key)
+
+            if (item !== null) app[key](item)
+        }
+
+        app.clear()
     }
 
     // #CYCLE

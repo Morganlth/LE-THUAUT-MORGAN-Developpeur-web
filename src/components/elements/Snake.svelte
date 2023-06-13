@@ -31,7 +31,7 @@
 
     // #IMPORTS
 
-        // #APP
+        // #APP-CONTEXT
         import { app } from './Console.svelte'
 
         // #SVELTE
@@ -89,19 +89,15 @@
 
     function addCommand()
     {
-        app.add('setBlockSize', (size) =>
+        app.add('snakeSize', (size) =>
         {
-            const [r, err] = app.testRange(size, 10, 70)
+            app.testRange(size, 10, 70)
 
-            if (!r) app.log(err)
-            else
-            {
-                blockSize = size
+            blockSize = size
 
-                set()
-    
-                app.success('blockSize = ' + size)
-            }
+            set()
+
+            app.success('snakeSize = ' + size)
         })
     }
 

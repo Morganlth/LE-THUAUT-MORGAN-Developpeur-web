@@ -92,12 +92,7 @@
 
         .app-context { color: $primary !important; }
 
-        .func-context
-        {
-            color: $secondary !important;
-
-            span { color: $light; }
-        }
+        .func-context { color: $secondary !important; }
     }
 
     .console-error { color: $indicator; }

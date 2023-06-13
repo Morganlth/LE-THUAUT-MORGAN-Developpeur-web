@@ -1,8 +1,13 @@
+// #IMPORTS
+
+import AppSuccess from './success'
+import AppError from './error'
+
 // #APP CLASS
 
 export default class App
 {
-    keyWords = ['log', 'clear', 'success', 'effect']
+    keyWords = ['log', 'clear', 'success', 'error', 'effect']
 
     constructor(cmd) { this.cmd = cmd }
 
@@ -17,14 +22,13 @@ export default class App
 
     testRange(n, min, max)
     {
-        return isNaN(parseInt(n, 10)) ? [false, new TypeError('la valeur doit être un nombre')] :
-        n < min || n > max ? [false, new RangeError(`la valeur doit être comprise entre [${min} et ${max}]`)] :
-        [true]
+        if (!/^\d*$/.test(n)) this.error('la valeur doit être un nombre', 'TypeError')
+        if (n < min || n > max) this.error(`la valeur doit être comprise entre [${min} et ${max}]`, 'RangeError')
     }
 
     log(msg)
     {
-        const type = msg instanceof Error ? msg instanceof Success ? 'success' : 'error' : null
+        const type = msg instanceof Error ? msg instanceof AppSuccess ? 'success' : 'error' : null
 
         this.cmd.lastChild.insertAdjacentHTML('beforebegin', `
             <div class="line">
@@ -46,29 +50,17 @@ export default class App
         for (let i = children.length - 2; i >= 0; i--) this.cmd.removeChild(children[i])
     }
 
-    success(msg) { this.log(new Success(msg)) }
+    success(msg) { this.log(new AppSuccess(msg)) }
+    
+    error(msg, type) { throw new AppError(type ?? 'Error', msg) }
 
-    effect(o)
+    effect(n, n2)
     {
-        const [r, err] = this.testRange(o, 0, 1)
+        this.testRange(n, 0, 1)
 
-        if (!r) this.log(err)
-        else
-        {
-            document.querySelector(':root').style.setProperty('--effect-opacity', o)
-            this.success('effet = ' + o)
-        }
-    }
-}
+        document.querySelector(':root').style.setProperty('--effect', n)
+        this.success('effet = ' + n)
 
-// #SUCCESS
-
-class Success extends Error
-{
-    constructor(msg)
-    {
-        super(msg)
-
-        this.name = 'Success'
+        localStorage.setItem('effect', n)
     }
 }

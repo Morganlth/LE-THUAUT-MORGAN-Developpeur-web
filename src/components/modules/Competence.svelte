@@ -29,7 +29,7 @@
 
     // #IMPORTS
 
-        // #APP
+        // #APP-CONTEXT
         import { app } from '../elements/Console.svelte'
 
         // #SVELTE
@@ -98,7 +98,7 @@
 
     function set()
     {
-        app.add('setDieNumber', setNumber)
+        app.add('spaceDimension', setNumber)
         app.add('darkSpace', darkSpace)
 
         main = document.querySelector('main')
@@ -121,14 +121,10 @@
 
     function setNumber(n)
     {
-        const [r, err] = app.testRange(n, 1, 10)
+        app.testRange(n, 1, 10)
 
-        if (!r) app.log(err)
-        else
-        {
-            number = n
-            app.success('number = ' + n)
-        }
+        number = n
+        app.success('spaceDimension = ' + n)
     }
 
     function darkSpace(dark)

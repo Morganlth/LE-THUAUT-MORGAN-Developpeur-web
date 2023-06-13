@@ -15,19 +15,21 @@
 
         // #JS
         import App from '../../assets/js/app'
+        import AppError from '../../assets/js/error'
 
         // #SVELTE
         import { onMount } from 'svelte'
+
+    // #CONSTANTE
+    
+    const children = []
 
     // #VARIABLES
 
     let
     cmd,
     input,
-    mirror,
-    child_0,
-    child_1,
-    params = null
+    mirror
 
     // #FUNCTIONS
 
@@ -35,83 +37,66 @@
 
     function writingEvent()
     {
-        const
-        value = input.value,
-        length = value.length
+        const value = input.value
 
-        ;(length === 3 || value[3] === '.') && value.substring(0, 3) === 'app' ? analyse(value, length) : update(value, '', 'remove')
+        console.clear()
+
+        ;(value.length === 3 || value[3] === ' ') && value.substring(0, 3) === 'app' ? analyse(value) : update('remove', [value])
     }
 
-    function analyse(value, length)
+    function analyse(value)
     {
-        let text = ''
+        const values = value.match(/^(app)(?:\s(\S*))?(?:\s(.*))?$/)
 
-        if (length > 3) text = check(value.substring(3))
+        values.shift()
 
-        update('app', text, 'add')
+        if (values[1]) check(values[1])
 
-        if (params !== null)
-        {
-            child_1.insertAdjacentHTML('beforeend', `<span>${params}</span>`)
-            child_1.insertAdjacentText('beforeend', ')')
-        }
+        update('add', values)
     }
 
-    function update(value_0, value_1, action)
+    function update(action, values = [])
     {
-        child_0.classList[action]('app-context')
-        child_0.innerText = value_0
-        child_1.innerText = value_1
+        children[0].classList[action]('app-context')
+
+        for (let i = 0; i < children.length; i++) children[i].innerText = values[i] ?? ''
     }
 
     function check(value)
     {
-        if (value[value.length - 1] === ')')
-        {
-            const
-            index = value.indexOf('('),
-            absoluteValue = index > 0 ? value.substring(1, index) : value.replace('.', '')
-
-            if (app.keyWords.includes(absoluteValue))
-            {
-                child_1.classList.add('func-context')
-                params = value.substring(index + 1, value.length - 1)
-
-                return '.' + absoluteValue + '('
-            }
-        }
-
-        child_1.classList.remove('func-context')
-        params = null
-
-        return value
+        children[1].classList[app.keyWords.includes(value) ? 'add' : 'remove']('func-context')
     }
 
     function enterEvent(e)
     {
-        if (e.key === 'Enter')
-        {
-            if (params !== null && child_0.innerText === 'app') execute()
-        }
+        if (e.key === 'Enter' && children[0].innerText === 'app') execute()
     }
 
     function execute()
     {
         const
-        value = child_1.innerText.replace('.', ''),
-        index = value.indexOf('(')
-
-        app[value.substring(0, index)](params)
+        func = children[1].innerText,
+        param = children[2].innerText
     
-        reset()
+        try
+        {
+            app[func](param)
+
+            reset()
+        }
+        catch (e)
+        {
+            const err = e instanceof AppError ? e : new AppError('TypeError', `"${func}" n'est pas une fonction valide`)
+            
+            app.log(err)
+        }
     }
 
     function reset()
     {
-        update('', '', 'remove')
+        update('remove')
         input.value = ''
         cmd.scrollTop = cmd.scrollHeight - cmd.offsetHeight
-        params = null
     }
 
     // #CYCLE
@@ -159,12 +144,12 @@ class="console"
                 class="mirror"
                 bind:this={mirror}
                 >
-                    <span
-                    bind:this={child_0}
-                    ></span>
-                    <span
-                    bind:this={child_1}
-                    ></span>
+                    {#each [0, 1, 2] as child}
+                        <pre
+                        bind:this={children[child]}
+                        >
+                        </pre> &nbsp;
+                    {/each}
                 </div>
             </div>
         </div>
@@ -228,6 +213,8 @@ lang="scss"
 
             border-right: solid $secondary 2px;
             border-bottom: solid $secondary 2px;
+
+            pre { display: inline; }
 
             &::-webkit-scrollbar
             {
