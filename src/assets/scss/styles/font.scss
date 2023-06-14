@@ -14,24 +14,14 @@
     line-height: 40px;
 }
 
-@mixin text-secondary($color: $secondary)
+@mixin text-info($color: $s-light)
 {
     @include font-secondary;
 
     color: $color;
-    font-size: 16px;
-    font-weight: 400;
-    letter-spacing: 1px;
-    line-height: 15px;
-}
-
-@mixin text-info
-{
-    @include font-secondary;
-
-    color: $s-light;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 900;
+    letter-spacing: 1px;
 }
 
 @mixin text-command

@@ -5,8 +5,6 @@
 
         // #PROP
         export let _check = false
-
-        // $: console.log(_check)
 </script>
 <!-- #HTML -->
 
@@ -44,7 +42,7 @@ lang="scss"
     {
         @include flex;
         @include f-a-center;
-        @include text-info;
+        @include text-info($light);
         @include no-event;
 
         gap: 10px;
@@ -71,8 +69,8 @@ lang="scss"
 
             background-color: $dark;
 
-            border-right: solid $secondary 2px;
-            border-bottom: solid $secondary 2px;
+            border-right: solid $light 2px;
+            border-bottom: solid $light 2px;
 
             box-sizing: border-box;
         }

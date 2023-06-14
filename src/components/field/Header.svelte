@@ -81,7 +81,7 @@ lang="scss"
 
         p
         {
-            @include text-secondary($light);
+            @include text-info($light);
     
             margin-left: 30px;
         }

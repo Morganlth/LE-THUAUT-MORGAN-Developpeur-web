@@ -311,9 +311,9 @@ lang="scss"
         .lang,
         .scroll-icon
         {
-            @include text-secondary($s-light);
+            @include text-info;
 
-            opacity: 0.8;
+            opacity: 0.7;
         }
         .scroll-icon
         {

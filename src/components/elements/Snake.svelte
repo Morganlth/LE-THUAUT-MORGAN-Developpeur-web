@@ -10,11 +10,6 @@
 
         // #BINDS
 
-        export
-        let xy = [],
-        textOff,
-        snakeOff
-
         export function scroll()
         {
             boundingClientRect = canvas.getBoundingClientRect()
@@ -40,6 +35,7 @@
 
         // #ELEMENT
         import Toggle from '../elements/Toggle.svelte'
+        import Card from '../elements/Card.svelte'
 
         // #COVERS
         import Cell from '../covers/Cell.svelte'
@@ -52,7 +48,16 @@
 
     const
     snake = [],
-    apple = []
+    apple = [],
+    cards =
+    [
+        { title: 'NOM - PRÉNOM', content: ['LE THUAUT Morgan'] },
+        { title: 'AGE', content: ['21 ans'] },
+        { title: 'PROFESSION', content: ['Développeur Web - FULL STACK'] },
+        { title: 'LOCALITÉ', content: ['Morbihan - FRANCE'] },
+        { title: 'ÉTUDES - FORMATIONS', content: ['Lycée Jeanne d\'Arc PONTIVY - bac S SVT spécialité MATHS', 'OpenClassrooms - formation de Développeur Web'] },
+        { title: 'CONTACT', content: ['Tel:  06 09 23 72 08', 'Email:  lethuaut.morgan@gmail.com'] }
+    ]
 
     // #VARIABLES
 
@@ -77,7 +82,11 @@
 
     let
     score = 0,
-    translateX = 100
+    translateX = 100,
+    textOff,
+    snakeOff
+
+    let i = 0
 
     // #REACTIVES
 
@@ -227,9 +236,7 @@
 
     function updateGamePlan()
     {
-        const lastPart = snake[snake.length - 1]
-
-        if (!textOff) xy = [lastPart[0] * blockSize, lastPart[1] * blockSize]
+        if (!textOff) updateCard()
     
         initApple()
 
@@ -357,6 +364,8 @@
         textOff = off
 
         localStorage.setItem('textOff', off)
+
+        off ? hidden() : view()
     }
 
     function updateSnake(off)
@@ -366,7 +375,41 @@
         draw()
 
         localStorage.setItem('snakeOff', off)
+
+        snakeOff ? view() : hidden()
     }
+
+    function updateCard()
+    {
+        const lastPart = snake[snake.length - 1]
+
+        if (i === cards.length) i = 0
+
+        const j = i - 1
+
+        cards[j < 0 ? cards.length - 1 : j].hidden()
+        cards[i++].update(lastPart[0] * blockSize, lastPart[1] * blockSize)
+    }
+
+    function view()
+    {
+        if (textOff || !snakeOff) return
+
+        let
+        x = width,
+        y = 78
+
+        for (let i = 0; i < cards.length; i++)
+        {
+            cards[i].update(x, y)
+
+            // x -= 
+            y += cards[i].height
+        }
+    }
+
+    function hidden() { for (let i = 0; i < cards.length; i++) cards[i].hidden() }
+
     // #CYCLE
 
     onMount(() =>
@@ -383,6 +426,21 @@ class="snake-game"
 style:height="{height}px"
 style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
 >
+    <div
+    class="card-container"
+    >
+        {#each cards as card}
+            <Card
+            _title={card.title}
+            _content={card.content}
+            _dark={_colors.dark}
+            bind:height={card.height}
+            bind:update={card.update}
+            bind:hidden={card.hidden}
+            />
+        {/each}
+    </div>
+
     <canvas
     style:width="{width}px"
     style:height="{height}px"
@@ -405,7 +463,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
         on:click={handleClick.bind(null, 0)}
         >
             <Icon
-            _size="20px"
+            _size="18px"
             _color={_colors.sLight}
             >
                 <Side />
@@ -415,7 +473,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
         <nav
         style:right="{-offsetX}px"
         style:transform="translateX({translateX}%)"
-        style:padding="80px {50 - offsetX}px 0"
+        style:padding="78px {50 - offsetX}px 0"
         on:mouseleave={leave}
         >
             <ul>
@@ -426,7 +484,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
                         <Toggle
                         _check={textOff}
                         >
-                            MASQUER LE TEXTE
+                            Masquer le texte
                         </Toggle>
                     </Cell>
                 </li>
@@ -438,7 +496,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
                         <Toggle
                         _check={snakeOff}
                         >
-                            DESACTIVER LE SERPENT
+                            Désactiver le serpent
                         </Toggle>
                     </Cell>
                 </li>
@@ -458,6 +516,7 @@ lang="scss"
     '../../assets/scss/styles/flex.scss',
     '../../assets/scss/styles/position.scss',
     '../../assets/scss/styles/size.scss',
+    '../../assets/scss/styles/background.scss',
     '../../assets/scss/styles/font.scss';
 
     /* #GROUPS */
@@ -467,7 +526,7 @@ lang="scss"
         @include relative;
 
         display: inline-block;
-
+        
         z-index: 1;
 
         .frame
@@ -490,8 +549,11 @@ lang="scss"
             {
                 @include absolute;
                 @include any-h;
+                @include black-glass(blur(3px));
 
                 top: 0;
+
+                z-index: -1;
 
                 transition: transform 0.5s ease;
 

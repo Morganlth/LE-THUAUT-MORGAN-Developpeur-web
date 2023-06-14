@@ -11,6 +11,8 @@
 
         // #BIND
 
+        export let height = 0
+
         export async function update(x, y)
         {
             if (timeout)
@@ -25,16 +27,15 @@
             }
 
             [translateX, translateY] = getPosition(x, y)
-            z = 1
             opacity = 1
         
-            animation('clearRect')
+            setTimeout(() => z = 0, animation('clearRect'))
         }
 
         export async function hidden()
         {
             context.fillStyle = _dark
-            z = 0
+            z = -1
 
             timeout = setTimeout(() =>
             {
@@ -58,10 +59,9 @@
     let
     card,
     width,
-    height,
     translateX = 0,
     translateY = 0,
-    z = 1,
+    z = -1,
     opacity = 0
 
     let
@@ -77,10 +77,13 @@
 
     function set()
     {
-        width = card.offsetWidth + blockSize - card.offsetWidth % blockSize,
-        height = card.offsetHeight + blockSize - card.offsetHeight % blockSize
+        document.fonts.ready.then(() =>
+        {
+            width = card.offsetWidth + blockSize - card.offsetWidth % blockSize,
+            height = card.offsetHeight + blockSize - card.offsetHeight % blockSize
 
-        setCanvas()
+            setCanvas()
+        })
     }
 
     function setCanvas()
@@ -94,14 +97,6 @@
         context = canvas.getContext('2d')
 
         even = columns % 2 ? false : true
-
-        drawBackground()
-    }
-
-    function drawBackground()
-    {
-        context.fillStyle = _dark
-        context.fillRect(0, 0, width, height)
     }
 
     function getPosition(x, y)
@@ -153,9 +148,9 @@
 
     function fade()
     {
-        opacity -= 0.1
+        // opacity -= 0.1
 
-        opacity > 0 ? frameId = requestAnimationFrame(fade) : opacity = 0
+        // opacity > 0 ? frameId = requestAnimationFrame(fade) : opacity = 0
     }
 
     //CYCLE
@@ -203,6 +198,7 @@ lang="scss"
     '../../assets/scss/styles/font.scss';
 
     /* #GROUPS */
+
     .card
     {
         @include black-glass(hue-rotate(180deg));
@@ -222,14 +218,19 @@ lang="scss"
             white-space: nowrap;
         }
 
-        .content { padding-left: 30px; }
+        .content
+        {
+            margin: 10px 0 0 30px;
+            padding: 10px 0 0 30px;
+
+            border-top: solid 1px $o-primary;
+        }
 
         p
         {
-            @include font-command;
+            @include text-command;
 
             color: $light;
-            font-size: 25px;
         }
     }
 </style>
