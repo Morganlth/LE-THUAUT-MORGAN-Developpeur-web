@@ -291,7 +291,7 @@ lang="scss"
 
         width: $width;
 
-        padding: 1% 0 1% 2%;
+        padding: 1% 0 1% 2.5%;
 
         .me
         {
@@ -325,7 +325,7 @@ lang="scss"
 
     .main
     {
-        gap: 35%;
+        gap: 34%;
 
         margin-bottom: 5%;
 

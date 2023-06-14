@@ -29,7 +29,8 @@
     let
     cmd,
     input,
-    mirror
+    mirror,
+    last = 'app'
 
     // #FUNCTIONS
 
@@ -38,8 +39,6 @@
     function writingEvent()
     {
         const value = input.value
-
-        console.clear()
 
         ;(value.length === 3 || value[3] === ' ') && value.substring(0, 3) === 'app' ? analyse(value) : update('remove', [value])
     }
@@ -67,17 +66,36 @@
         children[1].classList[app.keyWords.includes(value) ? 'add' : 'remove']('func-context')
     }
 
-    function enterEvent(e)
+    function keyEvent(e)
     {
-        if (e.key === 'Enter' && children[0].innerText === 'app') execute()
+        const key = e.key
+
+        switch (key)
+        {
+            case 'Enter':
+                if (children[0].innerText === 'app') execute()
+                break
+            case 'ArrowUp':
+                const length = last.length
+
+                input.value = last
+                input.focus()
+                input.setSelectionRange(length, length)
+                writingEvent()
+
+                break
+            default: break
+        }
     }
 
     function execute()
     {
         const
         func = children[1].innerText,
-        param = children[2].innerText
+        param = children[2].innerText.trim()
     
+        last = input.value
+
         try
         {
             app[func](param)
@@ -110,9 +128,9 @@
 class="console"
 >
     <div>
-        <h3>_Console</h3>
+        <h3>Console</h3>
 
-        <p>RECHERCHER ET MODIFIER</p>
+        <p>RECHERCHER & MODIFIER</p>
     </div>
 
     <div
@@ -137,7 +155,7 @@ class="console"
                 spellcheck="false"
                 bind:this={input}
                 on:input={writingEvent}
-                on:keydown={enterEvent}
+                on:keyup={keyEvent}
                 />
 
                 <div
@@ -214,7 +232,12 @@ lang="scss"
             border-right: solid $secondary 2px;
             border-bottom: solid $secondary 2px;
 
-            pre { display: inline; }
+            pre
+            {
+                display: inline;
+
+                font-family: inherit;
+            }
 
             &::-webkit-scrollbar
             {

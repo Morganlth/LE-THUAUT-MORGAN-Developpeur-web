@@ -12,7 +12,7 @@
 
         export
         let xy = [],
-        textOff = false
+        textOff
 
         export function scroll()
         {
@@ -89,19 +89,37 @@
 
     function addCommand()
     {
-        app.add('snakeSize', (size) =>
+        const name = 'snakeSize'
+
+        app.add(name, (size) =>
         {
+            if (size === 'default') size = 30
+    
             app.testRange(size, 10, 70)
 
             blockSize = size
-
-            set()
-
-            app.success('snakeSize = ' + size)
-        })
+            reset()
+    
+            app.success(name + ' ' + size)
+            
+            localStorage.setItem(name, size)
+        }, true)
     }
 
     function set()
+    {
+        restore()
+        reset()
+        initSnake()
+    }
+
+    function restore()
+    {
+        textOff = localStorage.getItem('textOff') === 'true'
+        snakeOff = localStorage.getItem('snakeOff') === 'true'
+    }
+
+    function reset()
     {
         offsetX = window.innerWidth % blockSize
         offsetY = window.innerHeight % blockSize / 2
@@ -111,7 +129,6 @@
 
         setCanvas()
         initApple()
-        initSnake()
     }
 
     function setCanvas()
@@ -138,11 +155,7 @@
         apple[1] = appleY
     }
 
-    function initSnake()
-    {
-        if (!snake.length)
-            for (let i = 0; i < 10; i++) snake.push([x - i, y - i])
-    }
+    function initSnake() { for (let i = 0; i < 10; i++) snake.push([x - i, y - i]) }
 
     function move()
     {
@@ -302,16 +315,20 @@
         switch (id)
         {
             case 0:
-                translateX = translateX ? 0 : 100
+                translateX = translateX ? 0 : 100 
+                
+                /* utiliser un event hover desactivant le kill serpent pour gerer l'affichage */
                 
                 if (!translateX) timeout = setTimeout(() => { translateX = 100, timeout = null }, 5000)
                 else if (timeout) clearTimeout(timeout), timeout = null
                 break
             case 1:
                 textOff = !textOff
+                localStorage.setItem('textOff', textOff)
                 break
             case 2:
                 snakeOff = !snakeOff
+                localStorage.setItem('snakeOff', snakeOff)
                 break
             default:
                 break
@@ -372,7 +389,9 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
                     <Cell
                     on:click={handleClick.bind(null, 1)}
                     >
-                        <Toggle>
+                        <Toggle
+                        _check={textOff}
+                        >
                             MASQUER LE TEXTE
                         </Toggle>
                     </Cell>
@@ -382,7 +401,9 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
                     <Cell
                     on:click={handleClick.bind(null, 2)}
                     >
-                        <Toggle>
+                        <Toggle
+                        _check={snakeOff}
+                        >
                             DESACTIVER LE SERPENT
                         </Toggle>
                     </Cell>
@@ -412,6 +433,8 @@ lang="scss"
         @include relative;
 
         display: inline-block;
+
+        z-index: 1;
 
         .frame
         {

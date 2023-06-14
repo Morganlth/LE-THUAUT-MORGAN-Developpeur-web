@@ -17,10 +17,6 @@
         import Header from './components/field/Header.svelte'
         import Main from './components/field/Main.svelte'
 
-    // #CONSTANTE
-
-    const storageKeys = ['effect']
-
     // #FUNCTIONS
 
     function set()
@@ -35,10 +31,10 @@
 
     function restore()
     {
-        for (let i = 0; i < storageKeys.length; i++)
+        for (let i = 0; i < app.storageKeys.length; i++)
         {
             const
-            key = storageKeys[i],
+            key = app.storageKeys[i],
             item = localStorage.getItem(key)
 
             if (item !== null) app[key](item)

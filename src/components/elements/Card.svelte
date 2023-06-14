@@ -33,6 +33,7 @@
                 if (yAndHeight > h) y -= yAndHeight - h
             }
 
+            z = 1
             translateX = x
             translateY = y
             opacity = 1
@@ -43,6 +44,7 @@
         export async function hidden()
         {
             context.fillStyle = _colors.dark
+            z = 0
 
             setTimeout(function fade()
             {
@@ -65,6 +67,7 @@
 
     let
     card,
+    z = 1,
     width,
     height,
     translateX = 0,
@@ -137,6 +140,7 @@
 
 <section
 class="card"
+style:z-index={z}
 style:transform="translate({translateX}px, {translateY}px)"
 style:opacity={opacity}
 bind:this={card}

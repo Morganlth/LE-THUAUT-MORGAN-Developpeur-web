@@ -1,3 +1,13 @@
+<!-- #SCRIPT -->
+
+<script>
+    // #EXPORT
+
+        // #PROP
+        export let _check = false
+
+        // $: console.log(_check)
+</script>
 <!-- #HTML -->
 
 <label
@@ -5,6 +15,7 @@ class="toggle"
 >
     <input
     type="checkbox"
+    checked={_check}
     on:click|stopPropagation
     >
 
@@ -24,7 +35,8 @@ lang="scss"
     '../../assets/scss/styles/flex.scss',
     '../../assets/scss/styles/position.scss',
     '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/font.scss';
+    '../../assets/scss/styles/font.scss',
+    '../../assets/scss/styles/cursor.scss';
 
     /* #GROUPS */
 
@@ -33,6 +45,7 @@ lang="scss"
         @include flex;
         @include f-a-center;
         @include text-info;
+        @include no-event;
 
         gap: 10px;
 

@@ -8,12 +8,14 @@ import AppError from './error'
 export default class App
 {
     keyWords = ['log', 'clear', 'success', 'error', 'effect']
+    storageKeys = ['effect']
 
     constructor(cmd) { this.cmd = cmd }
 
-    add(name, command)
+    add(name, command, storage)
     {
         if (this.keyWords.includes(name)) return
+        if (storage) this.storageKeys.push(name)
 
         this.keyWords.push(name)
 
@@ -22,7 +24,7 @@ export default class App
 
     testRange(n, min, max)
     {
-        if (!/^\d*$/.test(n)) this.error('la valeur doit être un nombre', 'TypeError')
+        if (!/^\d*?\.?\d+$/.test(n)) this.error('la valeur doit être un nombre', 'TypeError')
         if (n < min || n > max) this.error(`la valeur doit être comprise entre [${min} et ${max}]`, 'RangeError')
     }
 
@@ -54,7 +56,7 @@ export default class App
     
     error(msg, type) { throw new AppError(type ?? 'Error', msg) }
 
-    effect(n, n2)
+    effect(n)
     {
         this.testRange(n, 0, 1)
 

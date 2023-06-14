@@ -72,6 +72,8 @@
         color: transparent;
 
         caret-color: $primary;
+
+        user-select: contain;
     }
 
     .mirror,
