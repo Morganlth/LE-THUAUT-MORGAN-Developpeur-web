@@ -7,35 +7,25 @@
         export let
         _title,
         _content = [],
-        _colors
+        _dark
 
         // #BIND
 
         export async function update(x, y)
         {
-            const
-            w = window.innerWidth,
-            h = window.innerHeight
-
-            if (x < blockSize) x = blockSize
-            else
+            if (timeout)
             {
-                const xAndWidth = x + width + blockSize
-
-                if (xAndWidth > w) x -= xAndWidth - w
+                clearTimeout(timeout)
+                timeout = null
             }
-            
-            if (y < blockSize) y = blockSize
-            else
+            else if (frameId)
             {
-                const yAndHeight = y + height + blockSize
-
-                if (yAndHeight > h) y -= yAndHeight - h
+                cancelAnimationFrame(frameId)
+                frameId = null
             }
 
+            [translateX, translateY] = getPosition(x, y)
             z = 1
-            translateX = x
-            translateY = y
             opacity = 1
         
             animation('clearRect')
@@ -43,14 +33,14 @@
 
         export async function hidden()
         {
-            context.fillStyle = _colors.dark
+            context.fillStyle = _dark
             z = 0
 
-            setTimeout(function fade()
+            timeout = setTimeout(() =>
             {
-                opacity -= 0.1
-
-                if (opacity > 0) requestAnimationFrame(fade)
+                timeout = null
+    
+                fade()
             }, animation('fillRect'))
         }
 
@@ -67,11 +57,11 @@
 
     let
     card,
-    z = 1,
     width,
     height,
     translateX = 0,
     translateY = 0,
+    z = 1,
     opacity = 0
 
     let
@@ -79,7 +69,9 @@
     columns,
     rows,
     context,
-    even
+    even,
+    timeout = null,
+    frameId = null
 
     // #FUNCTIONS
 
@@ -108,8 +100,33 @@
 
     function drawBackground()
     {
-        context.fillStyle = _colors.dark
+        context.fillStyle = _dark
         context.fillRect(0, 0, width, height)
+    }
+
+    function getPosition(x, y)
+    {
+        const
+        w = window.innerWidth,
+        h = window.innerHeight
+
+        if (x < blockSize) x = blockSize
+        else
+        {
+            const xAndWidth = x + width + blockSize
+
+            if (xAndWidth > w) x -= xAndWidth - w
+        }
+        
+        if (y < blockSize) y = blockSize
+        else
+        {
+            const yAndHeight = y + height + blockSize
+
+            if (yAndHeight > h) y -= yAndHeight - h
+        }
+
+        return [x, y]
     }
 
     function animation(action)
@@ -122,13 +139,23 @@
             {
                 setTimeout(() =>
                 {
-                    context[action](x * blockSize, y * blockSize, blockSize, blockSize)
-                    context[action](((even ? columns - 1 : columns) - x) * blockSize, (rows - y - 1) * blockSize, blockSize, blockSize)
+                    requestAnimationFrame(() =>
+                    {
+                        context[action](x * blockSize, y * blockSize, blockSize, blockSize)
+                        context[action](((even ? columns - 1 : columns) - x) * blockSize, (rows - y - 1) * blockSize, blockSize, blockSize)
+                    })
                 }, delay += 30)
             }
         }
 
         return delay
+    }
+
+    function fade()
+    {
+        opacity -= 0.1
+
+        opacity > 0 ? frameId = requestAnimationFrame(fade) : opacity = 0
     }
 
     //CYCLE

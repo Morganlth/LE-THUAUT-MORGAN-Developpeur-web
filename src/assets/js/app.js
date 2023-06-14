@@ -7,20 +7,20 @@ import AppError from './error'
 
 export default class App
 {
-    keyWords = ['log', 'clear', 'success', 'error', 'effect']
+    keyWords = ['log', 'clear', 'reset', 'success', 'error', 'effect']
     storageKeys = ['effect']
 
     constructor(cmd) { this.cmd = cmd }
 
     add(name, command, storage)
     {
-        if (this.keyWords.includes(name)) return
-        if (storage) this.storageKeys.push(name)
-
-        this.keyWords.push(name)
+        if (!this.keyWords.includes(name)) this.keyWords.push(name)
+        if (storage && !this.storageKeys.includes(name)) this.storageKeys.push(name)
 
         this[name] = command
     }
+
+    testDefault(value) { return value === 'd' || value === 'default' }
 
     testRange(n, min, max)
     {
@@ -38,8 +38,8 @@ export default class App
                 <div class="line-content">
                     ${type ? `
                     <span class="console-${type}">${msg.name}:</span>
-                    <span class="console-result">${msg.message}</span>` : `
-                    <span class="console-result">${msg}</span>`}
+                    <pre class="console-result">${msg.message.trim()}</pre>` : `
+                    <pre class="console-result">${msg.trim()}</pre>`}
                 </div>
             </div>
         `)
@@ -52,17 +52,24 @@ export default class App
         for (let i = children.length - 2; i >= 0; i--) this.cmd.removeChild(children[i])
     }
 
+    reset(view)
+    {
+        for (const key of this.storageKeys) this[key]('d')
+
+        if (!view) this.clear()
+    }
+
     success(msg) { this.log(new AppSuccess(msg)) }
     
     error(msg, type) { throw new AppError(type ?? 'Error', msg) }
 
     effect(n)
     {
-        this.testRange(n, 0, 1)
+        this.testDefault(n) ? n = .3 : this.testRange(n, 0, 1)
 
         document.querySelector(':root').style.setProperty('--effect', n)
-        this.success('effet = ' + n)
-
         localStorage.setItem('effect', n)
+    
+        this.success('effet ' + n)
     }
 }

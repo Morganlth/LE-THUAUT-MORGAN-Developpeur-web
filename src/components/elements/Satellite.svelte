@@ -5,17 +5,23 @@
 
         // #PROPS
         export let
-        _color,
         _rotate = 0,
         _offset = 0,
         _r = 0,
-        _y = 0
+        _y = 0,
+        _color
+
+    // #IMPORT
+
+        // #ELEMENT
+        import Cube from './Cube.svelte'
 
     // #VARIABLES
 
     let
     translateX = 0,
-    translateZ = 0
+    translateZ = 0,
+    rotateY = 0
 
     // #REACTIVE
 
@@ -29,6 +35,7 @@
 
         translateX = _r * Math.cos(angle)
         translateZ = _r * Math.sin(angle)
+        rotateY = angle
     }
 </script>
 
@@ -38,12 +45,13 @@
 class="orbit"
 style:transform="rotate({_rotate}deg)"
 >
-    <div
-    class="satellite"
-    style:transform="perspective({_r * 3}px) translate3d({translateX}px, 0, {translateZ}px)"
-    style:background-color={_color}
-    >
-    </div>
+    <Cube
+    _perspective={_r * 3}
+    _translateX={translateX}
+    _translateZ={translateZ}
+    _rotateY={rotateY}
+    {_color}
+    />
 </div>
 
 <!-- #STYLE -->
@@ -67,20 +75,5 @@ lang="scss"
         @include any;
 
         transform-style: preserve-3d;
-
-        /* border: solid red 1px; */
-    }
-
-    .satellite
-    {
-        width: 300px;
-        height: 300px;
-
-        /* background-color: $dark; */
-        /* background: radial-gradient(circle, transparent 5%, rgba($dark, .3) 100%); */
-
-        border-radius: 50%;
-
-        box-shadow: 0 0 5px $s-light;
     }
 </style>

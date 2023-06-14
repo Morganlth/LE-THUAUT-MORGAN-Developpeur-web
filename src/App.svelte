@@ -37,7 +37,8 @@
             key = app.storageKeys[i],
             item = localStorage.getItem(key)
 
-            if (item !== null) app[key](item)
+            try { if (item !== null) app[key](item) }
+            catch { localStorage.removeItem(key) }
         }
 
         app.clear()

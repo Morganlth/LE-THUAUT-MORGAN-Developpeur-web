@@ -22,10 +22,7 @@
             y = gap > 0 ? gap < height ? gap / height : 1 : 0
         }
 
-        export function mouseMove(e)
-        {
-            dieMouseMove(e)
-        }
+        export function mouseMove(e) { dieMouseMove(e) }
 
     // #IMPORTS
 
@@ -38,6 +35,7 @@
         // #ELEMENTS
         import Die from '../elements/Die.svelte'
         import Satellite from '../elements/Satellite.svelte'
+    import { space } from 'svelte/internal';
 
     // #CONSTANTES
 
@@ -50,7 +48,7 @@
             _rotate: -50,
             _offset: 0
         }
-,   
+,
         {
             _color: _colors[colors[1]],
             _rotate: 80,
@@ -98,8 +96,7 @@
 
     function set()
     {
-        app.add('spaceDimension', setNumber)
-        app.add('darkSpace', darkSpace)
+        setCommand()
 
         main = document.querySelector('main')
 
@@ -119,21 +116,19 @@
         y = 1 /* set satellites positions */
     }
 
-    function setNumber(n)
+    function setCommand()
     {
-        app.testRange(n, 1, 10)
+        const name = 'spaceDimension'
+    
+        app.add(name, (n) =>
+        {
+            app.testDefault(n) ? n = 6 : app.testRange(n, 1, 6)
 
-        number = n
-        app.success('spaceDimension = ' + n)
-    }
-
-    function darkSpace(dark)
-    {
-        if (dark === 'false' || dark === '0') dark = false
-
-        for (let i = 0; i < satellites.length; i++) satellites[i]._color = _colors[dark ? 'dark' : colors[i]]
-
-        app.success('espace sur le thème ' + (dark ? 'sombre' : 'coloré'))
+            number = n
+            localStorage.setItem(name, n)
+    
+            app.success(name + ' ' + n)
+        }, true)
     }
 
     // #CYCLE

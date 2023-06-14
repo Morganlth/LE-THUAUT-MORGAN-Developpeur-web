@@ -12,7 +12,8 @@
 
         export
         let xy = [],
-        textOff
+        textOff,
+        snakeOff
 
         export function scroll()
         {
@@ -76,9 +77,7 @@
 
     let
     score = 0,
-    timeout = null,
-    translateX = 100,
-    snakeOff = false
+    translateX = 100
 
     // #REACTIVES
 
@@ -89,20 +88,38 @@
 
     function addCommand()
     {
-        const name = 'snakeSize'
+        const
+        name_1 = 'snakeSize',
+        name_2 = 'snakeTextOff',
+        name_3 = 'snakeOff'
 
-        app.add(name, (size) =>
+        app.add(name_1, (size) =>
         {
-            if (size === 'default') size = 30
-    
-            app.testRange(size, 10, 70)
+            app.testDefault(size) ? size = 30 : app.testRange(size, 10, 70)
 
             blockSize = size
+            localStorage.setItem(name_1, size)
             reset()
     
-            app.success(name + ' ' + size)
-            
-            localStorage.setItem(name, size)
+            app.success(name_1 + ' ' + size)
+        }, true)
+
+        app.add(name_2, (off) =>
+        {
+            if (app.testDefault(off)) off = false
+    
+            updateText(off)
+
+            app.success(name_2 + ' ' + textOff)
+        }, true)
+
+        app.add(name_3, (off) =>
+        {
+            if (app.testDefault(off)) off = false
+    
+            updateSnake(off)
+
+            app.success(name_3 + ' ' + snakeOff)
         }, true)
     }
 
@@ -315,26 +332,41 @@
         switch (id)
         {
             case 0:
-                translateX = translateX ? 0 : 100 
-                
-                /* utiliser un event hover desactivant le kill serpent pour gerer l'affichage */
-                
-                if (!translateX) timeout = setTimeout(() => { translateX = 100, timeout = null }, 5000)
-                else if (timeout) clearTimeout(timeout), timeout = null
+                translateX = translateX ? 0 : 100
+                _lock = translateX ? false : true
                 break
             case 1:
-                textOff = !textOff
-                localStorage.setItem('textOff', textOff)
+                updateText(!textOff)
                 break
             case 2:
-                snakeOff = !snakeOff
-                localStorage.setItem('snakeOff', snakeOff)
+                updateSnake(!snakeOff)
                 break
             default:
                 break
         }
     }
 
+    function leave()
+    {
+        translateX = 100
+        _lock = false
+    }
+
+    function updateText(off)
+    {
+        textOff = off
+
+        localStorage.setItem('textOff', off)
+    }
+
+    function updateSnake(off)
+    {
+        snakeOff = off
+
+        draw()
+
+        localStorage.setItem('snakeOff', off)
+    }
     // #CYCLE
 
     onMount(() =>
@@ -381,8 +413,10 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
         </Cell>
 
         <nav
+        style:right="{-offsetX}px"
         style:transform="translateX({translateX}%)"
-        style:padding="0 {50 - offsetX}px 0 {offsetX}px"
+        style:padding="80px {50 - offsetX}px 0"
+        on:mouseleave={leave}
         >
             <ul>
                 <li>
@@ -455,11 +489,15 @@ lang="scss"
             nav
             {
                 @include absolute;
+                @include any-h;
 
-                top: 10%;
-                right: 0;
+                top: 0;
 
                 transition: transform 0.5s ease;
+
+                border-left: dotted 4px $s-light;
+
+                box-sizing: border-box;
             }
 
             li

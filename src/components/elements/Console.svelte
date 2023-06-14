@@ -92,13 +92,13 @@
     {
         const
         func = children[1].innerText,
-        param = children[2].innerText.trim()
+        params = children[2].innerText.trim().split(',')
     
         last = input.value
 
         try
         {
-            app[func](param)
+            app[func](...params)
 
             reset()
         }
@@ -231,13 +231,6 @@ lang="scss"
 
             border-right: solid $secondary 2px;
             border-bottom: solid $secondary 2px;
-
-            pre
-            {
-                display: inline;
-
-                font-family: inherit;
-            }
 
             &::-webkit-scrollbar
             {

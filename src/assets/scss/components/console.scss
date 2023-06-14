@@ -48,6 +48,10 @@
         overflow: hidden;
 
         height: 40px;
+
+        cursor: text;
+
+        pre { display: inline; }
     }
 
     input,
@@ -58,8 +62,6 @@
     {
         @include any;
         @include text-command;
-
-        white-space: nowrap;
     }
 
     input
@@ -72,8 +74,6 @@
         color: transparent;
 
         caret-color: $primary;
-
-        user-select: contain;
     }
 
     .mirror,
@@ -91,6 +91,15 @@
         z-index: -1;
 
         background-color: $dark;
+
+        white-space: nowrap;
+
+        pre
+        {
+            @include any-h;
+    
+            font-family: inherit;
+        }
 
         .app-context { color: $primary !important; }
 
