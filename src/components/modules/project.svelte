@@ -267,17 +267,20 @@ lang="scss"
 
     #project
     {
+        @include flex;
         @include relative;
 
-        align-self: flex-end;
+        align-items: flex-end;
 
         width: 100vw;
+
+        overflow: clip;
 
         canvas
         {
             @include absolute;
 
-            top: 50%;
+            top: 75%;
             left: 50%;
 
             z-index: -1;
@@ -287,17 +290,14 @@ lang="scss"
 
         .track
         {
-            &,
-            .card
-            {
-                @include any;
-            }
-
             @include f-center(true);
+            @include any-w;
 
             perspective: 2000px;
 
             transform-origin: top left;
+
+            height: 50%;
 
             & 
             >div
@@ -312,6 +312,8 @@ lang="scss"
 
         .card
         {
+            @include any;
+
             flex-shrink: 0;
 
             transform-origin: left;
@@ -328,7 +330,7 @@ lang="scss"
             @include absolute;
             @include text-info;
 
-            bottom: 4%;
+            bottom: 30px;
             left: 3%;
         }
     }

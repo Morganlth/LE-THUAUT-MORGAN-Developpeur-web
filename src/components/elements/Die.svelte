@@ -21,6 +21,8 @@
         export function scroll()
         {
             const pageYNow = _main.scrollTop
+
+            delay = 0
     
             if (grabbing)
             {
@@ -41,6 +43,8 @@
             const
             now = +new Date(),
             coords = getCoords(e)
+
+            delay = 50
 
             if (coords)
             {
@@ -83,9 +87,8 @@
     // #CONSTANTES
 
     const
-    delay = 50,
     gravity = 9,
-    force = 4,
+    force = 1,
     modelX = [1, 4, 6, 2],
     modelY = [1, 3, 6, 5],
     modelZ = [2, 3, 4, 5],
@@ -126,6 +129,7 @@
     // #VARIABLES
 
     let
+    delay = 50,
     last = +new Date(),
     x = 0,
     y = 0,
@@ -378,5 +382,7 @@ lang="scss"
 </style>
 
 <!--
+    *optimisation du dé necessaire...
+     
     *animation => dé destructuré qui se decompose a l'eloignement du scroll
 -->

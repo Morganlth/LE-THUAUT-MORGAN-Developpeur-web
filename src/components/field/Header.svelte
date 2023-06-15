@@ -55,7 +55,8 @@ lang="scss"
     '../../assets/scss/styles/flex.scss',
     '../../assets/scss/styles/position.scss',
     '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/font.scss';
+    '../../assets/scss/styles/font.scss',
+    '../../assets/scss/styles/cursor.scss';
 
     header
     {
@@ -63,8 +64,11 @@ lang="scss"
         @include f-a-center;
         @include absolute;
         @include any-w;
+        @include no-event;
 
         justify-content: space-between;
+
+        z-index: 2;
 
         height: 60px;
 

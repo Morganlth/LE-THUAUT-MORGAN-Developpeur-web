@@ -19,6 +19,8 @@
 
         export function mouseMove(e)
         {
+
+            console.log('move')
             clientX = e.clientX
             clientY = e.clientY
     
@@ -496,7 +498,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
 
     <div
     class="frame"
-    style:padding="{30 - offsetY}px {50 - offsetX}px 0 50px"
+    style:padding="0 {50 - offsetX}px {30 - offsetY}px 50px"
     >
         <p
         class="score"
@@ -519,7 +521,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
         <nav
         style:right="{-offsetX}px"
         style:transform="translateX({translateX}%)"
-        style:padding="78px {50 - offsetX}px 0"
+        style:padding="0 {50 - offsetX}px 78px"
         on:mouseleave={leave}
         >
             <ul>
@@ -577,12 +579,18 @@ lang="scss"
 
         .frame
         {
-            @include flex;
+            &,
+            nav
+            {
+                @include flex;
+
+                align-items: flex-end;
+            }
+
             @include xy-start(true);
             @include any;
 
             justify-content: space-between;
-            align-items: flex-start;
 
             z-index: 2;
 

@@ -26,7 +26,7 @@
     // #CONSTANTES
 
     const
-    structures = [{ e1: 2, e2: 1, unit: 'vw' }, { e1: 6, e2: 1, unit: 'vh' }],
+    structures = [{ e1: 2, e2: 1, unit: 'vw' }, { e1: 6, e2: 2, unit: 'vh' }],
     scrollFunc = [],
     wheelFunc = [],
     mouseMoveFunc = [],
@@ -118,7 +118,6 @@ on:mouseleave={mouseUp}
     >
         <Wrapper
         _translateX={translateX}
-        _zIndex={1}
         >
             <Home
             _width={structures[0].e1 * 100 + structures[0].unit}

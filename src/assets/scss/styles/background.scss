@@ -4,6 +4,7 @@
 
 @use './position.scss' as *;
 @use './size.scss' as *;
+@use './cursor.scss' as *;
 
 /* #MIXIN */
 
@@ -42,6 +43,7 @@
     {
         @include absolute;
         @include any-h;
+        @include no-event;
 
         content: '';
 
