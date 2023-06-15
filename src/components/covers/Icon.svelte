@@ -28,6 +28,7 @@ style:transform={_transform}
 style:opacity={_opacity}
 style:width={_size}
 style:height={_size}
+style:pointer-events={_href ? 'auto' : 'none'}
 {...(_href ? { href: _href, alt: _alt } : {})}
 >
     <slot />

@@ -31,7 +31,7 @@
         import { app } from './Console.svelte'
 
         // #SVELTE
-        import { onMount } from 'svelte'
+        import { onMount, tick } from 'svelte'
 
         // #ELEMENT
         import Toggle from '../elements/Toggle.svelte'
@@ -67,7 +67,8 @@
     offsetY = 0,
     width,
     height,
-    outside = true
+    outside = true,
+    invincible = false
 
     let
     canvas,
@@ -86,7 +87,9 @@
     textOff,
     snakeOff
 
-    let i = 0
+    let
+    fontCharged = false,
+    i = 0
 
     // #REACTIVES
 
@@ -124,7 +127,9 @@
 
         app.add(name_3, (off) =>
         {
-            if (app.testDefault(off)) off = false
+            if (app.testDefault(off) || off === 'f' || off === 'false') off = false
+            else if (off === 't' || off === 'true') off = true
+            else app.error('la valeur doit être "t" ou "true" pour vrai | "f" ou "false" pour faux', 'TypeError')
     
             updateSnake(off)
 
@@ -134,6 +139,7 @@
 
     function set()
     {
+        setCards()
         restore()
         reset()
         initSnake()
@@ -155,6 +161,19 @@
 
         setCanvas()
         initApple()
+    }
+
+    function setCards()
+    {
+        document.fonts.ready.then(() =>
+        {
+            fontCharged = true
+
+            tick().then(() =>
+            {
+                if (snakeOff && !textOff) view()
+            })
+        })
     }
 
     function setCanvas()
@@ -221,7 +240,7 @@
         gapY = snakeY - y,
         i = 0
 
-        while(i++ < 30)
+        while(i++ < 20)
         {
             if (gapX !== 0) x < snakeX ? gapX-- : gapX++
             if (gapY !== 0) y < snakeY ? gapY-- : gapY++
@@ -276,7 +295,7 @@
             snakeX = part[0],
             snakeY = part[1]
 
-            if (xScope && yScope && snakeX === x && snakeY === y) snake.pop()
+            if (!invincible && xScope && yScope && snakeX === x && snakeY === y) snake.pop()
             if (snakeX === apple[0] && snakeY === apple[1]) updateGamePlan()
 
             drawSnakeBody(part, i)
@@ -340,7 +359,7 @@
         {
             case 0:
                 translateX = translateX ? 0 : 100
-                _lock = translateX ? false : true
+                translateX ? (_lock = false, setTimeout(() => { invincible = false }, 100)) : (_lock = true, invincible = true)
                 break
             case 1:
                 updateText(!textOff)
@@ -353,8 +372,12 @@
         }
     }
 
-    function leave()
+    function leave(e)
     {
+        if (e.relatedTarget.classList.contains('cell')) return
+    
+        setTimeout(() => { invincible = false }, 100)
+
         translateX = 100
         _lock = false
     }
@@ -365,7 +388,7 @@
 
         localStorage.setItem('textOff', off)
 
-        off ? hidden() : view()
+        if (fontCharged) off ? hidden() : view()
     }
 
     function updateSnake(off)
@@ -376,7 +399,7 @@
 
         localStorage.setItem('snakeOff', off)
 
-        snakeOff ? view() : hidden()
+        if (fontCharged) off ? view() : hidden()
     }
 
     function updateCard()
@@ -395,16 +418,15 @@
     {
         if (textOff || !snakeOff) return
 
-        let
-        x = width,
-        y = 78
+        let y = 40
 
-        for (let i = 0; i < cards.length; i++)
+        for (const card of cards)
         {
-            cards[i].update(x, y)
+            const x = Math.random() * (width - card.width)
+    
+            card.update(x, y)
 
-            // x -= 
-            y += cards[i].height
+            y += card.height
         }
     }
 
@@ -429,16 +451,19 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
     <div
     class="card-container"
     >
-        {#each cards as card}
-            <Card
-            _title={card.title}
-            _content={card.content}
-            _dark={_colors.dark}
-            bind:height={card.height}
-            bind:update={card.update}
-            bind:hidden={card.hidden}
-            />
-        {/each}
+        {#if fontCharged}
+            {#each cards as card}
+                <Card
+                _title={card.title}
+                _content={card.content}
+                _dark={_colors.dark}
+                bind:width={card.width}
+                bind:height={card.height}
+                bind:update={card.update}
+                bind:hidden={card.hidden}
+                />
+            {/each}
+        {/if}
     </div>
 
     <canvas
@@ -557,7 +582,7 @@ lang="scss"
 
                 transition: transform 0.5s ease;
 
-                border-left: dotted 4px $s-light;
+                border-left: solid 4px $s-light;
 
                 box-sizing: border-box;
             }

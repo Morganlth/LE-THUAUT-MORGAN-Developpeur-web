@@ -80,12 +80,12 @@ lang="scss"
             @include any-h;
         
             content: '';
-        }
-        span::after
-        {
+
             width: 50%;
 
-            background-color: $s-light;
+            background-color: $secondary;
+
+            transition: transform 400ms;
         }
     }
 </style>

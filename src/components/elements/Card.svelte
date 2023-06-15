@@ -9,9 +9,11 @@
         _content = [],
         _dark
 
-        // #BIND
+        // #BINDS
 
-        export let height = 0
+        export let
+        width = 0,
+        height = 0
 
         export async function update(x, y)
         {
@@ -58,7 +60,6 @@
 
     let
     card,
-    width,
     translateX = 0,
     translateY = 0,
     z = -1,
@@ -77,13 +78,10 @@
 
     function set()
     {
-        document.fonts.ready.then(() =>
-        {
-            width = card.offsetWidth + blockSize - card.offsetWidth % blockSize,
-            height = card.offsetHeight + blockSize - card.offsetHeight % blockSize
+        width = card.offsetWidth + blockSize - card.offsetWidth % blockSize,
+        height = card.offsetHeight + blockSize - card.offsetHeight % blockSize
 
-            setCanvas()
-        })
+        setCanvas()
     }
 
     function setCanvas()
@@ -97,6 +95,9 @@
         context = canvas.getContext('2d')
 
         even = columns % 2 ? false : true
+
+        context.fillStyle = _dark
+        context.fillRect(0, 0, columns * blockSize, rows * blockSize)
     }
 
     function getPosition(x, y)
@@ -148,14 +149,14 @@
 
     function fade()
     {
-        // opacity -= 0.1
+        opacity -= 0.1
 
-        // opacity > 0 ? frameId = requestAnimationFrame(fade) : opacity = 0
+        opacity > 0 ? frameId = requestAnimationFrame(fade) : opacity = 0
     }
 
-    //CYCLE
+    // #CYCLE
 
-    onMount(set)
+     onMount(set)
 </script>
 
 <!-- #HTML -->
@@ -214,6 +215,8 @@ lang="scss"
         h3
         {
             @include title-3($o-primary);
+
+            padding-right: 30px;
 
             white-space: nowrap;
         }

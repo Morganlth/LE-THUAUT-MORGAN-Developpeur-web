@@ -32,7 +32,7 @@
         offsetTop = parent.offsetTop + element.offsetTop,
         offsetLeft = parent.offsetLeft + element.offsetLeft
 
-        document.querySelector('main').scrollTo({ top: offsetTop + offsetLeft })
+        document.querySelector('main').scrollTo({ top: offsetTop + offsetLeft, behavior: this ? 'instant' : 'smooth' })
     }
 </script>
 
