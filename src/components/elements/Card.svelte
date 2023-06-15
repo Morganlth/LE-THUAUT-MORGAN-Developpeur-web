@@ -7,6 +7,7 @@
         export let
         _title,
         _content = [],
+        _blockSize = 0,
         _dark
 
         // #BINDS
@@ -17,34 +18,21 @@
 
         export async function update(x, y)
         {
-            if (timeout)
-            {
-                clearTimeout(timeout)
-                timeout = null
-            }
-            else if (frameId)
-            {
-                cancelAnimationFrame(frameId)
-                frameId = null
-            }
-
+            if (timeout) { clearTimeout(timeout), callHidden = false, timeout = null }
+    
             [translateX, translateY] = getPosition(x, y)
-            opacity = 1
         
-            setTimeout(() => z = 0, animation('clearRect'))
+            setTimeout(() => { if (!callHidden) z = 0 }, animation('clearRect'))
         }
 
         export async function hidden()
         {
+            callHidden = true
+
             context.fillStyle = _dark
             z = -1
 
-            timeout = setTimeout(() =>
-            {
-                timeout = null
-    
-                fade()
-            }, animation('fillRect'))
+            timeout = setTimeout(() => { callHidden = false, timeout = null }, animation('fillRect'))
         }
 
     // #IMPORT
@@ -52,18 +40,13 @@
         // #SVELTE
         import { onMount } from 'svelte'
 
-    // #CONSTANTE
-
-    const blockSize = 40
-
     // #VARIABLES
 
     let
     card,
     translateX = 0,
     translateY = 0,
-    z = -1,
-    opacity = 0
+    z = -1
 
     let
     canvas,
@@ -71,15 +54,15 @@
     rows,
     context,
     even,
-    timeout = null,
-    frameId = null
+    callHidden = false,
+    timeout = null
 
     // #FUNCTIONS
 
     function set()
     {
-        width = card.offsetWidth + blockSize - card.offsetWidth % blockSize,
-        height = card.offsetHeight + blockSize - card.offsetHeight % blockSize
+        width = card.offsetWidth + _blockSize - card.offsetWidth % _blockSize,
+        height = card.offsetHeight + _blockSize - card.offsetHeight % _blockSize
 
         setCanvas()
     }
@@ -89,15 +72,15 @@
         canvas.width = width
         canvas.height = height
 
-        columns = width / blockSize
-        rows = height / blockSize
+        columns = width / _blockSize
+        rows = height / _blockSize
 
         context = canvas.getContext('2d')
 
         even = columns % 2 ? false : true
 
         context.fillStyle = _dark
-        context.fillRect(0, 0, columns * blockSize, rows * blockSize)
+        context.fillRect(0, 0, columns * _blockSize, rows * _blockSize)
     }
 
     function getPosition(x, y)
@@ -106,18 +89,18 @@
         w = window.innerWidth,
         h = window.innerHeight
 
-        if (x < blockSize) x = blockSize
+        if (x < _blockSize) x = _blockSize
         else
         {
-            const xAndWidth = x + width + blockSize
+            const xAndWidth = x + width + _blockSize
 
             if (xAndWidth > w) x -= xAndWidth - w
         }
         
-        if (y < blockSize) y = blockSize
+        if (y < _blockSize) y = _blockSize
         else
         {
-            const yAndHeight = y + height + blockSize
+            const yAndHeight = y + height + _blockSize
 
             if (yAndHeight > h) y -= yAndHeight - h
         }
@@ -137,21 +120,14 @@
                 {
                     requestAnimationFrame(() =>
                     {
-                        context[action](x * blockSize, y * blockSize, blockSize, blockSize)
-                        context[action](((even ? columns - 1 : columns) - x) * blockSize, (rows - y - 1) * blockSize, blockSize, blockSize)
+                        context[action](x * _blockSize, y * _blockSize, _blockSize, _blockSize)
+                        context[action](((even ? columns - 1 : columns) - x) * _blockSize, (rows - y - 1) * _blockSize, _blockSize, _blockSize)
                     })
-                }, delay += 30)
+                }, delay += 16)
             }
         }
 
         return delay
-    }
-
-    function fade()
-    {
-        opacity -= 0.1
-
-        opacity > 0 ? frameId = requestAnimationFrame(fade) : opacity = 0
     }
 
     // #CYCLE
@@ -165,7 +141,6 @@
 class="card"
 style:z-index={z}
 style:transform="translate({translateX}px, {translateY}px)"
-style:opacity={opacity}
 bind:this={card}
 >
     <h3>{_title}</h3>
@@ -206,7 +181,7 @@ lang="scss"
 
         display: inline-block;
 
-        padding-top: 20px;
+        padding: 10px 20px;
 
         &,
         canvas

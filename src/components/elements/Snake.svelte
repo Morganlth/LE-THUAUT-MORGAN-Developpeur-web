@@ -47,6 +47,7 @@
     // #CONSTANTES
 
     const
+    defaultSize = 40,
     snake = [],
     apple = [],
     cards =
@@ -62,7 +63,7 @@
     // #VARIABLES
 
     let
-    blockSize = 30,
+    blockSize = defaultSize,
     offsetX = 0,
     offsetY = 0,
     width,
@@ -107,7 +108,7 @@
 
         app.add(name_1, (size) =>
         {
-            app.testDefault(size) ? size = 30 : app.testRange(size, 10, 70)
+            size = app.testDefault(size) ? defaultSize : app.testNumber(size, 10, 70)
 
             blockSize = size
             localStorage.setItem(name_1, size)
@@ -118,7 +119,9 @@
 
         app.add(name_2, (off) =>
         {
-            if (app.testDefault(off)) off = false
+            if (app.testDefault(off) || off === 'f' || off === 'false') off = false
+            else if (off === 't' || off === 'true') off = true
+            else app.error('la valeur doit être "t" ou "true" pour vrai | "f" ou "false" pour faux', 'TypeError')
     
             updateText(off)
 
@@ -231,7 +234,7 @@
     function draw()
     {
         if (outside) outside = false
-        if (snakeOff) return clear()
+        if (snakeOff) return
 
         const [snakeX, snakeY] = [snake[0][0], snake[0][1]]
 
@@ -395,11 +398,28 @@
     {
         snakeOff = off
 
-        draw()
+        animation(off ? false : true)
 
         localStorage.setItem('snakeOff', off)
 
         if (fontCharged) off ? view() : hidden()
+    }
+
+    function animation(draw)
+    {
+        let delay = 0
+
+        for (let i = snake.length - 1; i >= -1; i--)
+        {
+            const part = i >= 0 ? snake[i] : apple
+
+            setTimeout(() => requestAnimationFrame(() =>
+            {
+                if (draw) context.fillStyle = _colors[i > 0 ? 'oPrimary' : i === 0 ? 'primary' : 'indicator']
+    
+                context[draw ? 'fillRect' : 'clearRect'](part[0] * blockSize, part[1] * blockSize, blockSize, blockSize)
+            }), delay += 16)
+        }
     }
 
     function updateCard()
@@ -418,7 +438,7 @@
     {
         if (textOff || !snakeOff) return
 
-        let y = 40
+        let y = blockSize
 
         for (const card of cards)
         {
@@ -456,6 +476,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
                 <Card
                 _title={card.title}
                 _content={card.content}
+                _blockSize={defaultSize}
                 _dark={_colors.dark}
                 bind:width={card.width}
                 bind:height={card.height}

@@ -22,10 +22,12 @@ export default class App
 
     testDefault(value) { return value === 'd' || value === 'default' }
 
-    testRange(n, min, max)
+    testNumber(n, min, max)
     {
         if (!/^\d*?\.?\d+$/.test(n)) this.error('la valeur doit être un nombre', 'TypeError')
         if (n < min || n > max) this.error(`la valeur doit être comprise entre [${min} et ${max}]`, 'RangeError')
+
+        return parseInt(n, 10)
     }
 
     log(msg)
@@ -65,7 +67,7 @@ export default class App
 
     effect(n)
     {
-        this.testDefault(n) ? n = .3 : this.testRange(n, 0, 1)
+        n = this.testDefault(n) ? .3 : this.testNumber(n, 0, 1)
 
         document.querySelector(':root').style.setProperty('--effect', n)
         localStorage.setItem('effect', n)

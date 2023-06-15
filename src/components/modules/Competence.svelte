@@ -122,7 +122,7 @@
     
         app.add(name, (n) =>
         {
-            app.testDefault(n) ? n = 6 : app.testRange(n, 1, 6)
+            n = app.testDefault(n) ? 6 : app.testNumber(n, 1, 6)
 
             number = n
             localStorage.setItem(name, n)
