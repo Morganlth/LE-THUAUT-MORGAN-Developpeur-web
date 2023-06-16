@@ -45,7 +45,9 @@ lang="scss"
         @include text-info($light);
         @include no-event;
 
-        gap: 10px;
+        justify-content: space-between;
+    
+        gap: 20px;
 
         input
         {

@@ -3,11 +3,13 @@
 import AppSuccess from './success'
 import AppError from './error'
 
+import getFps from './fps'
+
 // #APP CLASS
 
 export default class App
 {
-    keyWords = ['log', 'clear', 'reset', 'success', 'error', 'effect']
+    keyWords = ['log', 'clear', 'reset', 'success', 'error', 'getFps', 'effect']
     storageKeys = ['effect']
 
     constructor(cmd) { this.cmd = cmd }
@@ -22,12 +24,19 @@ export default class App
 
     testDefault(value) { return value === 'd' || value === 'default' }
 
-    testNumber(n, min, max)
+    testNumber(value, min, max)
     {
-        if (!/^\d*?\.?\d+$/.test(n)) this.error('la valeur doit être un nombre', 'TypeError')
-        if (n < min || n > max) this.error(`la valeur doit être comprise entre [${min} et ${max}]`, 'RangeError')
+        if (!/^\d*?\.?\d+$/.test(value)) this.error('la valeur doit être un nombre', 'TypeError')
+        if (value < min || value > max) this.error(`la valeur doit être comprise entre [${min} et ${max}]`, 'RangeError')
 
-        return parseInt(n, 10)
+        return parseInt(value, 10)
+    }
+
+    testBoolean(value)
+    {
+        if (value === 'f' || value === 'false') return false
+        else if (value === 't' || value === 'true') return true
+        else this.error('"t" | "true" pour vrai - "f" | "false" pour faux', 'TypeError')
     }
 
     log(msg)
@@ -65,9 +74,11 @@ export default class App
     
     error(msg, type) { throw new AppError(type ?? 'Error', msg) }
 
+    async getFps() { this.log('' + await getFps()) }
+
     effect(n)
     {
-        n = this.testDefault(n) ? .3 : this.testNumber(n, 0, 1)
+        this.testDefault(n) ? n = .3 : this.testNumber(n, 0, 1)
 
         document.querySelector(':root').style.setProperty('--effect', n)
         localStorage.setItem('effect', n)

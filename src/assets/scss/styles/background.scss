@@ -37,7 +37,7 @@
     background-blend-mode: overlay;
 }
 
-@mixin glow($gap: 0px)
+@mixin glow
 {
     &::after
     {
@@ -47,14 +47,14 @@
 
         content: '';
 
-        will-change: contents; /* glow genère des bugs sous chrome lié a l'animation / voir pour passer sous une animation javascript */
+        will-change: contents; /* glow peut générer des glitch indésirable avec la position sticky et l'animation 'scan' */
 
         top: 0;
-        left: -$gap;
+        left: 0;
 
         opacity: var(--effect);
 
-        width: calc(200% + $gap);
+        width: 200%;
 
         background:
         radial-gradient(circle, $primary 0%, transparent 40%) left / 25% 100% repeat,
@@ -69,9 +69,9 @@
     @keyframes scan
     {
         0% { transform: translateX(-50%) scaleY(.4); }
-        25% { transform: translateX(-37.5%) scaleY(1.2); }
+        25% { transform: translateX(-37.5%) scaleY(1); }
         50% { transform: translateX(-25%) scaleY(.4); }
-        75% { transform: translateX(-12.5%) scaleY(1.2); }
+        75% { transform: translateX(-12.5%) scaleY(1); }
         100% { transform: translateX(0%) scaleY(.4); }    
     }
 }

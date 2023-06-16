@@ -13,6 +13,7 @@
 
         // #SVELTE
         import { onMount } from 'svelte'
+        import { spring } from 'svelte/motion'
 
         // #MODULES
         import Home from '../modules/Home.svelte'
@@ -26,7 +27,19 @@
     // #CONSTANTES
 
     const
-    structures = [{ e1: 2, e2: 1, unit: 'vw' }, { e1: 6, e2: 2, unit: 'vh' }],
+    structures =
+    [
+        {
+            e1: 200,
+            e2: 100,
+            unit: 'vw'
+        },
+        {
+            e1: 600,
+            e2: 200,
+            unit: 'vh'
+        }
+    ],
     scrollFunc = [],
     wheelFunc = [],
     mouseMoveFunc = [],
@@ -43,6 +56,11 @@
     max,
     translateX = 0
 
+    let
+    coords = spring({ x: -7, y: -7 }, { stiffness: 0.1, damping: 0.4 }),
+    size = spring(7),
+    up = false
+
     let grabbing
 
     // #FUNCTIONS
@@ -50,8 +68,6 @@
     function set()
     {
         max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 // (140vh + 200vw) - 140vh = 200vw
-
-        // console.clear()
     }
 
     function scroll()
@@ -84,7 +100,13 @@
         {
             requestAnimationFrame(() =>
             {
-                mouseMoveFunc.forEach(func => (async () => func(e))())
+                const
+                x = e.clientX,
+                y = e.clientY
+        
+                mouseMoveFunc.forEach(func => (async () => func(x, y))())
+
+                coords.set({ x: x, y: y })
 
                 mouseFrame = false
             })
@@ -93,9 +115,20 @@
         }
     }
 
+    function mouseDown()
+    {
+        up = false
+
+        setTimeout(() => { if (!up) size.set(150)}, 200)
+    }
+
     function mouseUp()
     {
+        up = true
+
         mouseUpFunc.forEach(func => func())
+
+        size.set(7)
     }
 
     // #CYCLE
@@ -110,23 +143,25 @@ bind:this={main}
 on:scroll={scroll}
 on:wheel={wheel}
 on:mousemove={mouseMove}
+on:mousedown={mouseDown}
 on:mouseup={mouseUp}
 on:mouseleave={mouseUp}
 >
     <div
-    style:height="calc(140vh + {(structures[0].e1 + structures[0].e2 - 1) * 100 + structures[0].unit})"
+    style:height="calc(140vh + {structures[0].e1 + structures[0].e2 - 100 + structures[0].unit})"
     >
         <Wrapper
         _translateX={translateX}
         >
             <Home
-            _width={structures[0].e1 * 100 + structures[0].unit}
+            _width={structures[0].e1 + structures[0].unit}
             {_colors}
             />
 
             <Presentation
             _lock={grabbing}
-            _width={structures[0].e2 * 100 + structures[0].unit}
+            _width={structures[0].e2 + structures[0].unit}
+            _springSize={size}
             {_colors}
             bind:scroll={scrollFunc[0]}
             bind:mouseMove={mouseMoveFunc[0]}
@@ -135,13 +170,13 @@ on:mouseleave={mouseUp}
     </div>
 
     <div
-    style:height={(structures[1].e1 + structures[1].e2) * 100 + structures[1].unit}
+    style:height={structures[1].e1 + structures[1].e2 + structures[1].unit}
     >
         <Wrapper
         _background={_colors.dark}
         >
             <Competence
-            _height={structures[1].e1 * 100 + structures[1].unit}
+            _height={structures[1].e1 + structures[1].unit}
             {_colors}
             bind:grabbing={grabbing}
             bind:scroll={scrollFunc[1]}
@@ -150,12 +185,20 @@ on:mouseleave={mouseUp}
             />
 
             <Project
-            _height={structures[1].e2 * 100 + structures[1].unit}
+            _height={structures[1].e2 + structures[1].unit}
             {_colors}
             bind:wheel={wheelFunc[0]}
             />
         </Wrapper>
     </div>
+
+    <svg>
+	    <circle
+        cx={$coords.x}
+        cy={$coords.y}
+        r={$size}
+        />
+    </svg>
 </main>
 
 <!-- #STYLE -->
@@ -163,7 +206,14 @@ on:mouseleave={mouseUp}
 <style
 lang="scss"
 >
-    @import '../../assets/scss/styles/size.scss';
+    /* #IMPORTS */
+
+    @import
+    '../../assets/scss/styles/position.scss',
+    '../../assets/scss/styles/size.scss',
+    '../../assets/scss/styles/cursor.scss';
+
+    /* #GROUPS */
 
     main
     {
@@ -171,6 +221,17 @@ lang="scss"
 
         overflow-x: clip;
         overflow-y: scroll;
+
+        svg
+        {
+            @include xy-start(true);
+            @include any;
+            @include no-event;
+
+            mix-blend-mode: difference;
+
+            circle { fill: $light; }
+	    }
 
         scrollbar-width: none !important;
         &::-webkit-scrollbar

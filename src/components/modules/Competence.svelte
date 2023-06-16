@@ -11,6 +11,7 @@
         // #BINDS
         export let
         grabbing,
+        mouseMove,
         drop
 
         export function scroll()
@@ -21,8 +22,6 @@
 
             y = gap > 0 ? gap < height ? gap / height : 1 : 0
         }
-
-        export function mouseMove(e) { dieMouseMove(e) }
 
     // #IMPORTS
 
@@ -35,7 +34,6 @@
         // #ELEMENTS
         import Die from '../elements/Die.svelte'
         import Satellite from '../elements/Satellite.svelte'
-    import { space } from 'svelte/internal';
 
     // #CONSTANTES
 
@@ -84,9 +82,7 @@
     r,
     y
 
-    let
-    dieScroll,
-    dieMouseMove
+    let dieScroll
 
     // #REACTIVE
 
@@ -157,7 +153,7 @@ bind:this={competence}
         bind:grabbing={grabbing}
         bind:number={number}
         bind:scroll={dieScroll}
-        bind:mouseMove={dieMouseMove}
+        bind:mouseMove={mouseMove}
         bind:drop={drop}
         />
 
@@ -212,20 +208,12 @@ lang="scss"
 
         width: 100vw;
 
-        &>div,
-        &::before,
-        .space,
-        .space>div
-        { @include any-w; }
-
-        &>div,
-        .space>div
-        { @include f-center(true); }
-
         &
         >div
         {
+            @include f-center(true);
             @include f-column;
+            @include any-w;
             @include glow;
         }
 
@@ -241,12 +229,16 @@ lang="scss"
 
         .space
         {
+            @include any-w;
+    
             height: 400vh;
     
             &
             >div
             {
+                @include f-center(true);
                 @include sticky(true);
+                @include any-w;
     
                 transform-style: preserve-3d;
     
@@ -266,19 +258,6 @@ lang="scss"
             border-radius: 50%;
 
             box-shadow: 0 0 20px $s-light;
-        }
-
-        &::before
-        {
-            @include xy-start(true);
-
-            content: '';
-
-            z-index: 2;
-
-            height: 7%;
-
-            background: linear-gradient(0deg, transparent 0%, $dark 100%);
         }
     }
 </style>

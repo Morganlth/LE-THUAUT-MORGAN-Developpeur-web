@@ -2,13 +2,13 @@
 
 :root
 {
-    --effect: .3;
+    --effect: .5;
 }
 
 
 /* #RESET */
 
-body, h1, h2, h3, ul, p, pre
+body, h1, h2, h3, h4, ul, p, pre
 {
     margin: 0;
 }

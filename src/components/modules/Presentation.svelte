@@ -7,6 +7,7 @@
         export let
         _lock,
         _width,
+        _springSize,
         _colors
 
         // #BINDS
@@ -15,7 +16,7 @@
         mouseMove
 
     // #IMPORT
-
+   
         // #ELEMENT
         import Snake from '../elements/Snake.svelte'
 </script>
@@ -27,8 +28,9 @@ id="presentation"
 style:width={_width}
 >
     <Snake
-    {_colors}
     {_lock}
+    {_springSize}
+    {_colors}
     bind:scroll={scroll}
     bind:mouseMove={mouseMove}
     />

@@ -5,8 +5,9 @@
 
         // #PROPS
         export let
-        _colors,
-        _lock = false
+        _lock = false,
+        _springSize,
+        _colors
 
         // #BINDS
 
@@ -17,17 +18,18 @@
             move()
         }
 
-        export function mouseMove(e)
+        export function mouseMove(x, y)
         {
-
-            console.log('move')
-            clientX = e.clientX
-            clientY = e.clientY
+            clientX = x
+            clientY = y
     
             move()
         }
 
     // #IMPORTS
+
+        // #JS
+        import getFps from '../../assets/js/fps'
 
         // #APP-CONTEXT
         import { app } from './Console.svelte'
@@ -86,15 +88,34 @@
 
     let
     score = 0,
+    fps = 0,
     translateX = 100,
-    textOff,
-    snakeOff
+    textOff = false,
+    snakeOff = false,
+    fpsOn = false,
+    noneOn = false,
+    normalOn = true,
+    challengeOn = false
 
     let
     fontCharged = false,
     i = 0
 
     // #REACTIVES
+
+    $: options =
+    [
+        { link: textOff, content: 'MASQUER LE TEXTE' },
+        { link: snakeOff, content: 'MASQUER LE SERPENT' },
+        { link: fpsOn, content: 'AFFICHER LES FPS' },
+    ]
+
+    $: gameModes =
+    [
+        { link: noneOn, content: 'AUCUN' },
+        { link: normalOn, content: 'NORMAL' },
+        { link: challengeOn, content: 'CHALLENGE' }
+    ]
 
     $: xScope = x >= 0 && x < columns
     $: yScope = y >= 0 && y < rows
@@ -106,7 +127,8 @@
         const
         name_1 = 'snakeSize',
         name_2 = 'snakeTextOff',
-        name_3 = 'snakeOff'
+        name_3 = 'snakeOff',
+        name_4 = 'fpsOn'
 
         app.add(name_1, (size) =>
         {
@@ -121,24 +143,29 @@
 
         app.add(name_2, (off) =>
         {
-            if (app.testDefault(off) || off === 'f' || off === 'false') off = false
-            else if (off === 't' || off === 'true') off = true
-            else app.error('la valeur doit être "t" ou "true" pour vrai | "f" ou "false" pour faux', 'TypeError')
+            off = app.testDefault(off) ? false : app.testBoolean(off)
     
             updateText(off)
 
-            app.success(name_2 + ' ' + textOff)
+            app.success(name_2 + ' ' + off)
         }, true)
 
         app.add(name_3, (off) =>
         {
-            if (app.testDefault(off) || off === 'f' || off === 'false') off = false
-            else if (off === 't' || off === 'true') off = true
-            else app.error('la valeur doit être "t" ou "true" pour vrai | "f" ou "false" pour faux', 'TypeError')
+            off = app.testDefault(off) ? false : app.testBoolean(off)
     
             updateSnake(off)
 
-            app.success(name_3 + ' ' + snakeOff)
+            app.success(name_3 + ' ' + off)
+        }, true)
+
+        app.add(name_4, (on) =>
+        {
+            on = app.testDefault(on) ? false : app.testBoolean(on)
+    
+            updateFps(on)
+
+            app.success(name_4 + ' ' + on)
         }, true)
     }
 
@@ -154,6 +181,10 @@
     {
         textOff = localStorage.getItem('textOff') === 'true'
         snakeOff = localStorage.getItem('snakeOff') === 'true'
+        fpsOn = localStorage.getItem('fpsOn') === 'true'
+
+        if (!textOff && snakeOff) noneOn = true, normalOn = false
+        else if (textOff || snakeOff) normalOn = false
     }
 
     function reset()
@@ -174,11 +205,15 @@
         {
             fontCharged = true
 
-            tick().then(() =>
-            {
-                if (snakeOff && !textOff) view()
-            })
+            if (snakeOff && !textOff) tick().then(view)
         })
+    }
+
+    async function setFps()
+    {
+        fps = await getFps()
+
+        if (fpsOn) setFps()
     }
 
     function setCanvas()
@@ -205,7 +240,7 @@
         apple[1] = appleY
     }
 
-    function initSnake() { for (let i = 0; i < 10; i++) snake.push([x - i, y - i]) }
+    function initSnake() { for (let i = 0; i < 10; i++) snake.push([-1, -1]) }
 
     function move()
     {
@@ -217,8 +252,15 @@
         score = snake.length
 
         if (snake.length && snake[0][0] === x && snake[0][1] === y) return
+        if (!xScope || !yScope)
+        {
+            if (_springSize.null) _springSize.set(7), _springSize.null = false
+            if (challengeOn) return gameOver()
+            if (outside || check()) return
+        }
+        else if (!snakeOff) { _springSize.set(0), _springSize.null = true }
     
-        return (!xScope || !yScope) && (outside || check()) ? null : draw() 
+        draw()
     }
 
     function check()
@@ -267,6 +309,11 @@
         snake.push([])
     }
 
+    function gameOver()
+    {
+        _lock = true
+    }
+
     function clear() { context.clearRect(0, 0, width, height) }
 
     function drawApple()
@@ -300,7 +347,7 @@
             snakeX = part[0],
             snakeY = part[1]
 
-            if (!invincible && xScope && yScope && snakeX === x && snakeY === y) snake.pop()
+            if (!invincible && xScope && yScope && snakeX === x && snakeY === y) challengeOn ? gameOver() : snake.pop()
             if (snakeX === apple[0] && snakeY === apple[1]) updateGamePlan()
 
             drawSnakeBody(part, i)
@@ -372,6 +419,18 @@
             case 2:
                 updateSnake(!snakeOff)
                 break
+            case 3:
+                updateFps(!fpsOn)
+                break
+            case 4:
+                updateNone(!noneOn)
+                break
+            case 5:
+                updateNormal(!normalOn)
+                break
+            case 6:
+                updateChallenge(!challengeOn)
+                break
             default:
                 break
         }
@@ -405,6 +464,54 @@
         localStorage.setItem('snakeOff', off)
 
         if (fontCharged) off ? view() : hidden()
+    }
+
+    function updateFps(on)
+    {
+        if (on) setFps()
+
+        fpsOn = on
+
+        localStorage.setItem('fpsOn', on)
+    }
+
+    function updateNone(on)
+    {
+        if (on)
+        {
+            if (textOff) updateText(false)
+            if (!snakeOff) updateSnake(true)
+            if (normalOn) normalOn = false
+            if (challengeOn) challengeOn = false
+        }
+
+        noneOn = on
+    }
+
+    function updateNormal(on)
+    {
+        if (on)
+        {
+            if (textOff) updateText(false)
+            if (snakeOff) updateSnake(false)
+            if (noneOn) noneOn = false
+            if (challengeOn) challengeOn = false
+        }
+
+        normalOn = on
+    }
+
+    function updateChallenge(on)
+    {
+        if (on)
+        {
+            if (!textOff) updateText(true)
+            if (snakeOff) updateSnake(false)
+            if (normalOn) normalOn = false
+            if (noneOn) noneOn = false
+        }
+
+        challengeOn = on
     }
 
     function animation(draw)
@@ -506,6 +613,12 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
             SCORE {score}
         </p>
 
+        {#if fpsOn}
+            <p>
+                FPS {fps}
+            </p>
+        {/if}
+
         <Cell
         _style="border: none; cursor: pointer"
         on:click={handleClick.bind(null, 0)}
@@ -524,32 +637,51 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
         style:padding="0 {50 - offsetX}px 78px"
         on:mouseleave={leave}
         >
-            <ul>
-                <li>
-                    <Cell
-                    on:click={handleClick.bind(null, 1)}
-                    >
-                        <Toggle
-                        _check={textOff}
-                        >
-                            Masquer le texte
-                        </Toggle>
-                    </Cell>
-                </li>
+            <h4>OPTIONS</h4>
 
-                <li>
-                    <Cell
-                    on:click={handleClick.bind(null, 2)}
-                    >
-                        <Toggle
-                        _check={snakeOff}
+            <ul>
+                {#each options as option, i}
+                    <li>
+                        <Cell
+                        _style="display: block; width: 100%; border: none; cursor: pointer"
+                        on:click={handleClick.bind(null, i + 1)}
                         >
-                            Désactiver le serpent
-                        </Toggle>
-                    </Cell>
-                </li>
+                            <Toggle
+                            _check={option.link}
+                            >
+                                {option.content}
+                            </Toggle>
+                        </Cell>
+                    </li>
+                {/each}
+            </ul>
+
+            <h4>MODES DE JEU</h4>
+
+            <ul>
+                {#each gameModes as mode, i}
+                    <li>
+                        <Cell
+                        _style="display: block; width: 100%; border: none; cursor: pointer"
+                        on:click={handleClick.bind(null, i + options.length + 1)}
+                        >
+                            <Toggle
+                            _check={mode.link}
+                            >
+                                {mode.content}
+                            </Toggle>
+                        </Cell>
+                    </li>
+                {/each}
             </ul>
         </nav>
+
+            <h2
+            class="game-over"
+            >
+                GAME
+                OVER
+            </h2>
     </div>
 </div>
 
@@ -597,13 +729,17 @@ lang="scss"
             box-sizing: border-box;
             box-shadow: inset -15px -15px 15px $dark, inset 15px 15px 15px $dark;
 
-            .score { @include text-info; }
+            p { @include text-info; }
 
             nav
             {
+                @include f-center(true);
+                @include f-column;
                 @include absolute;
                 @include any-h;
                 @include black-glass(blur(3px));
+
+                gap: 30px;
 
                 top: 0;
 
@@ -616,11 +752,26 @@ lang="scss"
                 box-sizing: border-box;
             }
 
-            li
+            h4
             {
-                margin-bottom: 15px;
-    
+                @include title-4;
+                @include any-w;
+
                 text-align: right;
+            }
+
+            ul { @include any-w; }
+
+            li { margin-bottom: 20px; }
+
+            h2
+            {
+                @include absolute;
+
+                top: 50%;
+                left: 50%;
+
+                transform: translate(-50%, -50%);
             }
         }
     }

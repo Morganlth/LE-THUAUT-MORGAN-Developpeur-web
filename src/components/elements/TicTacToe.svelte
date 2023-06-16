@@ -172,6 +172,8 @@
         opacity = 0
         borderColor = result === player ? _playerColor : _defeatColor
 
+        console.log(result)
+
         setTimeout(() =>
         {
             for (let x = 0; x < gameCells.length; x++) gameCells[x] = 0

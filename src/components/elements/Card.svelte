@@ -123,7 +123,7 @@
                         context[action](x * _blockSize, y * _blockSize, _blockSize, _blockSize)
                         context[action](((even ? columns - 1 : columns) - x) * _blockSize, (rows - y - 1) * _blockSize, _blockSize, _blockSize)
                     })
-                }, delay += 16)
+                }, delay += 32)
             }
         }
 
@@ -183,6 +183,8 @@ lang="scss"
 
         padding: 10px 20px;
 
+        transition: transform .1s;
+
         &,
         canvas
         { @include xy-start(true); }
@@ -209,6 +211,7 @@ lang="scss"
             @include text-command;
 
             color: $light;
+            user-select: none;
         }
     }
 </style>

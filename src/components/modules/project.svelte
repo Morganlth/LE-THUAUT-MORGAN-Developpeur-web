@@ -42,10 +42,10 @@
 
     let
     frameId = null,
-    offsetTop,
     width,
     height,
     size,
+    offsetTop,
     last = +new Date(),
     timeout = null
 
@@ -75,10 +75,11 @@
     {
         const parent = canvas.parentNode
 
-        offsetTop = parent.offsetTop + parent.parentNode.offsetTop
         width = window.innerWidth
         height = window.innerHeight
         size = Math.sqrt(width * width + height * height)
+
+        offsetTop = parent.offsetTop + parent.parentNode.offsetTop + height
     
         initTrack()
         initCanvas()

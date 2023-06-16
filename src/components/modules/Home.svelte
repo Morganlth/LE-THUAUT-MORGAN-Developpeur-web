@@ -29,7 +29,7 @@
         const 
         element = document.getElementById(['presentation', 'competence', 'project'][this]),
         parent = element.parentNode,
-        offsetTop = parent.offsetTop + element.offsetTop,
+        offsetTop = parent.offsetTop + element.offsetTop + (this ? window.innerHeight : 0), /* competence & projet demande un peux plus de profondeur */
         offsetLeft = parent.offsetLeft + element.offsetLeft
 
         document.querySelector('main').scrollTo({ top: offsetTop + offsetLeft, behavior: this ? 'instant' : 'smooth' })
@@ -169,65 +169,26 @@ lang="scss"
 
     $width: 50%;
 
-    /* #COMMON */
-
-    .bg,
-    .content,
-    .main,
-    section,
-    ul,
-    h1,
-    h1>span,
-    .scroll-icon
-    { @include flex; }
-
-    .content,
-    section
-    { @include f-column; }
-
-    #home::before,
-    #home::after,
-    .me,
-    h1::before
-    { @include absolute; }
-
-    #home,
-    #home>div,
-    .content,
-    .manager,
-    section,
-    h1
-    { @include relative; }
-
-    .main,
-    section,
-    h1
-    { align-items: flex-end; }
-
-    #home,
-    #home>div,
-    .content
-    { box-sizing: border-box; }
-
-    .me,
-    h1
-    { @include no-event; }
-
     /* #GROUPS */
 
     #home
     {
+        @include relative;
+        @include glow;
+    
         overflow: hidden;
 
         height: 100vh;
 
-        padding: 70px 0 30px 30px;
+        padding: 70px 0 30px 20px;
+
+        box-sizing: border-box;
 
         .bg
         {
+            @include flex;
             @include xy-start(true);
             @include any;
-            @include glow(30px);
 
             div
             {
@@ -247,44 +208,37 @@ lang="scss"
         >div
         {
             @include flex;
+            @include relative;
             @include any;
 
             border-right: solid rgba($s-light, .3) 4px;
             border-bottom: solid $o-primary 4px;
-        }
+            border-left: solid $dark 8px;
 
-        &::before,
-        &::after
+            box-sizing: border-box;
+        }
+    
+        &::before
         {
+            @include absolute;
             @include any-h;
 
             content: '';
 
             top: 0;
-        }
-    
-        &::before
-        {
             right: 0%;
 
             width: 10%;
 
             background: linear-gradient(90deg, transparent 0%, $dark 50%);
         }
-        &::after
-        {
-            left: 45%;
-
-            opacity: 0.3;
-
-            width: 4px;
-
-            background-color: $secondary;
-        }
     }
 
     .content
     {
+        @include flex;
+        @include f-column;
+        @include relative;
         @include any-h;
 
         justify-content: space-between;
@@ -293,16 +247,22 @@ lang="scss"
 
         padding: 1% 0 1% 2.5%;
 
+        box-sizing: border-box;
+
         .me
         {
+            @include absolute;
             @include any-h;
+            @include no-event;
 
             bottom: 0;
             right: 0;
 
-            opacity: 0.3;
+            opacity: .3;
 
             width: 43%;
+
+            mix-blend-mode: screen;
 
             object-position: bottom;
             object-fit: cover;
@@ -317,6 +277,7 @@ lang="scss"
         }
         .scroll-icon
         {
+            @include flex;
             @include f-a-center;
 
             gap: 10px;
@@ -325,17 +286,39 @@ lang="scss"
 
     .main
     {
+        @include flex;
+        @include relative;
+
+        align-items: flex-end;
         gap: 34%;
 
+        z-index: 2;
+
         margin-bottom: 5%;
+
+        section
+        {
+            @include flex;
+            @include f-column;
+
+            align-items: flex-end;
+        }
+
+        ul { @include flex; }
 
         a { @include link; }
 
         h1
         {
+            @include flex;
             @include f-column;
+            @include relative;
+            @include no-event;
 
+            align-items: flex-end;
             gap: 20px;
+
+            opacity: .95;
 
             margin-top: 20px;
 
@@ -345,9 +328,12 @@ lang="scss"
             font-weight: 900;
             line-height: 60px;
             letter-spacing: -3px;
+            user-select: none;
 
             &::before
             {
+                @include absolute;
+    
                 content: '';
 
                 bottom: 0;
@@ -361,12 +347,20 @@ lang="scss"
             }
         }
 
-        span { gap: 5px; }
+        span
+        {
+            @include flex;
+
+            gap: 5px;
+        }
     }
 
     .manager
     {
         @include f-center(true);
+        @include relative;
+
+        z-index: 2;
 
         width: $width;
     }

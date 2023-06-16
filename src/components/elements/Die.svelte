@@ -36,19 +36,19 @@
             _pageY = pageYNow
         }
 
-        export function mouseMove(e)
+        export function mouseMove(xNow, yNow)
         {
             if (!grabbing) return
 
             const
             now = +new Date(),
-            coords = getCoords(e)
+            coords = getCoords(xNow, yNow)
 
             delay = 50
 
             if (coords)
             {
-                const [xNow, yNow] = coords
+                [xNow, yNow] = coords
 
                 vX = Math.floor(xNow - x) * force
                 vY = Math.floor(yNow - y) * force
@@ -165,11 +165,11 @@
         rotateZ %= 360
     }
 
-    function getCoords(e)
+    function getCoords(x, y)
     {
         let
-        xNow = Math.floor(e.pageX),
-        yNow =  _main.scrollTop + Math.floor(e.pageY)
+        xNow = Math.floor(x),
+        yNow =  _main.scrollTop + Math.floor(y)
 
         return (xNow < 0 || xNow > _maxX || yNow < 0 || yNow > _maxY) ? null : [xNow, yNow]
     }

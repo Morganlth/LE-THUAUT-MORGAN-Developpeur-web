@@ -12,6 +12,18 @@
     font-size: 40px;
     font-weight: 900;
     line-height: 40px;
+    user-select: none;
+}
+
+@mixin title-4($color: $light)
+{
+    @include font-primary;
+
+    color: $color;
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 28px;
+    user-select: none;
 }
 
 @mixin text-info($color: $s-light)
@@ -22,6 +34,7 @@
     font-size: 18px;
     font-weight: 900;
     letter-spacing: 1px;
+    user-select: none;
 }
 
 @mixin text-command
@@ -41,4 +54,5 @@
     font-size: 22px;
     font-weight: 900;
     text-decoration: none;
+    user-select: none;
 }

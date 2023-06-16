@@ -45,7 +45,7 @@
 
     function analyse(value)
     {
-        const values = value.match(/^(app)(?:\s(\S*))?(?:\s(.*))?$/)
+        const values = value.match(/^(app)(\s+\S*)?(\s.*)?$/)
 
         values.shift()
 
@@ -63,7 +63,7 @@
 
     function check(value)
     {
-        children[1].classList[app.keyWords.includes(value) ? 'add' : 'remove']('func-context')
+        children[1].classList[app.keyWords.includes(value.trim()) ? 'add' : 'remove']('func-context')
     }
 
     function keyEvent(e)
@@ -91,7 +91,7 @@
     function execute()
     {
         const
-        func = children[1].innerText,
+        func = children[1].innerText.trim(),
         params = children[2].innerText.trim().split(',')
     
         last = input.value
@@ -166,7 +166,7 @@ class="console"
                         <pre
                         bind:this={children[child]}
                         >
-                        </pre> &nbsp;
+                        </pre>
                     {/each}
                 </div>
             </div>

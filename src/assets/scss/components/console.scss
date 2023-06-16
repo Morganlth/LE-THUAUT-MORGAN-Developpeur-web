@@ -30,6 +30,7 @@
         color: $secondary;
         font-size: 22px;
         font-weight: 900;
+        user-select: none;
     }
 
     .line-content,
@@ -48,6 +49,8 @@
         overflow: hidden;
 
         height: 40px;
+
+        white-space: nowrap;
 
         cursor: text;
 
