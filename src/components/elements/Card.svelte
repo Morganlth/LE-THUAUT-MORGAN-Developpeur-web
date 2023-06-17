@@ -17,24 +17,18 @@
 
         export async function update(x, y, delay)
         {
-            if (timeout) { clearTimeout(timeout), callHidden = false, timeout = null }
-     
             [translateX, translateY] = getPosition(x, y)
+            z = 0
         
-            setTimeout(() =>
-            {
-                setTimeout(() => { if (!callHidden) z = 0 }, animation('clearRect'))
-            }, delay ?? 0)
+            setTimeout(() => animation('clearRect'), delay ?? 0)
         }
 
         export async function hidden()
         {
-            callHidden = true
-
             context.fillStyle = _dark
             z = -1
 
-            timeout = setTimeout(() => { callHidden = false, timeout = null }, animation('fillRect'))
+            animation('fillRect')
         }
 
     // #IMPORT
@@ -55,9 +49,7 @@
     columns,
     rows,
     context,
-    even,
-    callHidden = false,
-    timeout = null
+    even
 
     // #FUNCTIONS
 
@@ -128,8 +120,6 @@
                 }, delay += 16)
             }
         }
-
-        return delay
     }
 
     // #CYCLE
@@ -161,18 +151,15 @@ bind:this={card}
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #IMPORT */
 
-    @import
-    '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/background.scss';
+    @import '../../assets/scss/styles/position.scss';
 
-    /* #GROUPS */
+    /* #GROUP */
 
     .card
     {
         @include absolute;
-        @include black-glass(hue-rotate(180deg));
 
         display: inline-block;
 

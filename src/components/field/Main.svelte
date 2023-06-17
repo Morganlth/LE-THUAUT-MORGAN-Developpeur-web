@@ -43,6 +43,7 @@
     scrollFunc = [],
     wheelFunc = [],
     mouseMoveFunc = [],
+    mouseDownFunc = [],
     mouseUpFunc = []
 
     // #VARIABLES
@@ -115,9 +116,11 @@
         }
     }
 
-    function mouseDown()
+    function mouseDown(e)
     {
         up = false
+
+        mouseDownFunc.forEach(func => (async () => func(e))())
 
         setTimeout(() => { if (!up) size.set(150)}, 200)
     }
@@ -126,7 +129,7 @@
     {
         up = true
 
-        mouseUpFunc.forEach(func => func())
+        mouseUpFunc.forEach(func => (async () => func())())
 
         size.set(7)
     }
@@ -165,6 +168,7 @@ on:mouseleave={mouseUp}
             {_colors}
             bind:scroll={scrollFunc[0]}
             bind:mouseMove={mouseMoveFunc[0]}
+            bind:mouseDown={mouseDownFunc[0]}
             />
         </Wrapper>
     </div>
@@ -196,7 +200,7 @@ on:mouseleave={mouseUp}
 	    <circle
         cx={$coords.x}
         cy={$coords.y}
-        r={$size}
+        r={$size < 0 ? 0 : $size}
         />
     </svg>
 </main>

@@ -26,6 +26,24 @@
             move()
         }
 
+        export function mouseDown(e)
+        {
+            if (gameOver.on && e.target.classList.contains('frame'))
+            {
+                clientX = e.clientX
+                clientY = e.clientY
+    
+                update()
+                initApple()
+                moveSnake()
+                prepareSnake()
+                invincible = true
+                gameOver.change(false)
+
+                setTimeout(() => invincible = false, 500)
+            }
+        }
+
     // #IMPORTS
 
         // #JS
@@ -37,7 +55,7 @@
         // #SVELTE
         import { onMount, tick } from 'svelte'
 
-        // #ELEMENT
+        // #ELEMENTS
         import Toggle from '../elements/Toggle.svelte'
         import Card from '../elements/Card.svelte'
 
@@ -84,7 +102,9 @@
     clientX = 0,
     clientY = 0,
     x = 0,
-    y = 0
+    y = 0,
+    xScope = false,
+    yScope = false
 
     let
     score = 0,
@@ -109,9 +129,9 @@
         {
             this.on = value
 
+            if (!snakeOff) setTimeout(() => animation(!value), 100)
+
             this[value ? 'update' : 'hidden']()
-            
-            if (!snakeOff) animation(!value)
         }
     }
 
@@ -130,9 +150,6 @@
         { link: normalOn, content: 'NORMAL' },
         { link: challengeOn, content: 'CHALLENGE' }
     ]
-
-    $: xScope = x >= 0 && x < columns
-    $: yScope = y >= 0 && y < rows
 
     // #FUNCTIONS
 
@@ -260,10 +277,7 @@
     {
         if (_lock || gameOver.on) return
 
-        x = Math.floor((clientX - boundingClientRect.left) / blockSize)
-        y = Math.floor((clientY - boundingClientRect.top) / blockSize)
-
-        score = snake.length
+        update()
 
         if (snake.length && snake[0][0] === x && snake[0][1] === y) return
         if (!xScope || !yScope)
@@ -272,9 +286,20 @@
             if (challengeOn) return gameOver.change(true)
             if (outside || check()) return
         }
-        else if (!snakeOff) { _springSize.set(2), _springSize.null = true }
+        else if (!snakeOff) { _springSize.set(0), _springSize.null = true }
     
         draw()
+    }
+
+    function update()
+    {
+        x = Math.floor((clientX - boundingClientRect.left) / blockSize)
+        y = Math.floor((clientY - boundingClientRect.top) / blockSize)
+
+        xScope = x >= 0 && x < columns
+        yScope = y >= 0 && y < rows
+
+        score = snake.length
     }
 
     function check()
@@ -332,13 +357,6 @@
         appleY = apple[1] * blockSize,
         appleSize = blockSize
 
-        if (apple[0] === snake[0][0] && apple[1] === snake[0][1])
-        {
-            appleX += 3
-            appleY += 3
-            appleSize -= 6
-        }
-
         context.fillStyle = _colors.indicator
         context.fillRect(appleX, appleY, appleSize, appleSize)
     }
@@ -367,6 +385,8 @@
 
     function drawSnakeHead(x, y)
     {
+        if (x === apple[0] && y === apple[1]) updateGamePlan()
+
         snake[0] = [x, y]
     
         context.fillStyle = _colors.primary
@@ -414,7 +434,7 @@
         else return null
     }
 
-    function handleClick()
+    function btnClick()
     {
         translateX = translateX ? 0 : 100
         translateX ? (_lock = false, setTimeout(() => { invincible = false }, 100)) : (_lock = true, invincible = true)
@@ -460,7 +480,7 @@
     {
         if (e.relatedTarget.classList.contains('cell')) return
     
-        setTimeout(() => { invincible = false }, 100)
+        setTimeout(() => { invincible = false }, 200)
 
         translateX = 100
         _lock = false
@@ -551,17 +571,44 @@
             if (snakeOff) updateSnake(false)
             if (normalOn) normalOn = false
             if (noneOn) noneOn = false
-            if (gameOver.on) gameOver.change(false)
+
+            prepareSnake()
         }
+        else if (gameOver.on) gameOver.change(false)
 
         challengeOn = on
     }
 
-    function animation(draw)
+    function prepareSnake()
+    {
+        if (snake.length > 10)
+        {
+            animation(false, 10)
+            snake.length = 10
+            score = 10
+        }
+    }
+
+    function moveSnake()
+    {
+        const
+        gapX = x - snake[0][0],
+        gapY = y - snake[0][1]
+
+        for (let i = 0; i < snake.length; i++)
+        {
+            const part = snake[i]
+
+            part[0] = part[0] + gapX
+            part[1] = part[1] + gapY
+        }
+    }
+
+    function animation(draw, max = -1)
     {
         let delay = 0
 
-        for (let i = snake.length - 1; i >= -1; i--)
+        for (let i = snake.length - 1; i >= max; i--)
         {
             const part = i >= 0 ? snake[i] : apple
 
@@ -657,13 +704,13 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
                 bind:update={gameOver.update}
                 bind:hidden={gameOver.hidden}
                 >
-                    <h5>
+                    <h6>
                         &lt GAME
                         <br>
                         OVER &gt
-                    </h5>
+                    </h6>
 
-                    <p>CLICK POUR RELANCER</p>
+                    <p>CLICK POUR REJOUER</p>
                 </Card>
             </div>
         {/if}
@@ -694,7 +741,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
 
         <Cell
         _style="border: none; cursor: pointer"
-        on:click={handleClick}
+        on:click={btnClick}
         >
             <Icon
             _size="18px"
@@ -805,18 +852,9 @@ lang="scss"
 
         .game-over
         {
-            /* @include absolute;
-            
-            top: 50%;
-            left: 50%;
-
-            z-index: -1;
-
-            transform: translate(-50%, -50%); */
-
-            h5
+            h6
             {
-                @include title-2;
+                @include title($light, 90px, 77px);
 
                 margin-bottom: 10px;
                 white-space: nowrap;
@@ -824,6 +862,8 @@ lang="scss"
 
             p { text-align: center; }
         }
+
+        canvas { @include relative; }
     
         .frame
         {

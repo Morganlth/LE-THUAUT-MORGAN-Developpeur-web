@@ -13,7 +13,8 @@
         // #BINDS
         export let
         scroll,
-        mouseMove
+        mouseMove,
+        mouseDown
 
     // #IMPORT
    
@@ -33,6 +34,7 @@ style:width={_width}
     {_colors}
     bind:scroll={scroll}
     bind:mouseMove={mouseMove}
+    bind:mouseDown={mouseDown}
     />
 </div>
 
