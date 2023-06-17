@@ -101,6 +101,20 @@
     fontCharged = false,
     i = 0
 
+    let gameOver =
+    {
+        on: false
+    ,
+        change: function (value)
+        {
+            this.on = value
+
+            this[value ? 'update' : 'hidden']()
+            
+            if (!snakeOff) animation(!value)
+        }
+    }
+
     // #REACTIVES
 
     $: options =
@@ -244,7 +258,7 @@
 
     function move()
     {
-        if (_lock) return
+        if (_lock || gameOver.on) return
 
         x = Math.floor((clientX - boundingClientRect.left) / blockSize)
         y = Math.floor((clientY - boundingClientRect.top) / blockSize)
@@ -255,10 +269,10 @@
         if (!xScope || !yScope)
         {
             if (_springSize.null) _springSize.set(7), _springSize.null = false
-            if (challengeOn) return gameOver()
+            if (challengeOn) return gameOver.change(true)
             if (outside || check()) return
         }
-        else if (!snakeOff) { _springSize.set(0), _springSize.null = true }
+        else if (!snakeOff) { _springSize.set(2), _springSize.null = true }
     
         draw()
     }
@@ -309,11 +323,6 @@
         snake.push([])
     }
 
-    function gameOver()
-    {
-        _lock = true
-    }
-
     function clear() { context.clearRect(0, 0, width, height) }
 
     function drawApple()
@@ -347,7 +356,7 @@
             snakeX = part[0],
             snakeY = part[1]
 
-            if (!invincible && xScope && yScope && snakeX === x && snakeY === y) challengeOn ? gameOver() : snake.pop()
+            if (!invincible && xScope && yScope && snakeX === x && snakeY === y) challengeOn ? gameOver.change(true) : snake.pop()
             if (snakeX === apple[0] && snakeY === apple[1]) updateGamePlan()
 
             drawSnakeBody(part, i)
@@ -405,30 +414,41 @@
         else return null
     }
 
-    function handleClick(id)
+    function handleClick()
+    {
+        translateX = translateX ? 0 : 100
+        translateX ? (_lock = false, setTimeout(() => { invincible = false }, 100)) : (_lock = true, invincible = true)
+    }
+
+    function updateOption(id)
     {
         switch (id)
         {
             case 0:
-                translateX = translateX ? 0 : 100
-                translateX ? (_lock = false, setTimeout(() => { invincible = false }, 100)) : (_lock = true, invincible = true)
-                break
-            case 1:
                 updateText(!textOff)
                 break
-            case 2:
+            case 1:
                 updateSnake(!snakeOff)
                 break
-            case 3:
+            case 2:
                 updateFps(!fpsOn)
                 break
-            case 4:
+            default:
+                break
+        }
+    }
+
+    function updateMode(id)
+    {
+        switch (id)
+        {
+            case 0:
                 updateNone(!noneOn)
                 break
-            case 5:
+            case 1:
                 updateNormal(!normalOn)
                 break
-            case 6:
+            case 2:
                 updateChallenge(!challengeOn)
                 break
             default:
@@ -450,20 +470,40 @@
     {
         textOff = off
 
-        localStorage.setItem('textOff', off)
+        if (off)
+        {
+            if (fontCharged) hidden()
+            if (noneOn) noneOn = false
+            if (normalOn) normalOn = false
+        }
+        else
+        {
+            if (fontCharged) view()
+            if (challengeOn) challengeOn = false
+        }
 
-        if (fontCharged) off ? hidden() : view()
+        localStorage.setItem('textOff', off)
     }
 
     function updateSnake(off)
     {
         snakeOff = off
+    
+        if (off)
+        {
+            if (fontCharged) view()
+            if (normalOn) normalOn = false
+            if (challengeOn) challengeOn = false
+        }
+        else
+        {
+            if (fontCharged) hidden()
+            if (noneOn) noneOn = false
+        }
 
         animation(off ? false : true)
 
         localStorage.setItem('snakeOff', off)
-
-        if (fontCharged) off ? view() : hidden()
     }
 
     function updateFps(on)
@@ -483,6 +523,7 @@
             if (!snakeOff) updateSnake(true)
             if (normalOn) normalOn = false
             if (challengeOn) challengeOn = false
+            if (gameOver.on) gameOver.change(false)
         }
 
         noneOn = on
@@ -496,6 +537,7 @@
             if (snakeOff) updateSnake(false)
             if (noneOn) noneOn = false
             if (challengeOn) challengeOn = false
+            if (gameOver.on) gameOver.change(false)
         }
 
         normalOn = on
@@ -509,6 +551,7 @@
             if (snakeOff) updateSnake(false)
             if (normalOn) normalOn = false
             if (noneOn) noneOn = false
+            if (gameOver.on) gameOver.change(false)
         }
 
         challengeOn = on
@@ -540,7 +583,7 @@
         const j = i - 1
 
         cards[j < 0 ? cards.length - 1 : j].hidden()
-        cards[i++].update(lastPart[0] * blockSize, lastPart[1] * blockSize)
+        cards[i++].update(lastPart[0] * blockSize, lastPart[1] * blockSize, 100)
     }
 
     function view()
@@ -583,16 +626,46 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
         {#if fontCharged}
             {#each cards as card}
                 <Card
-                _title={card.title}
-                _content={card.content}
                 _blockSize={defaultSize}
                 _dark={_colors.dark}
                 bind:width={card.width}
                 bind:height={card.height}
                 bind:update={card.update}
                 bind:hidden={card.hidden}
-                />
+                >
+                    <h3>{card.title}</h3>
+
+                    <div
+                    class="content"
+                    >
+                        {#each card.content as text}
+                            <p>{text}</p>
+                        {/each}
+                    </div>
+                </Card>
             {/each}
+
+            <div
+            class="game-over"
+            >
+                <Card
+                _blockSize={defaultSize}
+                _start={false}
+                _dark={_colors.dark}
+                bind:width={gameOver.width}
+                bind:height={gameOver.height}
+                bind:update={gameOver.update}
+                bind:hidden={gameOver.hidden}
+                >
+                    <h5>
+                        &lt GAME
+                        <br>
+                        OVER &gt
+                    </h5>
+
+                    <p>CLICK POUR RELANCER</p>
+                </Card>
+            </div>
         {/if}
     </div>
 
@@ -621,7 +694,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
 
         <Cell
         _style="border: none; cursor: pointer"
-        on:click={handleClick.bind(null, 0)}
+        on:click={handleClick}
         >
             <Icon
             _size="18px"
@@ -644,7 +717,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
                     <li>
                         <Cell
                         _style="display: block; width: 100%; border: none; cursor: pointer"
-                        on:click={handleClick.bind(null, i + 1)}
+                        on:click={updateOption.bind(null, i)}
                         >
                             <Toggle
                             _check={option.link}
@@ -663,7 +736,7 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
                     <li>
                         <Cell
                         _style="display: block; width: 100%; border: none; cursor: pointer"
-                        on:click={handleClick.bind(null, i + options.length + 1)}
+                        on:click={updateMode.bind(null, i)}
                         >
                             <Toggle
                             _check={mode.link}
@@ -675,13 +748,6 @@ style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
                 {/each}
             </ul>
         </nav>
-
-            <h2
-            class="game-over"
-            >
-                GAME
-                OVER
-            </h2>
     </div>
 </div>
 
@@ -709,6 +775,56 @@ lang="scss"
         
         z-index: 1;
 
+        .card-container
+        {
+            h3
+            {
+                @include title-3($o-primary);
+
+                padding-right: 30px;
+
+                white-space: nowrap;
+            }
+
+            .content
+            {
+                margin: 10px 0 0 30px;
+                padding: 10px 0 0 30px;
+
+                border-top: solid 1px $o-primary;
+            }
+
+            p
+            {
+                @include text-command;
+
+                color: $light;
+                user-select: none;
+            }
+        }
+
+        .game-over
+        {
+            /* @include absolute;
+            
+            top: 50%;
+            left: 50%;
+
+            z-index: -1;
+
+            transform: translate(-50%, -50%); */
+
+            h5
+            {
+                @include title-2;
+
+                margin-bottom: 10px;
+                white-space: nowrap;
+            }
+
+            p { text-align: center; }
+        }
+    
         .frame
         {
             &,
@@ -763,16 +879,6 @@ lang="scss"
             ul { @include any-w; }
 
             li { margin-bottom: 20px; }
-
-            h2
-            {
-                @include absolute;
-
-                top: 50%;
-                left: 50%;
-
-                transform: translate(-50%, -50%);
-            }
         }
     }
 </style>

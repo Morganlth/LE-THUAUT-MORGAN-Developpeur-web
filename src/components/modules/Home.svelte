@@ -313,6 +313,7 @@ lang="scss"
             @include flex;
             @include f-column;
             @include relative;
+            @include title-1;
             @include no-event;
 
             align-items: flex-end;
@@ -321,14 +322,6 @@ lang="scss"
             opacity: .95;
 
             margin-top: 20px;
-
-            color: $light;
-            font-family: 'Montserrat';
-            font-size: 86px;
-            font-weight: 900;
-            line-height: 60px;
-            letter-spacing: -3px;
-            user-select: none;
 
             &::before
             {

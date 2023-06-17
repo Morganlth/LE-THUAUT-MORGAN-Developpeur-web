@@ -143,7 +143,7 @@ class="console"
             <div
             class="line-indicator"
             >
-                >
+                &gt
             </div>
 
             <div

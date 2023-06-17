@@ -5,9 +5,8 @@
 
         // #PROPS
         export let
-        _title,
-        _content = [],
         _blockSize = 0,
+        _start = true,
         _dark
 
         // #BINDS
@@ -16,13 +15,16 @@
         width = 0,
         height = 0
 
-        export async function update(x, y)
+        export async function update(x, y, delay)
         {
             if (timeout) { clearTimeout(timeout), callHidden = false, timeout = null }
-    
+     
             [translateX, translateY] = getPosition(x, y)
         
-            setTimeout(() => { if (!callHidden) z = 0 }, animation('clearRect'))
+            setTimeout(() =>
+            {
+                setTimeout(() => { if (!callHidden) z = 0 }, animation('clearRect'))
+            }, delay ?? 0)
         }
 
         export async function hidden()
@@ -123,7 +125,7 @@
                         context[action](x * _blockSize, y * _blockSize, _blockSize, _blockSize)
                         context[action](((even ? columns - 1 : columns) - x) * _blockSize, (rows - y - 1) * _blockSize, _blockSize, _blockSize)
                     })
-                }, delay += 32)
+                }, delay += 16)
             }
         }
 
@@ -140,18 +142,11 @@
 <section
 class="card"
 style:z-index={z}
-style:transform="translate({translateX}px, {translateY}px)"
+style:transform="translate({_start ? `${translateX}px, ${translateY}px` : '-50%, -50%'})"
+style={_start ? 'top: 0; left: 0' : 'top: 50%; left: 50%'}
 bind:this={card}
 >
-    <h3>{_title}</h3>
-
-    <div
-    class="content"
-    >
-        {#each _content as text}
-            <p>{text}</p>
-        {/each}
-    </div>
+    <slot />
 
     <canvas
     style:width="{width}px"
@@ -170,13 +165,13 @@ lang="scss"
 
     @import
     '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/background.scss',
-    '../../assets/scss/styles/font.scss';
+    '../../assets/scss/styles/background.scss';
 
     /* #GROUPS */
 
     .card
     {
+        @include absolute;
         @include black-glass(hue-rotate(180deg));
 
         display: inline-block;
@@ -185,33 +180,6 @@ lang="scss"
 
         transition: transform .1s;
 
-        &,
-        canvas
-        { @include xy-start(true); }
-    
-        h3
-        {
-            @include title-3($o-primary);
-
-            padding-right: 30px;
-
-            white-space: nowrap;
-        }
-
-        .content
-        {
-            margin: 10px 0 0 30px;
-            padding: 10px 0 0 30px;
-
-            border-top: solid 1px $o-primary;
-        }
-
-        p
-        {
-            @include text-command;
-
-            color: $light;
-            user-select: none;
-        }
+        canvas { @include xy-start(true); }
     }
 </style>
