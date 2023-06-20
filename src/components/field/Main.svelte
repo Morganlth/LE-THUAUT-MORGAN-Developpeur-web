@@ -1,33 +1,51 @@
 <!-- #SCRIPT -->
+<script
+context="module"
+>
+    // #EXPORTS
+
+        // --MODULES
+        export let
+        app = new App(),
+        event = new EventManager(),
+        spring = new SpringManager()
+
+    // #IMPORT
+
+        // --JS
+        import App from '../../assets/js/appManager'
+        import EventManager from '../../assets/js/eventManager'
+        import SpringManager from '../../assets/js/springManager'
+</script>
 
 <script>
-    // #EXPORT
+    // #EXPORTS
 
-        // #PROP
-        export let _colors
+        // --PROPS
+        export let
+        _colors,
+        _page
 
     // #IMPORTS
 
-        // #SCSS
+        // --SCSS
         import '../../assets/scss/components/main.scss'
 
-        // #SVELTE
+        // --SVELTE
         import { onMount } from 'svelte'
-        import { spring } from 'svelte/motion'
 
-        // #MODULES
+        // --COMPONENT-MODULES
         import Home from '../modules/Home.svelte'
         import Presentation from '../modules/Presentation.svelte'
         import Competence from '../modules/Competence.svelte'
         import Project from '../modules/project.svelte'
 
-        // #COVER
+        // --COMPONENT-COVER
         import Wrapper from '../covers/Wrapper.svelte'
 
-    // #CONSTANTES
+    // #CONSTANTE
 
-    const
-    structures =
+    const structures =
     [
         {
             e1: 200,
@@ -39,100 +57,83 @@
             e2: 200,
             unit: 'vh'
         }
-    ],
-    scrollFunc = [],
-    wheelFunc = [],
-    mouseMoveFunc = [],
-    mouseDownFunc = [],
-    mouseUpFunc = []
+    ]
 
     // #VARIABLES
 
-    let
-    main,
-    scrollFrame = false,
-    mouseFrame = false
+        // --THIS
+        let main
 
-    let
-    max,
-    translateX = 0
+        // --ELEMENT-WRAPPER-1
+        let
+        max,
+        translateX = 0
 
-    let
-    coords = spring({ x: -7, y: -7 }, { stiffness: 0.1, damping: 0.4 }),
-    size = spring(7),
-    up = false
-
-    let grabbing
+        // --ELEMENT-SPRING
+        let
+        coords = spring.coords,
+        size = spring.size
 
     // #FUNCTIONS
 
-    function set()
-    {
-        max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 // (140vh + 200vw) - 140vh = 200vw
-    }
-
-    function scroll()
-    {
-        if (!scrollFrame)
+        // --CYCLE
+        function set()
         {
-            requestAnimationFrame(() =>
-            {
-                const scrollTop = main.scrollTop
+            max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 // (140vh + 200vw) - 140vh = 200vw
+
+            setEvent()
+            setPage()
+        }
+
+        // --SET
+        function setEvent()
+        {
+            event.add('scroll', scroll)
     
-                translateX = - (scrollTop < max ? scrollTop : max)
-
-                scrollFunc.forEach(func => (async () => func())())
-
-                scrollFrame = false
-            })
-
-            scrollFrame = true
+            event.add('mouseMove', spring.spring_mouseMove.bind(spring))
+            event.add('mouseDown', spring.spring_mouseDown.bind(spring))
+            event.add('mouseUp', spring.spring_mouseUp.bind(spring))
         }
-    }
 
-    function wheel(e)
-    {
-        wheelFunc.forEach(func => (async () => func(e))())
-    }
-
-    function mouseMove(e)
-    {
-        if (!mouseFrame)
+        function setPage()
         {
-            requestAnimationFrame(() =>
+            if (_page !== -1)
             {
-                const
-                x = e.clientX,
-                y = e.clientY
-        
-                mouseMoveFunc.forEach(func => (async () => func(x, y))())
+                const 
+                element = document.getElementById(['presentation', 'competence', 'project'][_page]),
+                parent = element.parentNode,
+                offsetTop = parent.offsetTop + element.offsetTop + (_page ? window.innerHeight : 0), /* competence & projet demande un peux plus de profondeur */
+                offsetLeft = parent.offsetLeft + element.offsetLeft
 
-                coords.set({ x: x, y: y })
+                main.scrollTo({ top: offsetTop + offsetLeft, behavior: 'instant' })
 
-                mouseFrame = false
-            })
-
-            mouseFrame = true
+                sideEffects()
+            }
         }
-    }
 
-    function mouseDown(e)
-    {
-        up = false
+        // --EVENT
+        async function scroll()
+        {
+            const scrollTop = main.scrollTop
+            
+            translateX = - (scrollTop < max ? scrollTop : max)
+        }
 
-        mouseDownFunc.forEach(func => (async () => func(e))())
-
-        setTimeout(() => { if (!up) size.set(150)}, 200)
-    }
-
-    function mouseUp()
-    {
-        up = true
-
-        mouseUpFunc.forEach(func => (async () => func())())
-
-        size.set(7)
-    }
+        // --CODE-PAGE
+        function sideEffects()
+        {
+            switch (_page)
+            {
+                case 0:
+                    setTimeout(event.scroll.bind(event), 100) /* appel de scroll pour set les positions dans le snake */
+                    break
+                case 2:
+                    event.wheel({ deltaY: true, currentTarget: main }) /* event artificiel */
+                    break
+                default:
+                    break
+            }
+        }
 
     // #CYCLE
 
@@ -143,12 +144,12 @@
 
 <main
 bind:this={main}
-on:scroll={scroll}
-on:wheel={wheel}
-on:mousemove={mouseMove}
-on:mousedown={mouseDown}
-on:mouseup={mouseUp}
-on:mouseleave={mouseUp}
+on:scroll={event.scroll.bind(event)}
+on:wheel={event.wheel.bind(event)}
+on:mousemove={event.mouseMove.bind(event)}
+on:mousedown={event.mouseDown.bind(event)}
+on:mouseup={event.mouseUp.bind(event)}
+on:mouseleave={event.mouseUp.bind(event)}
 >
     <div
     style:height="calc(140vh + {structures[0].e1 + structures[0].e2 - 100 + structures[0].unit})"
@@ -162,13 +163,8 @@ on:mouseleave={mouseUp}
             />
 
             <Presentation
-            _lock={grabbing}
             _width={structures[0].e2 + structures[0].unit}
-            _springSize={size}
             {_colors}
-            bind:scroll={scrollFunc[0]}
-            bind:mouseMove={mouseMoveFunc[0]}
-            bind:mouseDown={mouseDownFunc[0]}
             />
         </Wrapper>
     </div>
@@ -182,21 +178,18 @@ on:mouseleave={mouseUp}
             <Competence
             _height={structures[1].e1 + structures[1].unit}
             {_colors}
-            bind:grabbing={grabbing}
-            bind:scroll={scrollFunc[1]}
-            bind:mouseMove={mouseMoveFunc[1]}
-            bind:drop={mouseUpFunc[0]}
             />
 
             <Project
             _height={structures[1].e2 + structures[1].unit}
             {_colors}
-            bind:wheel={wheelFunc[0]}
             />
         </Wrapper>
     </div>
 
-    <svg>
+    <svg
+    class="spring"
+    >
 	    <circle
         cx={$coords.x}
         cy={$coords.y}
@@ -226,7 +219,7 @@ lang="scss"
         overflow-x: clip;
         overflow-y: scroll;
 
-        svg
+        .spring
         {
             @include xy-start(true);
             @include any;

@@ -3,22 +3,14 @@
 <script>
     // #EXPORTS
 
-        // #PROPS
+        // --PROPS
         export let
-        _lock,
         _width,
-        _springSize,
         _colors
-
-        // #BINDS
-        export let
-        scroll,
-        mouseMove,
-        mouseDown
 
     // #IMPORT
    
-        // #ELEMENT
+        // --COMPONENT-ELEMENT
         import Snake from '../elements/Snake.svelte'
 </script>
 
@@ -29,12 +21,7 @@ id="presentation"
 style:width={_width}
 >
     <Snake
-    {_lock}
-    {_springSize}
     {_colors}
-    bind:scroll={scroll}
-    bind:mouseMove={mouseMove}
-    bind:mouseDown={mouseDown}
     />
 </div>
 

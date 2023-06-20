@@ -1,16 +1,14 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORTS
+    // #EXPORT
     
-        // #PROPS
-        export let
-        _data = {},
-        _style = 'border: none'
+        // --PROP
+        export let _style = 'border: none'
 
     // #IMPORT
 
-        // #SVELTE-DEPENDENCE
+        // --SVELTE
         import { createEventDispatcher } from 'svelte'
 
     // #CONSTANTE
@@ -19,7 +17,8 @@
 
     // #FUNCTION
 
-    function handleClick(cE) { dispatch('click', { event: cE }) }
+        // --EVENT
+        function click(e) { dispatch('click', { event: e }) }
 </script>
 
 <!-- #HTML -->
@@ -27,9 +26,8 @@
 <button
 type="button"
 class="cell"
-{..._data}
 style={_style}
-on:click={handleClick}
+on:click={click}
 >
     <slot />
 </button>
@@ -41,8 +39,6 @@ on:click={handleClick}
     {
         background-color: transparent;
 
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
+        font: inherit;
     }
 </style>

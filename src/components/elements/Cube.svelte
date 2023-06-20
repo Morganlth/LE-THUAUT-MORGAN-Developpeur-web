@@ -9,6 +9,7 @@
         _translateX = 0,
         _translateZ = 0,
         _rotateY = 0,
+        _content = ['', ''],
         _color = '#FFF'
 </script>
 
@@ -23,6 +24,8 @@ style:transform="perspective({_perspective}px) translateX({_translateX}px) trans
         class="side"
         style:border-color={_color}
         >
+            {_content[0]} <br>
+            {_content[1]}
         </div>
     {/each}
 </div>
@@ -32,14 +35,20 @@ style:transform="perspective({_perspective}px) translateX({_translateX}px) trans
 <style
 lang="scss"
 >
-    /* #IMPORT */
+    /* #IMPORTS */
 
-    @import '../../assets/scss/styles/size.scss';
+    @import
+    '../../assets/scss/styles/flex.scss',
+    '../../assets/scss/styles/size.scss',
+    '../../assets/scss/styles/font.scss',
+    '../../assets/scss/styles/cursor.scss';
 
     /* #GROUPS */
 
     .cube
     {
+        @include pointer;
+    
         width: 250px;
         height: 250px;
 
@@ -48,13 +57,20 @@ lang="scss"
 
         .side
         {
+            @include f-center(true);
             @include any;
+            @include font-command;
 
             background-color: $dark;
 
-            border: solid 4px;
+            border: solid 8px;
 
             box-sizing: border-box;
+
+            color: $light;
+            font-size: 36px;
+            text-align: center;
+            user-select: none;
         }
         .side:nth-child(1)
         {
@@ -66,7 +82,7 @@ lang="scss"
         }
         .side:nth-child(3)
         {
-            transform: translate(-50%, -200%) rotateY(90deg);
+            transform: translate(-50%, -200%) rotateY(90deg) scaleX(-1);
         }
         .side:nth-child(4)
         {

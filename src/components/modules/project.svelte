@@ -8,23 +8,10 @@
         _height,
         _colors
 
-        //#BIND
-        export function wheel(e)
-        {
-            const
-            deltaY = e.deltaY,
-            scrollTop = e.currentTarget.scrollTop
-
-            if (scrollTop >= offsetTop - size)
-            {
-                if (!frameId) animate()
-
-                if (deltaY > 0 && scrollTop >= offsetTop) move()
-            }
-            else destroy()
-        }
-
     // #IMPORTS
+
+        // #CONTEXT
+        import { event } from '../field/Main.svelte'
 
         // #SVELTE
         import { onMount } from 'svelte'
@@ -83,6 +70,25 @@
     
         initTrack()
         initCanvas()
+        setEvent()
+    }
+
+    function setEvent()
+    {
+        event.add('wheel', project_wheel)
+    }
+
+    async function project_wheel(target, deltaY)
+    {
+        const scrollTop = target.scrollTop
+
+        if (scrollTop >= offsetTop - size)
+        {
+            if (!frameId) animate()
+
+            if (deltaY > 0 && scrollTop >= offsetTop) move()
+        }
+        else destroy()
     }
 
     function destroy()

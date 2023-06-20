@@ -1,27 +1,14 @@
-// #IMPORTS
-
-import AppSuccess from './success'
-import AppError from './error'
-
-import getFps from './fps'
-
-// #APP CLASS
+// #APP-MANAGER
 
 export default class App
 {
+    // --VARIABLES
     keyWords = ['log', 'clear', 'reset', 'success', 'error', 'getFps', 'effect']
     storageKeys = ['effect']
 
-    constructor(cmd) { this.cmd = cmd }
+    cmd = null
 
-    add(name, command, storage)
-    {
-        if (!this.keyWords.includes(name)) this.keyWords.push(name)
-        if (storage && !this.storageKeys.includes(name)) this.storageKeys.push(name)
-
-        this[name] = command
-    }
-
+    // --TEST
     testDefault(value) { return value === 'd' || value === 'default' }
 
     testNumber(value, min, max)
@@ -39,6 +26,22 @@ export default class App
         else this.error('"t" | "true" pour vrai - "f" | "false" pour faux', 'TypeError')
     }
 
+    // --CYCLE
+    clear()
+    {
+        const children = [...this.cmd.children]
+
+        for (let i = children.length - 2; i >= 0; i--) this.cmd.removeChild(children[i])
+    }
+
+    reset(view)
+    {
+        for (const key of this.storageKeys) this[key]('d')
+
+        if (!view) this.clear()
+    }
+
+    // --MANAGEMENT
     log(msg)
     {
         const type = msg instanceof Error ? msg instanceof AppSuccess ? 'success' : 'error' : null
@@ -56,26 +59,11 @@ export default class App
         `)
     }
 
-    clear()
-    {
-        const children = [...this.cmd.children]
-
-        for (let i = children.length - 2; i >= 0; i--) this.cmd.removeChild(children[i])
-    }
-
-    reset(view)
-    {
-        for (const key of this.storageKeys) this[key]('d')
-
-        if (!view) this.clear()
-    }
-
     success(msg) { this.log(new AppSuccess(msg)) }
     
     error(msg, type) { throw new AppError(type ?? 'Error', msg) }
 
-    async getFps() { this.log('' + await getFps()) }
-
+    // --SET
     effect(n)
     {
         this.testDefault(n) ? n = .3 : this.testNumber(n, 0, 1)
@@ -85,4 +73,23 @@ export default class App
     
         this.success('effet ' + n)
     }
+
+    // --GET
+    async getFps() { this.log('' + await getFps()) }
+
+    // --CODE
+    add(name, command, storage)
+    {
+        if (!this.keyWords.includes(name)) this.keyWords.push(name)
+        if (storage && !this.storageKeys.includes(name)) this.storageKeys.push(name)
+
+        this[name] = command
+    }
 }
+
+// #IMPORTS
+
+import AppSuccess from './success'
+import AppError from './error'
+
+import getFps from './fps'

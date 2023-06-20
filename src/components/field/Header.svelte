@@ -3,15 +3,15 @@
 <script>
     // #EXPORT
 
-        // #PROP
+        // --PROP
         export let _iconColor = '#FFF'
 
     // #IMPORT
 
-        // #COVER
+        // --COMPONENT-COVER
         import Icon from '../covers/Icon.svelte'
 
-        // ICONS
+        // --COMPONENT-ICONS
         import Logo from '../icons/Logo.svelte'
         import LinkedIn from '../icons/LinkedIn.svelte'
 </script>
@@ -19,7 +19,9 @@
 <!-- #HTML -->
 
 <header>
-    <div>
+    <div
+    data-sveltekit-reload
+    >
         <Icon
         _size="30px"
         _href="./"
@@ -51,12 +53,16 @@
 <style
 lang="scss"
 >
+    /* #IMPORTS */
+
     @import
     '../../assets/scss/styles/flex.scss',
     '../../assets/scss/styles/position.scss',
     '../../assets/scss/styles/size.scss',
     '../../assets/scss/styles/font.scss',
     '../../assets/scss/styles/cursor.scss';
+
+    /* #GROUPS */
 
     header
     {

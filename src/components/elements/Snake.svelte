@@ -1,56 +1,20 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORTS
+    // #EXPORT
 
-        // #PROPS
-        export let
-        _lock = false,
-        _springSize,
-        _colors
-
-        // #BINDS
-
-        export function scroll()
-        {
-            boundingClientRect = canvas.getBoundingClientRect()
-
-            move()
-        }
-
-        export function mouseMove(x, y)
-        {
-            clientX = x
-            clientY = y
-    
-            move()
-        }
-
-        export function mouseDown(e)
-        {
-            if (gameOver.on && e.target.classList.contains('frame'))
-            {
-                clientX = e.clientX
-                clientY = e.clientY
-    
-                update()
-                initApple()
-                moveSnake()
-                prepareSnake()
-                invincible = true
-                gameOver.change(false)
-
-                setTimeout(() => invincible = false, 500)
-            }
-        }
+        // #PROP
+        export let _colors
 
     // #IMPORTS
 
         // #JS
         import getFps from '../../assets/js/fps'
 
-        // #APP-CONTEXT
-        import { app } from './Console.svelte'
+        // #CONTEXTS
+        import { app } from '../field/Main.svelte'
+        import { event } from '../field/Main.svelte'
+        import { spring } from '../field/Main.svelte'
 
         // #SVELTE
         import { onMount, tick } from 'svelte'
@@ -90,6 +54,7 @@
     offsetY = 0,
     width,
     height,
+    lock = false,
     outside = true,
     invincible = false
 
@@ -101,8 +66,8 @@
     boundingClientRect,
     clientX = 0,
     clientY = 0,
-    x = 0,
-    y = 0,
+    x = -1,
+    y = -1,
     xScope = false,
     yScope = false
 
@@ -206,6 +171,7 @@
         restore()
         reset()
         initSnake()
+        setEvent()
     }
 
     function restore()
@@ -259,6 +225,46 @@
         boundingClientRect = canvas.getBoundingClientRect()
     }
 
+    function setEvent()
+    {
+        event.add('scroll', snake_scroll)
+        event.add('mouseMove', snake_mouseMove)
+        event.add('mouseDown', snake_mouseDown)
+    }
+
+    async function snake_scroll()
+    {
+        boundingClientRect = canvas.getBoundingClientRect()
+
+        move()
+    }
+
+    async function snake_mouseMove(x, y)
+    {
+        clientX = x
+        clientY = y
+
+        move()
+    }
+
+    async function snake_mouseDown(e)
+    {
+        if (gameOver.on && e.target.classList.contains('frame'))
+        {
+            clientX = e.clientX
+            clientY = e.clientY
+
+            update()
+            initApple()
+            moveSnake()
+            prepareSnake()
+            invincible = true
+            gameOver.change(false)
+
+            setTimeout(() => invincible = false, 500)
+        }
+    }
+
     function initApple()
     {
         const
@@ -275,18 +281,21 @@
 
     function move()
     {
-        if (_lock || gameOver.on) return
+        if (lock || event.grabbing || gameOver.on) return
 
         update()
 
         if (snake.length && snake[0][0] === x && snake[0][1] === y) return
         if (!xScope || !yScope)
         {
-            if (_springSize.null) _springSize.set(7), _springSize.null = false
             if (challengeOn) return gameOver.change(true)
             if (outside || check()) return
         }
-        else if (!snakeOff) { _springSize.set(0), _springSize.null = true }
+        else
+        {
+            if (snakeOff) { if (spring.lock) spring.spring_mouseLeave() }
+            else if (!spring.lock) spring.spring_mouseEnter()
+        }
     
         draw()
     }
@@ -437,7 +446,7 @@
     function btnClick()
     {
         translateX = translateX ? 0 : 100
-        translateX ? (_lock = false, setTimeout(() => { invincible = false }, 100)) : (_lock = true, invincible = true)
+        translateX ? (lock = false, setTimeout(() => { invincible = false }, 100)) : (lock = true, invincible = true)
     }
 
     function updateOption(id)
@@ -483,7 +492,7 @@
         setTimeout(() => { invincible = false }, 200)
 
         translateX = 100
-        _lock = false
+        lock = false
     }
 
     function updateText(off)
@@ -666,6 +675,7 @@
 class="snake-game"
 style:height="{height}px"
 style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
+on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 >
     <div
     class="card-container"

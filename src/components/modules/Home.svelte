@@ -3,37 +3,24 @@
 <script>
     // #EXPORTS
 
-        // #PROPS
+        // --PROPS
         export let
         _width,
         _colors
 
     // #IMPORTS
 
-        // #ELEMENTS
+        // --COMPONENT-ELEMENTS
         import TicTacToe from '../elements/TicTacToe.svelte'
         import Console from '../elements/Console.svelte'
 
-        // #COVER
+        // --COMPONENT-COVER
         import Icon from '../covers/Icon.svelte'
 
-        // ICONS
+        // --COMPONENT-ICONS
         import E from '../icons/E.svelte'
         import Logo from '../icons/Logo.svelte'
         import Mouse from '../icons/Mouse.svelte'
-
-    // #FUNCTION
-
-    function linkClick()
-    {
-        const 
-        element = document.getElementById(['presentation', 'competence', 'project'][this]),
-        parent = element.parentNode,
-        offsetTop = parent.offsetTop + element.offsetTop + (this ? window.innerHeight : 0), /* competence & projet demande un peux plus de profondeur */
-        offsetLeft = parent.offsetLeft + element.offsetLeft
-
-        document.querySelector('main').scrollTo({ top: offsetTop + offsetLeft, behavior: this ? 'instant' : 'smooth' })
-    }
 </script>
 
 <!-- #HTML -->
@@ -74,8 +61,8 @@ style:width={_width}
                             {#each ['presentation', 'competences', 'projets'] as section, i}
                                 <li>
                                     <a
-                                    href="#{section}"
-                                    on:click|preventDefault={linkClick.bind(i)}
+                                    href="./{['presentation', 'competence', 'project'][i]}"
+                                    alt="LE THUAUT Morgan - {section}"
                                     >
                                     &nbsp; #{section}
                                     </a>
@@ -119,10 +106,7 @@ style:width={_width}
                 </section>
 
                 <TicTacToe
-                _defaultColor={_colors.sLight}
-                _defeatColor={_colors.dark}
-                _playerColor={_colors.primary}
-                _aiColor={_colors.secondary}
+                {_colors}
                 />
             </div>
 

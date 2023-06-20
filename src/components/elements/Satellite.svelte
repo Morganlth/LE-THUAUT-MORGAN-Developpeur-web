@@ -9,6 +9,7 @@
         _offset = 0,
         _r = 0,
         _y = 0,
+        _content,
         _color
 
     // #IMPORT
@@ -35,6 +36,7 @@
 
         translateX = _r * Math.cos(angle)
         translateZ = _r * Math.sin(angle)
+
         rotateY = angle
     }
 </script>
@@ -50,6 +52,7 @@ style:transform="rotate({_rotate}deg)"
     _translateX={translateX}
     _translateZ={translateZ}
     _rotateY={rotateY}
+    {_content}
     {_color}
     />
 </div>

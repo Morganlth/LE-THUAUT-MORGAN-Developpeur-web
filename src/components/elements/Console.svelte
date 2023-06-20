@@ -1,23 +1,19 @@
 <!-- #SCRIPT -->
 
-<script context="module">
-    // #EXPORT
-
-        // #MODULE
-        export let app
-</script>
-
 <script>
     // #IMPORTS
 
-        // #SCSS
+        // --SCSS
         import '../../assets/scss/components/console.scss'
 
-        // #JS
-        import App from '../../assets/js/app'
+        // --CONTEXT
+        import { app } from '../field/Main.svelte'
+        import { spring } from '../field/Main.svelte'
+
+        // --JS
         import AppError from '../../assets/js/error'
 
-        // #SVELTE
+        // --SVELTE
         import { onMount } from 'svelte'
 
     // #CONSTANTE
@@ -26,96 +22,114 @@
 
     // #VARIABLES
 
-    let
-    cmd,
-    input,
-    mirror,
-    last = 'app'
+        // --THIS
+        let
+        cmd,
+        input,
+        mirror,
+        value
+
+        // --MEMORY
+        let
+        history = ['app'],
+        i = 0
 
     // #FUNCTIONS
 
-    function set() { app = new App(cmd) }
+        // --CYCLES
+        function set() { app.cmd = cmd }
 
-    function writingEvent()
-    {
-        const value = input.value
-
-        ;(value.length === 3 || value[3] === ' ') && value.substring(0, 3) === 'app' ? analyse(value) : update('remove', [value])
-    }
-
-    function analyse(value)
-    {
-        const values = value.match(/^(app)(\s+\S*)?(\s.*)?$/)
-
-        values.shift()
-
-        if (values[1]) check(values[1])
-
-        update('add', values)
-    }
-
-    function update(action, values = [])
-    {
-        children[0].classList[action]('app-context')
-
-        for (let i = 0; i < children.length; i++) children[i].innerText = values[i] ?? ''
-    }
-
-    function check(value)
-    {
-        children[1].classList[app.keyWords.includes(value.trim()) ? 'add' : 'remove']('func-context')
-    }
-
-    function keyEvent(e)
-    {
-        const key = e.key
-
-        switch (key)
+        function reset()
         {
-            case 'Enter':
-                if (children[0].innerText === 'app') execute()
-                break
-            case 'ArrowUp':
-                const length = last.length
-
-                input.value = last
-                input.focus()
-                input.setSelectionRange(length, length)
-                writingEvent()
-
-                break
-            default: break
+            update('remove')
+            value = ''
+            cmd.scrollTop = cmd.scrollHeight - cmd.offsetHeight
         }
-    }
 
-    function execute()
-    {
-        const
-        func = children[1].innerText.trim(),
-        params = children[2].innerText.trim().split(',')
-    
-        last = input.value
-
-        try
+        function restore()
         {
-            app[func](...params)
+            const
+            command = history[i],
+            length = command.length
 
-            reset()
+            value = command
+            input.focus()
+            input.setSelectionRange(length, length)
+            writingEvent()
         }
-        catch (e)
+
+        function update(action, values = [])
         {
-            const err = e instanceof AppError ? e : new AppError('TypeError', `"${func}" n'est pas une fonction valide`)
-            
-            app.log(err)
-        }
-    }
+            children[0].classList[action]('app-context')
 
-    function reset()
-    {
-        update('remove')
-        input.value = ''
-        cmd.scrollTop = cmd.scrollHeight - cmd.offsetHeight
-    }
+            for (let i = 0; i < children.length; i++) children[i].innerText = values[i] ?? ''
+        }
+
+        // --EVENTS
+        function writingEvent()
+        {
+            (value.length === 3 || value[3] === ' ') && value.substring(0, 3) === 'app'
+            ? analyse(value)
+            : update('remove', [value])
+        }
+
+        function keyEvent(e)
+        {
+            const key = e.key
+
+            switch (key)
+            {
+                case 'Enter':
+                    if (children[0].innerText === 'app') execute()
+                    break
+                case 'ArrowUp':
+                    if (--i < 0) i = 0
+                    restore()
+                    break
+                case 'ArrowDown':
+                    if (++i >= history.length) i = history.length-1
+                    restore()
+                    break
+                default: break
+            }
+        }
+
+        // --COMMAND-CODE
+        function analyse(value)
+        {
+            const values = value.match(/^(app)(\s+\S*)?(\s.*)?$/)
+
+            values.shift()
+
+            if (values[1]) check(values[1])
+
+            update('add', values)
+        }
+
+        function check(value) { children[1].classList[app.keyWords.includes(value.trim()) ? 'add' : 'remove']('func-context') }
+
+        function execute()
+        {
+            const
+            func = children[1].innerText.trim(),
+            params = children[2].innerText.trim().split(',')
+
+            history.push(value)
+            i = history.length
+
+            try
+            {
+                app[func](...params)
+
+                reset()
+            }
+            catch (e)
+            {
+                const err = e instanceof AppError ? e : new AppError('TypeError', `"${func}" n'est pas une fonction valide`)
+                
+                app.log(err)
+            }
+        }
 
     // #CYCLE
 
@@ -126,6 +140,8 @@
 
 <section
 class="console"
+on:mouseenter={spring.spring_mouseEnter.bind(spring)}
+on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 >
     <div>
         <h3>Console</h3>
@@ -154,8 +170,9 @@ class="console"
                 maxlength="59"
                 spellcheck="false"
                 bind:this={input}
+                bind:value={value}
                 on:input={writingEvent}
-                on:keyup={keyEvent}
+                on:keyup|preventDefault={keyEvent}
                 />
 
                 <div

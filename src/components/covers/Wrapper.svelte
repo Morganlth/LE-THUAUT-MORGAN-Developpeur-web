@@ -3,10 +3,9 @@
 <script>
     // #EXPORTS
 
-        // #PROPS
+        // --PROPS
         export let
         _translateX = 0,
-        _translateY = 0,
         _background = 'transparent'
 </script>
 
@@ -14,7 +13,7 @@
 
 <div
 class="wrapper"
-style:transform="translate({_translateX}px, {_translateY}px)"
+style:transform="translateX({_translateX}px)"
 style:background-color={_background}
 >
     <slot />

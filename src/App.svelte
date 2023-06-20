@@ -1,48 +1,54 @@
 <!-- #SCRIPT -->
 
 <script>
+    // #EXPORT
+
+        // --PROP
+        export let _page = -1
+
     // #IMPORTS
 
-        // #SCSS
+        // --SCSS
         import colors from './assets/scss/modules/variables.module.scss'
         import './assets/scss/app.scss'
 
-        // #APP-CONTEXT
-        import { app } from './components/elements/Console.svelte'
+        // --CONTEXT
+        import { app } from './components/field/Main.svelte'
 
-        // #SVELTE
+        // --SVELTE
         import { onMount } from 'svelte'
 
-        // #FIELDS
+        // --COMPONENT-FIELDS
         import Header from './components/field/Header.svelte'
         import Main from './components/field/Main.svelte'
 
     // #FUNCTIONS
 
-    function set()
-    {
-        const appElement = document.body.firstElementChild
-        
-        appElement.style.backgroundColor = colors.dark
-        appElement.style.opacity = 1
-
-        restore()
-    }
-
-    function restore()
-    {
-        for (let i = 0; i < app.storageKeys.length; i++)
+        // --CYCLE
+        function set()
         {
-            const
-            key = app.storageKeys[i],
-            item = localStorage.getItem(key)
+            const appElement = document.body.firstElementChild
+            
+            appElement.style.backgroundColor = colors.dark
+            appElement.style.opacity = 1
 
-            try { if (item !== null) app[key](item) }
-            catch { localStorage.removeItem(key) }
+            restore()
         }
 
-        app.clear()
-    }
+        function restore()
+        {
+            for (let i = 0; i < app.storageKeys.length; i++)
+            {
+                const
+                key = app.storageKeys[i],
+                item = localStorage.getItem(key)
+
+                try { if (item !== null) app[key](item) }
+                catch { localStorage.removeItem(key) }
+            }
+
+            app.clear()
+        }
 
     // #CYCLE
 
@@ -58,5 +64,6 @@
 
     <Main
     _colors={colors}
+    {_page}
     />
 </slot>

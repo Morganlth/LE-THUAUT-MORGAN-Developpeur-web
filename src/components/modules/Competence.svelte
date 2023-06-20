@@ -3,86 +3,85 @@
 <script>
     // #EXPORTS
 
-        // #PROPS
+        // --PROPS
         export let
         _height,
         _colors
 
-        // #BINDS
-        export let
-        grabbing,
-        mouseMove,
-        drop
-
-        export function scroll()
-        {
-            (async () => dieScroll())()
-
-            const gap = main.scrollTop - offsetTop
-
-            y = gap > 0 ? gap < height ? gap / height : 1 : 0
-        }
-
     // #IMPORTS
 
-        // #APP-CONTEXT
-        import { app } from '../elements/Console.svelte'
+        // --CONTEXTS
+        import { app } from '../field/Main.svelte'
+        import { event } from '../field/Main.svelte'
 
-        // #SVELTE
+        // --SVELTE
         import { onMount } from 'svelte'
 
-        // #ELEMENTS
+        // --COMPONENT-ELEMENTS
         import Die from '../elements/Die.svelte'
         import Satellite from '../elements/Satellite.svelte'
 
     // #CONSTANTES
 
-    const
-    colors = ['primary', 'secondary', 'light', 'indicator'],
-    satellites =
-    [
-        {
-            _color: _colors[colors[0]],
-            _rotate: -50,
-            _offset: 0
-        }
-,
-        {
-            _color: _colors[colors[1]],
-            _rotate: 80,
-            _offset: 4.71
-        }
-,
-        {
-            _color: _colors[colors[2]],
-            _rotate: 40,
-            _offset: 3.14
-        }
-,
-        {
-            _color: _colors[colors[3]],
-            _rotate: -190,
-            _offset: 1.57
-        }
-    ]
+        // --COLORS
+        const colors = ['indicator', 'secondary', 'light', 'primary']
+
+        // --TO-ITERATE
+        const satellites =
+        [
+            {
+                _color: _colors[colors[0]],
+                _rotate: -50,
+                _offset: 0,
+                _content: ['<HTML', '/>']
+            }
+        ,
+            {
+                _color: _colors[colors[1]],
+                _rotate: 80,
+                _offset: 4.71,
+                _content: ['#CSS', '{...}']
+            }
+        ,
+            {
+                _color: _colors[colors[2]],
+                _rotate: 40,
+                _offset: 3.14,
+                _content: ['const =', '\'script\'']
+            }
+        ,
+            {
+                _color: _colors[colors[3]],
+                _rotate: 10,
+                _offset: 1.57,
+                _content: ['npm i', '-s node']
+            }
+        ]
 
     // #VARIABLES
 
-    let
-    competence,
-    main,
-    offsetTop,
-    height,
-    pageY,
-    maxX,
-    maxY,
-    initX,
-    initY,
-    number = 6,
-    r,
-    y
+        // --THIS
+        let
+        competence,
+        offsetTop,
+        height
+        
+        // --ELEMENT-MAIN
+        let main
 
-    let dieScroll
+        // --ELEMENT-DIE
+        let
+        pageY,
+        maxX,
+        maxY,
+        initX,
+        initY,
+        number = 6
+
+        // --ELEMENT-SATELLITE
+        let
+        r,
+        y
 
     // #REACTIVE
 
@@ -90,42 +89,72 @@
 
     // #FUNCTIONS
 
-    function set()
-    {
-        setCommand()
-
-        main = document.querySelector('main')
-
-        const
-        die = competence.querySelector('.die'),
-        scrollTop = main.scrollTop
-
-        offsetTop = scrollTop + competence.getBoundingClientRect().top
-        height = competence.offsetHeight
-
-        maxX = window.innerWidth
-        maxY = main.scrollHeight
-        initX = maxX / 2
-        initY = scrollTop + die.getBoundingClientRect().top + die.offsetHeight / 2
-
-        r = maxX / 2
-        y = 1 /* set satellites positions */
-    }
-
-    function setCommand()
-    {
-        const name = 'spaceDimension'
-    
-        app.add(name, (n) =>
+        // --CYCLE
+        function set()
         {
-            n = app.testDefault(n) ? 6 : app.testNumber(n, 1, 6)
+            setElement()
+            setEvent()
+            setCommand()
+        }
 
-            number = n
-            localStorage.setItem(name, n)
-    
-            app.success(name + ' ' + n)
-        }, true)
-    }
+        // --SET
+        function setElement()
+        {
+            setMain()
+            setCompetence()
+            setDie()
+            setSatellite()
+        }
+
+        function setEvent() { event.add('scroll', competence_scroll) }
+
+        function setCommand()
+        {
+            const name = 'spaceDimension'
+        
+            app.add(name, (n) =>
+            {
+                n = app.testDefault(n) ? 6 : app.testNumber(n, 1, 6)
+
+                number = n
+                localStorage.setItem(name, n)
+        
+                app.success(name + ' ' + n)
+            }, true)
+        }
+
+        // --SET-ELEMENTS
+        function setMain() { main = document.querySelector('main') }
+
+        function setCompetence()
+        {
+            offsetTop = main.scrollTop + competence.getBoundingClientRect().top
+            height = competence.offsetHeight
+        }
+
+        function setDie()
+        {
+            const die = competence.querySelector('.die')
+
+            maxX = window.innerWidth
+            maxY = main.scrollHeight
+            initX = maxX / 2
+            initY = main.scrollTop + die.getBoundingClientRect().top + die.offsetHeight / 2
+        }
+
+        function setSatellite()
+        {
+            r = maxX / 2
+            y = 1 /* set satellites positions */
+        }
+
+        // --EVENT
+        async function competence_scroll()
+        {
+            const gap = main.scrollTop - offsetTop
+
+            y = gap > 0 ? gap < height ? gap / height : 1 : 0
+        }
 
     // #CYCLE
 
@@ -150,11 +179,7 @@ bind:this={competence}
         _initX={initX}
         _initY={initY}
         _color={_colors.light}
-        bind:grabbing={grabbing}
         bind:number={number}
-        bind:scroll={dieScroll}
-        bind:mouseMove={mouseMove}
-        bind:drop={drop}
         />
 
         <div
@@ -214,7 +239,6 @@ lang="scss"
             @include f-center(true);
             @include f-column;
             @include any-w;
-            @include glow;
         }
 
         p
@@ -250,14 +274,15 @@ lang="scss"
 
         .planet
         {
-            @include glitch(true, (transparent 0%, $dark 70%));
+            @include glitch(true, (transparent 0%, $dark 60%));
 
             width: 100vh;
             height: 100vh;
     
+            border: solid rgba($light, .1) 10px;
             border-radius: 50%;
 
-            box-shadow: 0 0 20px $s-light;
+            box-sizing: border-box;
         }
     }
 </style>

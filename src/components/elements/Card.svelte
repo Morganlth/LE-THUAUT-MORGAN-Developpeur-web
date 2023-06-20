@@ -3,7 +3,7 @@
 <script>
     // #EXPORTS
 
-        // #PROPS
+        // --PROPS
         export let
         _blockSize = 0,
         _start = true,

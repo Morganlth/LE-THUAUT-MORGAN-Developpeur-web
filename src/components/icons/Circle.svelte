@@ -3,7 +3,7 @@
 <script>
     // #EXPORT
 
-        // #PROP
+        // --PROP
         export let _fill = false
 </script>
 

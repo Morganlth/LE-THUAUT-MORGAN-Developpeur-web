@@ -2,8 +2,8 @@
 
 <script>
     // #EXPORTS
-        // #PROPS
 
+        // --PROPS
         export let
         _transform = '',
         _opacity = 1, /*tictactoe*/
@@ -14,7 +14,7 @@
 
     // #IMPORT
 
-        // #SCSS
+        // --SCSS
         import '../../assets/scss/components/icon.scss'
 </script>
 
@@ -39,7 +39,11 @@ style:pointer-events={_href ? 'auto' : 'none'}
 <style
 lang="scss"
 >
+    /* #IMPORT */
+
     @import '../../assets/scss/styles/flex.scss';
+
+    /* #GROUP */
 
     .icon
     {

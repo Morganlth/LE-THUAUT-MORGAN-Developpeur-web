@@ -13,70 +13,19 @@
         _initY = 0,
         _color
 
-        // #BINDS
-        export let
-        grabbing = false,
-        number = 0
-
-        export function scroll()
-        {
-            const pageYNow = _main.scrollTop
-
-            delay = 0
-    
-            if (grabbing)
-            {
-                y += pageYNow - _pageY
-                anchor = y
-        
-                updateTranslate()
-                updateRotate()
-            }
-        
-            _pageY = pageYNow
-        }
-
-        export function mouseMove(xNow, yNow)
-        {
-            if (!grabbing) return
-
-            const
-            now = +new Date(),
-            coords = getCoords(xNow, yNow)
-
-            delay = 50
-
-            if (coords)
-            {
-                [xNow, yNow] = coords
-
-                vX = Math.floor(xNow - x) * force
-                vY = Math.floor(yNow - y) * force
-                x = xNow
-                y = yNow
-        
-                if (now > last + delay)
-                {
-                    updateTranslate()
-                    updateRotate()
-
-                    last = now
-
-                    if (Math.abs(vX) <= force && Math.abs(vY) <= force) anchor = y
-                }
-            }
-        }
-
-        export function drop()
-        {
-            cursor = 'grab'
-            grabbing = false
-            document.body.style.userSelect = 'auto'
-
-            if (!launchedInterval && y !== anchor && (Math.abs(vX) > gravity || Math.abs(vY) > gravity)) launched()
-        }
+        // #BIND
+        export let number = 0
 
     // #IMPORTS
+
+        // --CONTEXT
+        import { spring } from '../field/Main.svelte'
+    
+        // #MODULE
+        import { event } from '../field/Main.svelte'
+
+        // #SVELTE
+        import { onMount } from 'svelte'    
     
         // #COVER
         import Icon from '../covers/Icon.svelte'
@@ -146,13 +95,15 @@
     launchedInterval = null,
     rotateInterval = null
 
-    // REACTIVE --- uniquement pour le set :/
-
-    $: set(_initX, _initY)
-
     // #FUNCTIONS
 
-    function set(xNow, yNow)
+    function set()
+    {
+        setEvent()
+        setVar(_initX, _initY)
+    }
+
+    function setVar(xNow, yNow)
     {
         rotateDelay = delay
         x = xNow
@@ -163,6 +114,71 @@
         rotateX %= 360
         rotateY %= 360
         rotateZ %= 360
+    }
+
+    function setEvent()
+    {
+        event.add('scroll', die_scroll)
+        event.add('mouseMove', die_mouseMove)
+        event.add('mouseUp', die_mouseUp)
+    }
+
+    async function die_scroll()
+    {
+        const pageYNow = _main.scrollTop
+
+        delay = 0
+
+        if (event.grabbing)
+        {
+            y += pageYNow - _pageY
+            anchor = y
+    
+            updateTranslate()
+            updateRotate()
+        }
+    
+        _pageY = pageYNow
+    }
+
+    async function die_mouseMove(xNow, yNow)
+    {
+        if (!event.grabbing) return
+
+        const
+        now = +new Date(),
+        coords = getCoords(xNow, yNow)
+
+        delay = 50
+
+        if (coords)
+        {
+            [xNow, yNow] = coords
+
+            vX = Math.floor(xNow - x) * force
+            vY = Math.floor(yNow - y) * force
+            x = xNow
+            y = yNow
+    
+            if (now > last + delay)
+            {
+                updateTranslate()
+                updateRotate()
+
+                last = now
+
+                if (Math.abs(vX) <= force && Math.abs(vY) <= force) anchor = y
+            }
+        }
+    }
+
+    async function die_mouseUp()
+    {
+        cursor = 'grab'
+        event.grabbing = false
+        document.body.style.userSelect = 'auto'
+
+        if (!launchedInterval && y !== anchor && (Math.abs(vX) > gravity || Math.abs(vY) > gravity)) launched()
     }
 
     function getCoords(x, y)
@@ -191,7 +207,7 @@
         clear()
 
         cursor = 'grabbing'
-        grabbing = true
+        event.grabbing = true
         document.body.style.userSelect = 'none'
     }
 
@@ -228,7 +244,7 @@
                 else if (yNow > _maxY) yNow = _maxY
     
                 clear()
-                set(xNow, yNow)
+                setVar(xNow, yNow)
                 getNumber()
             }
 
@@ -267,6 +283,10 @@
 
         number = n
     }
+
+    // #CYCLE
+
+    onMount(set)
 </script>
 
 <!-- #HTML -->
@@ -277,6 +297,8 @@ style:transform="translateX({translateX}px) translateY({translateY}px)"
 style:transition="transform {delay}ms"
 style:cursor={cursor}
 on:mousedown={grab}
+on:mouseenter={spring.spring_mouseEnter}
+on:mouseleave={spring.spring_mouseLeave}
 >
     <div
     class="die-3d"
