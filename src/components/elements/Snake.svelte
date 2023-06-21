@@ -1,15 +1,23 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORT
+    // #EXPORTS
 
-        // #PROP
-        export let _colors
+        // --PROPS
+        export let
+        _size,
+        _options,
+        _modes,
+        _cards,
+        _gameOver,
+        _lock,
+        _invincible,
+        _colors
+
+        // --BIND
+        export let score = 10
 
     // #IMPORTS
-
-        // #JS
-        import getFps from '../../assets/js/fps'
 
         // #CONTEXTS
         import { app } from '../field/Main.svelte'
@@ -17,88 +25,49 @@
         import { spring } from '../field/Main.svelte'
 
         // #SVELTE
-        import { onMount, tick } from 'svelte'
-
-        // #ELEMENTS
-        import Toggle from '../elements/Toggle.svelte'
-        import Card from '../elements/Card.svelte'
-
-        // #COVERS
-        import Cell from '../covers/Cell.svelte'
-        import Icon from '../covers/Icon.svelte'
-
-        // #ICON
-        import Side from '../icons/Side.svelte'
+        import { onMount } from 'svelte'
 
     // #CONSTANTES
 
-    const
-    defaultSize = 40,
-    snake = [],
-    apple = [],
-    cards =
-    [
-        { title: 'NOM - PRÉNOM', content: ['LE THUAUT Morgan'] },
-        { title: 'AGE', content: ['21 ans'] },
-        { title: 'PROFESSION', content: ['Développeur Web - FULL STACK'] },
-        { title: 'LOCALITÉ', content: ['Morbihan - FRANCE'] },
-        { title: 'ÉTUDES - FORMATIONS', content: ['Lycée Jeanne d\'Arc PONTIVY - bac S SVT spécialité MATHS', 'OpenClassrooms - formation de Développeur Web'] },
-        { title: 'CONTACT', content: ['Tel:  06 09 23 72 08', 'Email:  lethuaut.morgan@gmail.com'] }
-    ]
+        // --ARRAY
+        const
+        snake = [],
+        apple = []
 
     // #VARIABLES
 
-    let
-    blockSize = defaultSize,
-    offsetX = 0,
-    offsetY = 0,
-    width,
-    height,
-    lock = false,
-    outside = true,
-    invincible = false
+        // --THIS
+        let
+        canvas,
+        columns,
+        rows,
+        context,
+        boundingClientRect,
+        clientX,
+        clientY,
+        x = -1,
+        y = -1,
+        blockSize = _size,
+        scope = false,
+        outside = true
+
+        // --STYLES
+        let
+        offsetX,
+        offsetY,
+        width,
+        height
+
+        // --CARDS
+        let i = 0
 
     let
-    canvas,
-    columns,
-    rows,
-    context,
-    boundingClientRect,
-    clientX = 0,
-    clientY = 0,
-    x = -1,
-    y = -1,
-    xScope = false,
-    yScope = false
-
-    let
-    score = 0,
-    fps = 0,
-    translateX = 100,
     textOff = false,
     snakeOff = false,
     fpsOn = false,
     noneOn = false,
     normalOn = true,
     challengeOn = false
-
-    let
-    fontCharged = false,
-    i = 0
-
-    let gameOver =
-    {
-        on: false
-    ,
-        change: function (value)
-        {
-            this.on = value
-
-            if (!snakeOff) setTimeout(() => animation(!value), 100)
-
-            this[value ? 'update' : 'hidden']()
-        }
-    }
 
     // #REACTIVES
 
@@ -118,555 +87,419 @@
 
     // #FUNCTIONS
 
-    function addCommand()
-    {
-        const
-        name_1 = 'snakeSize',
-        name_2 = 'snakeTextOff',
-        name_3 = 'snakeOff',
-        name_4 = 'fpsOn'
-
-        app.add(name_1, (size) =>
+        // --SET
+        function set()
         {
-            size = app.testDefault(size) ? defaultSize : app.testNumber(size, 10, 70)
+            reset()
+
+            context = canvas.getContext('2d')
+
+            setSnake()
+            setCommand()
+            setEvent()
+        }
+
+        function setCanvas()
+        {
+            canvas.width = width
+            canvas.height = height
+
+            columns = width / blockSize
+            rows = height / blockSize
+
+            boundingClientRect = canvas.getBoundingClientRect()
+        }
+
+        function setApple()
+        {
+            const
+            appleX = Math.floor(Math.random() * (columns - 2) + 1), // ne prend pas les bordure
+            appleY = Math.floor(Math.random() * (rows - 2) + 1)
+
+            if (snake.find(part => part[0] === appleX && part[1] === appleY)) return setApple() // probleme si snake trop grand
+
+            apple[0] = appleX
+            apple[1] = appleY
+        }
+
+        function setSnake()
+        {
+            const startY = Math.floor(rows / 2)
+    
+            for (let i = 0; i < 10; i++) snake.push([-1 - i, startY])
+        }
+
+        function setCommand() { app.add('snakeSize', snakeSize, true) }
+
+        function setEvent()
+        {
+            event.add('scroll', snake_scroll)
+            event.add('mouseMove', snake_mouseMove)
+            event.add('mouseDown', snake_mouseDown)
+        }
+
+        // --GET
+        function getModel(pre, current, next)
+        {
+            const
+            currentX = current[0],
+            currentY = current[1],
+            positions =
+            [
+                ['a', 'b', 'c'],
+                ['d', 'e', 'f'],
+                ['g', 'h', 'i']
+            ],
+            model = [null, null]
+        
+            if (pre) model[0] = positions[pre[1] - currentY][pre[0] - currentX]
+            if (next) model[1] = positions[next[1] - currentY][next[0] - currentX]
+
+            return model
+        }
+
+        function getDimensions(model)
+        {
+            let
+            offsetX = 1,
+            offsetY = 1,
+            blockWidth = blockSize - 1,
+            blockHeight = blockSize - 1
+
+            for (const m of model)
+            {
+                switch (m)
+                {
+                    case 'a':
+                        offsetX = 0
+                        offsetY = 0
+                        break
+                    case 'b':
+                        offsetY = 0
+                        break
+                    case 'c':
+                        offsetY = 0
+                        blockWidth = blockSize
+                        break
+                    case 'd':
+                        offsetX = 0
+                        break
+                    case 'f':
+                        blockWidth = blockSize
+                        break
+                    case 'g':
+                        offsetX = 0
+                        blockHeight = blockSize
+                        break
+                    case 'h':
+                        blockHeight = blockSize
+                        break
+                    case 'i':
+                        blockWidth = blockSize
+                        blockHeight = blockSize
+                        break
+                    default:
+                        break
+                }
+            }
+
+            return [offsetX, offsetY, blockWidth - offsetX, blockHeight - offsetY]
+        }
+
+        // --RESET
+        function reset()
+        {
+            offsetX = window.innerWidth % blockSize
+            offsetY = window.innerHeight % blockSize / 2
+
+            width = window.innerWidth - offsetX
+            height = window.innerHeight - offsetY * 2
+
+            setCanvas()
+            setApple()
+        }
+    
+        function resetGame() /* reset game over */
+        {
+            update()
+            resetSnake()
+            moveSnake()
+            setApple()
+
+            _gameOver.update(false)
+        }
+
+        function resetSnake() // reset le serpent
+        {
+            if (snake.length > 10)
+            {
+                animation(false, 10)
+                snake.length = 10
+                score = 10
+            }
+        }
+    
+        // --UPDATE
+        function update()
+        {
+            score = snake.length
+    
+            x = Math.floor((clientX - boundingClientRect.left) / blockSize)
+            y = Math.floor((clientY - boundingClientRect.top) / blockSize)
+
+            scope = x >= 0 && x < columns && y >= 0 && y < rows
+        }
+
+        function updateGamePlan()
+        {
+            if (options.text) updateCard()
+        
+            setApple()
+
+            snake.push([])
+        }
+
+        function updateCard()
+        {
+            const [cardX, cardY] = snake[snake.length - 1]
+    
+            if (i === _cards.length) i = 0
+
+            const j = i - 1
+
+            _cards[j < 0 ? _cards.length - 1 : j].hidden()
+            _cards[i++].update(cardX * blockSize, cardY * blockSize, 100)
+        }
+
+        // --COMMAND
+        async function snakeSize(size)
+        {
+            size = app.testDefault(size) ? _size : app.testNumber(size, 10, 70)
 
             blockSize = size
-            localStorage.setItem(name_1, size)
+            localStorage.setItem('snakeSize', size)
             reset()
     
-            app.success(name_1 + ' ' + size)
-        }, true)
-
-        app.add(name_2, (off) =>
-        {
-            off = app.testDefault(off) ? false : app.testBoolean(off)
-    
-            updateText(off)
-
-            app.success(name_2 + ' ' + off)
-        }, true)
-
-        app.add(name_3, (off) =>
-        {
-            off = app.testDefault(off) ? false : app.testBoolean(off)
-    
-            updateSnake(off)
-
-            app.success(name_3 + ' ' + off)
-        }, true)
-
-        app.add(name_4, (on) =>
-        {
-            on = app.testDefault(on) ? false : app.testBoolean(on)
-    
-            updateFps(on)
-
-            app.success(name_4 + ' ' + on)
-        }, true)
-    }
-
-    function set()
-    {
-        setCards()
-        restore()
-        reset()
-        initSnake()
-        setEvent()
-    }
-
-    function restore()
-    {
-        textOff = localStorage.getItem('textOff') === 'true'
-        snakeOff = localStorage.getItem('snakeOff') === 'true'
-        fpsOn = localStorage.getItem('fpsOn') === 'true'
-
-        if (!textOff && snakeOff) noneOn = true, normalOn = false
-        else if (textOff || snakeOff) normalOn = false
-    }
-
-    function reset()
-    {
-        offsetX = window.innerWidth % blockSize
-        offsetY = window.innerHeight % blockSize / 2
-
-        width = window.innerWidth - offsetX
-        height = window.innerHeight - offsetY * 2
-
-        setCanvas()
-        initApple()
-    }
-
-    function setCards()
-    {
-        document.fonts.ready.then(() =>
-        {
-            fontCharged = true
-
-            if (snakeOff && !textOff) tick().then(view)
-        })
-    }
-
-    async function setFps()
-    {
-        fps = await getFps()
-
-        if (fpsOn) setFps()
-    }
-
-    function setCanvas()
-    {
-        canvas.width = width
-        canvas.height = height
-
-        columns = width / blockSize
-        rows = height / blockSize
-
-        context = canvas.getContext('2d')
-        boundingClientRect = canvas.getBoundingClientRect()
-    }
-
-    function setEvent()
-    {
-        event.add('scroll', snake_scroll)
-        event.add('mouseMove', snake_mouseMove)
-        event.add('mouseDown', snake_mouseDown)
-    }
-
-    async function snake_scroll()
-    {
-        boundingClientRect = canvas.getBoundingClientRect()
-
-        move()
-    }
-
-    async function snake_mouseMove(x, y)
-    {
-        clientX = x
-        clientY = y
-
-        move()
-    }
-
-    async function snake_mouseDown(e)
-    {
-        if (gameOver.on && e.target.classList.contains('frame'))
-        {
-            clientX = e.clientX
-            clientY = e.clientY
-
-            update()
-            initApple()
-            moveSnake()
-            prepareSnake()
-            invincible = true
-            gameOver.change(false)
-
-            setTimeout(() => invincible = false, 500)
+            app.success('snakeSize ' + size)
         }
-    }
-
-    function initApple()
-    {
-        const
-        appleX = Math.floor(Math.random() * (columns - 2) + 1), // ne prend pas les bordure
-        appleY = Math.floor(Math.random() * (rows - 2) + 1)
-
-        if (snake.find(part => part[0] === appleX && part[1] === appleY)) return initApple() // probleme si snake trop grand
-
-        apple[0] = appleX
-        apple[1] = appleY
-    }
-
-    function initSnake() { for (let i = 0; i < 10; i++) snake.push([-1, -1]) }
-
-    function move()
-    {
-        if (lock || event.grabbing || gameOver.on) return
-
-        update()
-
-        if (snake.length && snake[0][0] === x && snake[0][1] === y) return
-        if (!xScope || !yScope)
+    
+        // --EVENTS
+        async function snake_scroll()
         {
-            if (challengeOn) return gameOver.change(true)
-            if (outside || check()) return
+            boundingClientRect = canvas.getBoundingClientRect()
+
+            move()
         }
-        else
+
+        async function snake_mouseMove(x, y)
         {
-            if (snakeOff) { if (spring.lock) spring.spring_mouseLeave() }
+            clientX = x
+            clientY = y
+
+            move()
+        }
+
+        async function snake_mouseDown(e) // click pour reset apres un gameOver
+        {
+            if (_gameOver.on && e.target.classList.contains('frame'))
+            {
+                clientX = e.clientX
+                clientY = e.clientY
+
+                resetGame()
+            }
+        }
+
+        function snake_mouseLeave()
+        {
+            spring.spring_mouseLeave()
+
+            if (_modes.challenge) _gameOver.update(true)
+        }
+
+        // --MOVE
+        function move()
+        {
+            if (test())
+            {
+                update()
+            
+                if (check()) draw()
+            }
+        }
+
+        function moveSnake() // deplace le serpent en conservant sa position initiale
+        {
+            const [gapX, gapY] = [x - snake[0][0], y - snake[0][1]]
+
+            for (let i = 0; i < snake.length; i++)
+            {
+                const part = snake[i]
+
+                part[0] = part[0] + gapX
+                part[1] = part[1] + gapY
+            }
+        }
+
+        // --TEST-CHECK
+        function test()
+        {
+            return !(
+               _lock
+            || _gameOver.on
+            || event.grabbing
+            || (snake.length && snake[0][0] === x && snake[0][1] === y))
+        }
+
+        function check()
+        {
+            if (scope) checkInside()
+            else
+            {
+                if (outside || checkOutside()) return false
+            }
+    
+            if (!options.snake) return false
+
+            return true
+        }
+
+        function checkInside()
+        {
+            if (outside) outside = false
+    
+            if (!options.snake)
+            {
+                if (spring.lock) spring.spring_mouseLeave()
+            }
             else if (!spring.lock) spring.spring_mouseEnter()
         }
-    
-        draw()
-    }
 
-    function update()
-    {
-        x = Math.floor((clientX - boundingClientRect.left) / blockSize)
-        y = Math.floor((clientY - boundingClientRect.top) / blockSize)
-
-        xScope = x >= 0 && x < columns
-        yScope = y >= 0 && y < rows
-
-        score = snake.length
-    }
-
-    function check()
-    {
-        for (let i = 0; i < snake.length; i++)
+        function checkOutside()
         {
-            const part = snake[i]
-    
-            if (part[0] >= 0 && part[0] < columns && part[1] >= 0 && part[1] < rows) return false
-        }
-
-        return outside = true
-    }
-
-    function draw()
-    {
-        if (outside) outside = false
-        if (snakeOff) return
-
-        const [snakeX, snakeY] = [snake[0][0], snake[0][1]]
-
-        let
-        gapX = snakeX - x,
-        gapY = snakeY - y,
-        i = 0
-
-        while(i++ < 20)
-        {
-            if (gapX !== 0) x < snakeX ? gapX-- : gapX++
-            if (gapY !== 0) y < snakeY ? gapY-- : gapY++
-
-            clear()
-            drawApple()
-            drawSnake(x + gapX, y + gapY)
-
-            if (gapX === 0 && gapY === 0) break
-        }
-    }
-
-    function updateGamePlan()
-    {
-        if (!textOff) updateCard()
-    
-        initApple()
-
-        snake.push([])
-    }
-
-    function clear() { context.clearRect(0, 0, width, height) }
-
-    function drawApple()
-    {
-        let
-        appleX = apple[0] * blockSize,
-        appleY = apple[1] * blockSize,
-        appleSize = blockSize
-
-        context.fillStyle = _colors.indicator
-        context.fillRect(appleX, appleY, appleSize, appleSize)
-    }
-
-    function drawSnake(x, y)
-    {
-        context.fillStyle = _colors.oPrimary
-
-        for (let i = snake.length - 1; i > 0; i--)
-        {
-            snake[i] = snake[i-1]
-
-            const
-            part = snake[i],
-            snakeX = part[0],
-            snakeY = part[1]
-
-            if (!invincible && xScope && yScope && snakeX === x && snakeY === y) challengeOn ? gameOver.change(true) : snake.pop()
-            if (snakeX === apple[0] && snakeY === apple[1]) updateGamePlan()
-
-            drawSnakeBody(part, i)
-        }
-
-        drawSnakeHead(x, y)
-    }
-
-    function drawSnakeHead(x, y)
-    {
-        if (x === apple[0] && y === apple[1]) updateGamePlan()
-
-        snake[0] = [x, y]
-    
-        context.fillStyle = _colors.primary
-        context.fillRect(snake[0][0] * blockSize, snake[0][1] * blockSize, blockSize, blockSize)
-    }
-
-    function drawSnakeBody(part, i)
-    {
-        const model = getAvailablePositions(snake[i+1], part, snake[i-2])
-
-        let
-        offsetX = 0,
-        offsetY = 0,
-        partWidth = blockSize,
-        partHeight = blockSize
-    
-        if (model.includes('l')) offsetX++
-        if (model.includes('t')) offsetY++
-        if (model.includes('r')) partWidth -= (2 - offsetY)
-        if (model.includes('b')) partHeight -= (2 - offsetX)
-
-        context.fillRect(part[0] * blockSize + offsetX, part[1] * blockSize + offsetY, partWidth, partHeight)
-    }
-
-    function getAvailablePositions(pre, now, aft)
-    {
-        let positions = 'trbl' // top right bottom left
-    
-        const
-        posA = getPositionTaken(pre, now),
-        posB = getPositionTaken(aft, now)
-
-        if (posA) positions = positions.replace(posA, '')
-        if (posB) positions = positions.replace(posB, '')
-
-        return positions
-    }
-
-    function getPositionTaken(a, b) // t (top) - b (bottom) - r (right) - l (left)
-    {
-        if (!a || !b) return null
-
-        if (a[0] === b[0]) return a[1] < b[1] ? 't' : 'b'
-        else if (a[1] === b[1]) return a[0] < b[0] ? 'l' : 'r'
-        else return null
-    }
-
-    function btnClick()
-    {
-        translateX = translateX ? 0 : 100
-        translateX ? (lock = false, setTimeout(() => { invincible = false }, 100)) : (lock = true, invincible = true)
-    }
-
-    function updateOption(id)
-    {
-        switch (id)
-        {
-            case 0:
-                updateText(!textOff)
-                break
-            case 1:
-                updateSnake(!snakeOff)
-                break
-            case 2:
-                updateFps(!fpsOn)
-                break
-            default:
-                break
-        }
-    }
-
-    function updateMode(id)
-    {
-        switch (id)
-        {
-            case 0:
-                updateNone(!noneOn)
-                break
-            case 1:
-                updateNormal(!normalOn)
-                break
-            case 2:
-                updateChallenge(!challengeOn)
-                break
-            default:
-                break
-        }
-    }
-
-    function leave(e)
-    {
-        if (e.relatedTarget.classList.contains('cell')) return
-    
-        setTimeout(() => { invincible = false }, 200)
-
-        translateX = 100
-        lock = false
-    }
-
-    function updateText(off)
-    {
-        textOff = off
-
-        if (off)
-        {
-            if (fontCharged) hidden()
-            if (noneOn) noneOn = false
-            if (normalOn) normalOn = false
-        }
-        else
-        {
-            if (fontCharged) view()
-            if (challengeOn) challengeOn = false
-        }
-
-        localStorage.setItem('textOff', off)
-    }
-
-    function updateSnake(off)
-    {
-        snakeOff = off
-    
-        if (off)
-        {
-            if (fontCharged) view()
-            if (normalOn) normalOn = false
-            if (challengeOn) challengeOn = false
-        }
-        else
-        {
-            if (fontCharged) hidden()
-            if (noneOn) noneOn = false
-        }
-
-        animation(off ? false : true)
-
-        localStorage.setItem('snakeOff', off)
-    }
-
-    function updateFps(on)
-    {
-        if (on) setFps()
-
-        fpsOn = on
-
-        localStorage.setItem('fpsOn', on)
-    }
-
-    function updateNone(on)
-    {
-        if (on)
-        {
-            if (textOff) updateText(false)
-            if (!snakeOff) updateSnake(true)
-            if (normalOn) normalOn = false
-            if (challengeOn) challengeOn = false
-            if (gameOver.on) gameOver.change(false)
-        }
-
-        noneOn = on
-    }
-
-    function updateNormal(on)
-    {
-        if (on)
-        {
-            if (textOff) updateText(false)
-            if (snakeOff) updateSnake(false)
-            if (noneOn) noneOn = false
-            if (challengeOn) challengeOn = false
-            if (gameOver.on) gameOver.change(false)
-        }
-
-        normalOn = on
-    }
-
-    function updateChallenge(on)
-    {
-        if (on)
-        {
-            if (!textOff) updateText(true)
-            if (snakeOff) updateSnake(false)
-            if (normalOn) normalOn = false
-            if (noneOn) noneOn = false
-
-            prepareSnake()
-        }
-        else if (gameOver.on) gameOver.change(false)
-
-        challengeOn = on
-    }
-
-    function prepareSnake()
-    {
-        if (snake.length > 10)
-        {
-            animation(false, 10)
-            snake.length = 10
-            score = 10
-        }
-    }
-
-    function moveSnake()
-    {
-        const
-        gapX = x - snake[0][0],
-        gapY = y - snake[0][1]
-
-        for (let i = 0; i < snake.length; i++)
-        {
-            const part = snake[i]
-
-            part[0] = part[0] + gapX
-            part[1] = part[1] + gapY
-        }
-    }
-
-    function animation(draw, max = -1)
-    {
-        let delay = 0
-
-        for (let i = snake.length - 1; i >= max; i--)
-        {
-            const part = i >= 0 ? snake[i] : apple
-
-            setTimeout(() => requestAnimationFrame(() =>
+            for (let i = 0; i < snake.length; i++)
             {
-                if (draw) context.fillStyle = _colors[i > 0 ? 'oPrimary' : i === 0 ? 'primary' : 'indicator']
-    
-                context[draw ? 'fillRect' : 'clearRect'](part[0] * blockSize, part[1] * blockSize, blockSize, blockSize)
-            }), delay += 16)
+                const part = snake[i]
+        
+                if (part[0] >= 0 && part[0] < columns && part[1] >= 0 && part[1] < rows) return false
+            }
+
+            return outside = true
         }
-    }
 
-    function updateCard()
-    {
-        const lastPart = snake[snake.length - 1]
-
-        if (i === cards.length) i = 0
-
-        const j = i - 1
-
-        cards[j < 0 ? cards.length - 1 : j].hidden()
-        cards[i++].update(lastPart[0] * blockSize, lastPart[1] * blockSize, 100)
-    }
-
-    function view()
-    {
-        if (textOff || !snakeOff) return
-
-        let y = blockSize
-
-        for (const card of cards)
+        function checkSnakePart(part)
         {
-            const x = Math.random() * (width - card.width)
+            const [snakeX, snakeY] = [part[0], part[1]]
     
-            card.update(x, y)
-
-            y += card.height
+            if (snakeX === apple[0] && snakeY === apple[1]) updateGamePlan()
+            if (!_invincible && scope && snakeX === x && snakeY === y) _modes.challenge ? _gameOver.update(true) : snake.pop()
         }
-    }
+
+        // --DRAW-CLEAR
+        function draw()
+        {
+            const [snakeX, snakeY] = [snake[0][0], snake[0][1]]
+
+            let
+            gapX = snakeX - x,
+            gapY = snakeY - y,
+            // step = Math.max(Math.abs(gapX), Math.abs(gapY)),
+            i = 0
+
+            // console.log(step + ' - ' + (gapX / step) + ' - ' + (gapY / step))
+
+            while(i++ < 20)
+            {
+                if (gapX !== 0) x < snakeX ? gapX-- : gapX++
+                if (gapY !== 0) y < snakeY ? gapY-- : gapY++
+
+                clear()
+                drawApple()
+                drawSnake(x + gapX, y + gapY)
+
+                if (gapX === 0 && gapY === 0) break
+            }
+        }
+
+        function clear() { context.clearRect(0, 0, width, height) }
+
+        function drawApple()
+        {
+            context.fillStyle = _colors.indicator
+            context.fillRect(apple[0] * blockSize, apple[1] * blockSize, blockSize, blockSize)
+        }
+
+        function drawSnake(x, y)
+        {
+            context.fillStyle = _colors.oPrimary
+
+            for (let i = snake.length - 1; i > 0; i--)
+            {
+                snake[i] = snake[i-1]
+
+                const part = snake[i]
+
+                checkSnakePart(part)
+                drawSnakeBody(part, i)
+            }
+
+            drawSnakeHead(x, y)
+        }
+
+        function drawSnakeBody(part, i)
+        {
+            const
+            model = getModel(snake[i+1], part, snake[i-2]),
+            [offsetX, offsetY, blockWidth, blockHeight] = getDimensions(model)
+
+            context.fillRect(part[0] * blockSize + offsetX, part[1] * blockSize + offsetY, blockWidth, blockHeight)
+        }
+
+        function drawSnakeHead(x, y)
+        {
+            if (x === apple[0] && y === apple[1]) updateGamePlan()
+
+            snake[0] = [x, y]
+        
+            context.fillStyle = _colors.primary
+            context.fillRect(snake[0][0] * blockSize, snake[0][1] * blockSize, blockSize, blockSize)
+        }
+
+        // --CODE
+        function animation(draw, max = -1) // dessine ou supprime de façon animé (serpent et pomme)
+        {
+            let delay = 0
+
+            for (let i = snake.length - 1; i >= max; i--)
+            {
+                const part = i >= 0 ? snake[i] : apple
+
+                setTimeout(() => requestAnimationFrame(() =>
+                {
+                    if (draw) context.fillStyle = _colors[i > 0 ? 'oPrimary' : i === 0 ? 'primary' : 'indicator']
+        
+                    context[draw ? 'fillRect' : 'clearRect'](part[0] * blockSize, part[1] * blockSize, blockSize, blockSize)
+                }), delay += 16)
+            }
+        }
+
+
+
+
+    
+    
+
+    
+
+
+
+    
 
     function hidden() { for (let i = 0; i < cards.length; i++) cards[i].hidden() }
 
     // #CYCLE
 
-    onMount(() =>
-    {
-        addCommand()
-        set()
-    })
+    onMount(set)
 </script>
 
 <!-- #HTML -->
@@ -675,137 +508,14 @@
 class="snake-game"
 style:height="{height}px"
 style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
-on:mouseleave={spring.spring_mouseLeave.bind(spring)}
+on:mouseleave={snake_mouseLeave}
 >
-    <div
-    class="card-container"
-    >
-        {#if fontCharged}
-            {#each cards as card}
-                <Card
-                _blockSize={defaultSize}
-                _dark={_colors.dark}
-                bind:width={card.width}
-                bind:height={card.height}
-                bind:update={card.update}
-                bind:hidden={card.hidden}
-                >
-                    <h3>{card.title}</h3>
-
-                    <div
-                    class="content"
-                    >
-                        {#each card.content as text}
-                            <p>{text}</p>
-                        {/each}
-                    </div>
-                </Card>
-            {/each}
-
-            <div
-            class="game-over"
-            >
-                <Card
-                _blockSize={defaultSize}
-                _start={false}
-                _dark={_colors.dark}
-                bind:width={gameOver.width}
-                bind:height={gameOver.height}
-                bind:update={gameOver.update}
-                bind:hidden={gameOver.hidden}
-                >
-                    <h6>
-                        &lt GAME
-                        <br>
-                        OVER &gt
-                    </h6>
-
-                    <p>CLICK POUR REJOUER</p>
-                </Card>
-            </div>
-        {/if}
-    </div>
-
     <canvas
     style:width="{width}px"
     style:height="{height}px"
     bind:this={canvas}
     >
     </canvas>
-
-    <div
-    class="frame"
-    style:padding="0 {50 - offsetX}px {30 - offsetY}px 50px"
-    >
-        <p
-        class="score"
-        >
-            SCORE {score}
-        </p>
-
-        {#if fpsOn}
-            <p>
-                FPS {fps}
-            </p>
-        {/if}
-
-        <Cell
-        _style="border: none; cursor: pointer"
-        on:click={btnClick}
-        >
-            <Icon
-            _size="18px"
-            _color={_colors.sLight}
-            >
-                <Side />
-            </Icon>
-        </Cell>
-
-        <nav
-        style:right="{-offsetX}px"
-        style:transform="translateX({translateX}%)"
-        style:padding="0 {50 - offsetX}px 78px"
-        on:mouseleave={leave}
-        >
-            <h4>OPTIONS</h4>
-
-            <ul>
-                {#each options as option, i}
-                    <li>
-                        <Cell
-                        _style="display: block; width: 100%; border: none; cursor: pointer"
-                        on:click={updateOption.bind(null, i)}
-                        >
-                            <Toggle
-                            _check={option.link}
-                            >
-                                {option.content}
-                            </Toggle>
-                        </Cell>
-                    </li>
-                {/each}
-            </ul>
-
-            <h4>MODES DE JEU</h4>
-
-            <ul>
-                {#each gameModes as mode, i}
-                    <li>
-                        <Cell
-                        _style="display: block; width: 100%; border: none; cursor: pointer"
-                        on:click={updateMode.bind(null, i)}
-                        >
-                            <Toggle
-                            _check={mode.link}
-                            >
-                                {mode.content}
-                            </Toggle>
-                        </Cell>
-                    </li>
-                {/each}
-            </ul>
-        </nav>
-    </div>
 </div>
 
 <!-- #STYLE -->
