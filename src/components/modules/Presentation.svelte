@@ -36,11 +36,6 @@
         // --PARAM
         const size = 40
 
-        // --OBJECTS
-        const
-        options = { text: true, snake: true, fps: false },
-        modes = { none: false, normal: true, challenge: false }
-
         // --TO-ITERATE
         const cards =
         [
@@ -55,7 +50,9 @@
     // #VARIABLES
 
         // --ELEMENT-CARD
-        let charged = false
+        let
+        charged = false,
+        i = 0
 
         // --ELEMENT-CARD-GAME-OVER
         let gameOver = { on: false, update: updateGameOver }
@@ -63,13 +60,48 @@
         // --ELEMENT-SNAKE
         let
         score,
+        snakeTail = [0, 0],
+        resetSnake,
+        animation,
         lock = false,
         invincible = false
 
         // --ELEMENT-FRAME
         let
-        fps,
+        fps = 0,
         translateX = 100
+
+        // --OPTIONS
+        let
+        textOption = true,
+        snakeOption = true,
+        fpsOption = false
+
+        // --MODES
+        let
+        noneMode = false,
+        normalMode = true,
+        challengeMode = false
+
+    // #REACTIVE
+
+        // --UPDATE
+        $: updateCard(snakeTail)
+
+        // --TO-ITERATE
+        $: options =
+        [
+            { on: textOption, content: 'AFFICHER LE TEXTE' },
+            { on: snakeOption, content: 'AFFICHER LE SERPENT' },
+            { on: fpsOption, content: 'AFFICHER LES FPS' }
+        ]
+        
+        $: modes =
+        [
+            { on: noneMode, content: 'AUCUN' },
+            { on: normalMode, content: 'NORMAL' },
+            { on: challengeMode, content: 'CHALLENGE' }
+        ]
 
     // #FUNCTIONS
 
@@ -87,7 +119,7 @@
             {
                 charged = true
 
-                if (!options.snake && options.text) tick().then(viewCards)
+                if (!snakeOption && textOption) tick().then(viewCards)
             })
         }
 
@@ -102,32 +134,74 @@
         {
             fps = await getFps()
 
-            if (options.fps) setFps()
+            if (fpsOption) setFps()
+        }
+
+        function setInvincible()
+        {
+            invincible = true
+
+            setTimeout(() => invincible = false, 500)
         }
 
         // --RESTORE
-        function restore() /* ne set pas les fps ?*/
+        function restore()
         {
-            options.text = localStorage.getItem('presentation_text') === 'true'
-            options.snake = localStorage.getItem('presentation_snake') === 'true'
-            options.fps = localStorage.getItem('presentation_fps') === 'true'
+            restoreOptions()
+            restoreModes()
+        }
 
-            if (!options.snake)
+        function restoreOptions()
+        {
+            const
+            textStorage = localStorage.getItem('presentation_text'),
+            snakeStorage = localStorage.getItem('presentation_snake'),
+            fpsStorage = localStorage.getItem('presentation_fps')
+
+            textOption = (!textStorage || textStorage === 'true')
+            snakeOption = (!snakeStorage || snakeStorage === 'true')
+            fpsOption = (!fpsStorage || fpsStorage === 'true') 
+        }
+
+        function restoreModes()
+        {
+            if (!snakeOption)
             {
-                if (options.text) modes.none = true
+                if (textOption) noneMode = true
         
-                modes.normal = false
+                normalMode = false
             }
-            else if (!options.text) modes.normal = false
+            else if (!textOption) normalMode = false
+        }
+
+        function restoreCard()
+        {
+            if (--i < 0) i = 0
+
+            updateCard(snakeTail)
         }
 
         // --UPDATE
-        function updateGameOver(on)
+        function updateCard([cardX, cardY])
+        {
+            if (!textOption || !charged) return
+    
+            if (i === cards.length) i = 0
+
+            const j = i - 1
+
+            cards[j < 0 ? cards.length - 1 : j].hidden()
+            cards[i++].view(cardX, cardY, 100)
+        }
+    
+        async function updateGameOver(on)
         {
             gameOver.on = on
     
-            gameOver[on ? 'update' : 'view']()
-            .then(() => { if (options.snake) animation(!on) })
+            await gameOver[on ? 'view' : 'hidden']()
+           
+            if (snakeOption) animation(!on)
+            if (!on) setInvincible()
         }
 
         function updateOption(id)
@@ -135,13 +209,13 @@
             switch (id)
             {
                 case 0:
-                    updateText(!options.text)
+                    updateText(!textOption)
                     break
                 case 1:
-                    updateSnake(!options.snake)
+                    updateSnake(!snakeOption)
                     break
                 case 2:
-                    updateFps(!options.fps)
+                    updateFps(!fpsOption)
                     break
                 default:
                     break
@@ -153,13 +227,13 @@
             switch (id)
             {
                 case 0:
-                    updateNone(!modes.none)
+                    updateNone(!noneMode)
                     break
                 case 1:
-                    updateNormal(!modes.normal)
+                    updateNormal(!normalMode)
                     break
                 case 2:
-                    updateChallenge(!modes.challenge)
+                    updateChallenge(!challengeMode)
                     break
                 default:
                     break
@@ -168,20 +242,20 @@
 
         function updateText(on)
         {
-            options.text = on
+            textOption = on
 
             if (on)
             {
-                if (charged) viewCards()
+                if (charged) snakeOption ? restoreCard() : viewCards()
                 
-                modes.challenge = false
+                challengeMode = false
             }
             else
             {
-                if (charged) hidden()
+                if (charged) hiddenCards()
     
-                modes.none = false
-                modes.normal = false
+                noneMode = false
+                normalMode = false
             }
 
             localStorage.setItem('presentationText', on)
@@ -189,32 +263,32 @@
 
         function updateSnake(on)
         {
-            options.snake = on
+            snakeOption = on
         
             if (on)
             {
-                if (charged) hidden()
+                if (textOption && charged) hiddenCards()
             
-                modes.none = false
+                noneMode = false
             }
             else
             {
-                if (charged) viewCards()
+                if (textOption && charged) viewCards()
     
-                modes.normal = false
-                modes.challenge = false
+                normalMode = false
+                challengeMode = false
             }
 
-            // animation(on ? false : true)
+            animation(on)
 
-            localStorage.setItem('presentationSnake', onafterprint)
+            localStorage.setItem('presentationSnake', on)
         }
 
         function updateFps(on)
         {
             if (on) setFps()
 
-            options.fps = on
+            fpsOption = on
 
             localStorage.setItem('presentationFps', on)
         }
@@ -223,46 +297,47 @@
         {
             if (on)
             {
-                if (!options.text) updateText(true)
-                if (options.snake) updateSnake(false)
+                if (!textOption) updateText(true)
+                if (snakeOption) updateSnake(false)
+                if (gameOver.on) gameOver.update(false)
     
-                modes.normal = false
-                modes.challenge = false
-        
-                if (gameOver.on) gameOver.change(false)
+                normalMode = false
+                challengeMode = false
             }
 
-            noneOn = on
+            noneMode = on
         }
 
         function updateNormal(on)
         {
             if (on)
             {
-                if (textOff) updateText(false)
-                if (snakeOff) updateSnake(false)
-                if (noneOn) noneOn = false
-                if (challengeOn) challengeOn = false
-                if (gameOver.on) gameOver.change(false)
+                if (!textOption) updateText(true)
+                if (!snakeOption) updateSnake(true)
+                if (gameOver.on) gameOver.update(false)
+                
+                noneMode = false
+                challengeMode = false
             }
 
-            normalOn = on
+            normalMode = on
         }
 
         function updateChallenge(on)
         {
             if (on)
             {
-                if (!textOff) updateText(true)
-                if (snakeOff) updateSnake(false)
-                if (normalOn) normalOn = false
-                if (noneOn) noneOn = false
+                if (textOption) updateText(false)
+                if (!snakeOption) updateSnake(true)
+                
+                noneMode = false
+                normalMode = false
 
-                prepareSnake()
+                resetSnake()
             }
-            else if (gameOver.on) gameOver.change(false)
+            else if (gameOver.on) gameOver.update(false)
 
-            challengeOn = on
+            challengeMode = on
         }
 
         // --EVENTS  
@@ -274,7 +349,9 @@
 
         function mouseLeave(e)
         {
-            if (e.relatedTarget.classList.contains('cell')) return
+            const target = e.relatedTarget
+
+            if (!target || target.classList.contains('icon')) return
         
             setTimeout(() => { invincible = false }, 200)
 
@@ -321,12 +398,13 @@
             {
                 const x = Math.random() * (window.innerWidth - card.width - size * 2) + size
         
-                card.update(x, y)
+                card.view(x, y)
 
                 y += card.height
             }
         }
 
+        function hiddenCards() { for (let i = 0; i < cards.length; i++) cards[i].hidden() }
     // #CYCLE
 
     onMount(set)
@@ -387,14 +465,16 @@ style:width={_width}
 
     <Snake
     _size={size}
-    _options={options}
-    _mode={modes}
-    _cards={cards}
+    _snakeOption={snakeOption}
+    _challenge={challengeMode}
     _gameOver={gameOver}
     _lock={lock}
     _invincible={invincible}
     {_colors}
     bind:score={score}
+    bind:snakeTail={snakeTail}
+    bind:resetSnake={resetSnake}
+    bind:animation={animation}
     />
 
     <div
@@ -407,7 +487,7 @@ style:width={_width}
             SCORE {score}
         </p>
 
-        {#if options.fps}
+        {#if fpsOption}
             <p>
                 FPS {fps}
             </p>
@@ -426,7 +506,6 @@ style:width={_width}
         </Cell>
 
         <nav
-        style:right="{-size}px"
         style:transform="translateX({translateX}%)"
         style:padding="{size * 2}px {size}px"
         on:mouseleave={mouseLeave}
@@ -441,7 +520,7 @@ style:width={_width}
                         on:click={updateOption.bind(null, i)}
                         >
                             <Toggle
-                            _check={option.link}
+                            _check={option.on}
                             >
                                 {option.content}
                             </Toggle>
@@ -453,14 +532,14 @@ style:width={_width}
             <h4>MODES DE JEU</h4>
 
             <ul>
-                {#each gameModes as mode, i}
+                {#each modes as mode, i}
                     <li>
                         <Cell
                         _style="display: block; width: 100%; border: none; cursor: pointer"
                         on:click={updateMode.bind(null, i)}
                         >
                             <Toggle
-                            _check={mode.link}
+                            _check={mode.on}
                             >
                                 {mode.content}
                             </Toggle>
@@ -480,15 +559,113 @@ lang="scss"
     /* #IMPORTS */
 
     @import
+    '../../assets/scss/styles/flex.scss',
     '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/size.scss';
+    '../../assets/scss/styles/size.scss',
+    '../../assets/scss/styles/background.scss',
+    '../../assets/scss/styles/font.scss',
+    '../../assets/scss/styles/cursor.scss';
 
     /* #GROUPS */
 
     #presentation
     {
+        @include relative;
+
         height: 100vh;
 
-        background-color: $dark;
+        .card-container
+        {
+            h3
+            {
+                @include title-3($o-primary);
+
+                padding-right: 30px;
+
+                white-space: nowrap;
+            }
+
+            .content
+            {
+                margin: 10px 0 0 30px;
+                padding: 10px 0 0 30px;
+
+                border-top: solid 1px $o-primary;
+            }
+
+            p
+            {
+                @include text-command;
+
+                color: $light;
+                user-select: none;
+            }
+        }
+
+        .game-over
+        {
+            h6
+            {
+                @include title($light, 90px, 77px);
+
+                margin-bottom: 10px;
+                white-space: nowrap;
+            }
+
+            p { text-align: center; }
+        }
+    
+        .frame
+        {
+            @include flex;
+            @include xy-start(true);
+            @include any;
+            @include no-event;
+
+            justify-content: space-between;
+            align-items: flex-end;
+
+            z-index: 1;
+
+            box-sizing: border-box;
+
+            p { @include text-info; }
+
+            nav
+            {
+                @include f-center(true);
+                @include f-column;
+                @include absolute;
+                @include any-h;
+                @include black-glass(blur(5px));
+
+                gap: 30px;
+
+                top: 0;
+                right: 0;
+
+                z-index: -1;
+
+                transition: transform 0.5s ease;
+
+                border-left: solid 4px $s-light;
+
+                box-sizing: border-box;
+
+                pointer-events: auto;
+            }
+
+            h4
+            {
+                @include title-4;
+                @include any-w;
+
+                text-align: right;
+            }
+
+            ul { @include any-w; }
+
+            li { margin-bottom: 20px; }
+        }
     }
 </style>

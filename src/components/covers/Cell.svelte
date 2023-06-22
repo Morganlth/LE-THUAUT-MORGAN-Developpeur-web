@@ -40,5 +40,7 @@ on:click={click}
         background-color: transparent;
 
         font: inherit;
+
+        pointer-events: auto;
     }
 </style>

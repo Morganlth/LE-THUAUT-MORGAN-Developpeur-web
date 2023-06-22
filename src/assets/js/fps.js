@@ -12,7 +12,7 @@ export default function getFps()
         {
             count++
 
-            performance.now() - startTime >= 1000 ? resolve(count) : requestAnimationFrame(frame)
+            performance.now() - startTime >= 500 ? resolve(count * 2) : requestAnimationFrame(frame)
         }
 
         frame()

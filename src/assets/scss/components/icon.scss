@@ -2,4 +2,9 @@
 
 @use '../styles/size.scss' as *;
 
-.icon>svg { @include any-h; }
+.icon>svg
+{
+    @include any-h;
+
+    pointer-events: none;
+}

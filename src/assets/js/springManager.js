@@ -46,3 +46,7 @@ export default class SpringManager
 // #IMPORT
 
 import { spring } from 'svelte/motion'
+
+// desactiver spring par command
+// verifier les performances de l'appareil et desactiver spring et d'autres paramètres inutiles si performances faibles
+// gros lag lors de mousedown dans la partie presentation

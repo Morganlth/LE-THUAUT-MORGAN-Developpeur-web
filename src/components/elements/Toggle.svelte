@@ -3,9 +3,10 @@
 <script>
     // #EXPORT
 
-        // #PROP
+        // --PROP
         export let _check = false
 </script>
+
 <!-- #HTML -->
 
 <label

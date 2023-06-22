@@ -9,13 +9,13 @@
         _start = true,
         _dark
 
-        // #BINDS
+        // --BINDS
 
         export let
         width = 0,
         height = 0
 
-        export async function update(x, y, delay)
+        export async function view(x, y, delay)
         {
             [translateX, translateY] = getPosition(x, y)
             z = 0
@@ -33,94 +33,99 @@
 
     // #IMPORT
 
-        // #SVELTE
+        // --SVELTE
         import { onMount } from 'svelte'
 
     // #VARIABLES
 
-    let
-    card,
-    translateX = 0,
-    translateY = 0,
-    z = -1
+        // --ELEMENT-CARD
+        let
+        card,
+        translateX = 0,
+        translateY = 0,
+        z = -1
 
-    let
-    canvas,
-    columns,
-    rows,
-    context,
-    even
+        // --ELEMENT-CANVAS
+        let
+        canvas,
+        columns,
+        rows,
+        context,
+        even
 
     // #FUNCTIONS
 
-    function set()
-    {
-        width = card.offsetWidth + _blockSize - card.offsetWidth % _blockSize,
-        height = card.offsetHeight + _blockSize - card.offsetHeight % _blockSize
-
-        setCanvas()
-    }
-
-    function setCanvas()
-    {
-        canvas.width = width
-        canvas.height = height
-
-        columns = width / _blockSize
-        rows = height / _blockSize
-
-        context = canvas.getContext('2d')
-
-        even = columns % 2 ? false : true
-
-        context.fillStyle = _dark
-        context.fillRect(0, 0, columns * _blockSize, rows * _blockSize)
-    }
-
-    function getPosition(x, y)
-    {
-        const
-        w = window.innerWidth,
-        h = window.innerHeight
-
-        if (x < _blockSize) x = _blockSize
-        else
+        // --SET
+        function set()
         {
-            const xAndWidth = x + width + _blockSize
+            width = card.offsetWidth + _blockSize - card.offsetWidth % _blockSize,
+            height = card.offsetHeight + _blockSize - card.offsetHeight % _blockSize
 
-            if (xAndWidth > w) x -= xAndWidth - w
-        }
-        
-        if (y < _blockSize) y = _blockSize
-        else
-        {
-            const yAndHeight = y + height + _blockSize
-
-            if (yAndHeight > h) y -= yAndHeight - h
+            setCanvas()
         }
 
-        return [x, y]
-    }
-
-    function animation(action)
-    {
-        let delay = 0
-    
-        for (let y = 0; y < rows; y++)
+        function setCanvas()
         {
-            for (let x = 0; x < columns; x += 2)
+            canvas.width = width
+            canvas.height = height
+
+            columns = width / _blockSize
+            rows = height / _blockSize
+
+            context = canvas.getContext('2d')
+
+            even = columns % 2 ? false : true
+
+            context.fillStyle = _dark
+            context.fillRect(0, 0, columns * _blockSize, rows * _blockSize)
+        }
+
+        // --GET
+        function getPosition(x, y)
+        {
+            const
+            w = window.innerWidth,
+            h = window.innerHeight
+
+            if (x < _blockSize) x = _blockSize
+            else
             {
-                setTimeout(() =>
+                const xAndWidth = x + width + _blockSize
+
+                if (xAndWidth > w) x -= xAndWidth - w
+            }
+            
+            if (y < _blockSize) y = _blockSize
+            else
+            {
+                const yAndHeight = y + height + _blockSize
+
+                if (yAndHeight > h) y -= yAndHeight - h
+            }
+
+            return [x, y]
+        }
+
+        // --ANIMATION
+        function animation(action)
+        {
+            let delay = 0
+        
+            for (let y = 0; y < rows; y++)
+            {
+                for (let x = 0; x < columns; x += 2)
                 {
-                    requestAnimationFrame(() =>
+                    setTimeout(() =>
                     {
-                        context[action](x * _blockSize, y * _blockSize, _blockSize, _blockSize)
-                        context[action](((even ? columns - 1 : columns) - x) * _blockSize, (rows - y - 1) * _blockSize, _blockSize, _blockSize)
-                    })
-                }, delay += 16)
+                        requestAnimationFrame(() =>
+                        {
+                            context[action](x * _blockSize, y * _blockSize, _blockSize, _blockSize)
+                            context[action](((even ? columns - 1 : columns) - x) * _blockSize, (rows - y - 1) * _blockSize, _blockSize, _blockSize)
+                        })
+                    }, delay += 16)
+                }
             }
         }
-    }
 
     // #CYCLE
 

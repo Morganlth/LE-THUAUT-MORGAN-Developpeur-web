@@ -6,16 +6,44 @@
         // --PROPS
         export let
         _size,
-        _options,
-        _modes,
-        _cards,
+        _snakeOption,
+        _challenge,
         _gameOver,
         _lock,
         _invincible,
         _colors
 
-        // --BIND
-        export let score = 10
+        // --BINDS
+        export let
+        score = 10,
+        snakeTail = [0, 0]
+
+        export function resetSnake()
+        {
+            if (snake.length > 10)
+            {
+                animation(false, 10)
+                snake.length = 10
+                score = 10
+            }
+        }
+
+        export function animation(draw, max = -1) // dessine ou supprime de façon animé (serpent et pomme)
+        {
+            let delay = 0
+
+            for (let i = snake.length - 1; i >= max; i--)
+            {
+                const part = i >= 0 ? snake[i] : apple
+
+                setTimeout(() => requestAnimationFrame(() =>
+                {
+                    if (draw) context.fillStyle = _colors[i > 0 ? 'oPrimary' : i === 0 ? 'primary' : 'indicator']
+        
+                    context[draw ? 'fillRect' : 'clearRect'](part[0] * blockSize, part[1] * blockSize, blockSize, blockSize)
+                }), delay += 16)
+            }
+        }
 
     // #IMPORTS
 
@@ -57,33 +85,6 @@
         offsetY,
         width,
         height
-
-        // --CARDS
-        let i = 0
-
-    let
-    textOff = false,
-    snakeOff = false,
-    fpsOn = false,
-    noneOn = false,
-    normalOn = true,
-    challengeOn = false
-
-    // #REACTIVES
-
-    $: options =
-    [
-        { link: textOff, content: 'MASQUER LE TEXTE' },
-        { link: snakeOff, content: 'MASQUER LE SERPENT' },
-        { link: fpsOn, content: 'AFFICHER LES FPS' },
-    ]
-
-    $: gameModes =
-    [
-        { link: noneOn, content: 'AUCUN' },
-        { link: normalOn, content: 'NORMAL' },
-        { link: challengeOn, content: 'CHALLENGE' }
-    ]
 
     // #FUNCTIONS
 
@@ -142,21 +143,13 @@
         function getModel(pre, current, next)
         {
             const
-            currentX = current[0],
-            currentY = current[1],
-            positions =
-            [
-                ['a', 'b', 'c'],
-                ['d', 'e', 'f'],
-                ['g', 'h', 'i']
-            ],
-            model = [null, null]
-        
-            if (pre) model[0] = positions[pre[1] - currentY][pre[0] - currentX]
-            if (next) model[1] = positions[next[1] - currentY][next[0] - currentX]
-
-            return model
+            currentX = Math.abs(current[0]),
+            currentY = Math.abs(current[1])
+            
+            return [pre ? getPosition(pre, currentX, currentY) : null, getPosition(next, currentX, currentY)]
         }
+
+        function getPosition(part, x, y) { return [['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i']][1 + (Math.abs(part[1]) - y)][1 + (Math.abs(part[0]) - x)] }
 
         function getDimensions(model)
         {
@@ -228,16 +221,6 @@
 
             _gameOver.update(false)
         }
-
-        function resetSnake() // reset le serpent
-        {
-            if (snake.length > 10)
-            {
-                animation(false, 10)
-                snake.length = 10
-                score = 10
-            }
-        }
     
         // --UPDATE
         function update()
@@ -252,23 +235,13 @@
 
         function updateGamePlan()
         {
-            if (options.text) updateCard()
+            const tail = snake[snake.length - 1]
+    
+            snakeTail = [tail[0] * blockSize, tail[1] * blockSize]
         
             setApple()
 
             snake.push([])
-        }
-
-        function updateCard()
-        {
-            const [cardX, cardY] = snake[snake.length - 1]
-    
-            if (i === _cards.length) i = 0
-
-            const j = i - 1
-
-            _cards[j < 0 ? _cards.length - 1 : j].hidden()
-            _cards[i++].update(cardX * blockSize, cardY * blockSize, 100)
         }
 
         // --COMMAND
@@ -301,7 +274,7 @@
 
         async function snake_mouseDown(e) // click pour reset apres un gameOver
         {
-            if (_gameOver.on && e.target.classList.contains('frame'))
+            if (_gameOver.on && e.target.classList.contains('snake-game'))
             {
                 clientX = e.clientX
                 clientY = e.clientY
@@ -310,11 +283,14 @@
             }
         }
 
-        function snake_mouseLeave()
+        function snake_mouseLeave(e)
         {
+            const target = e.relatedTarget
+    
             spring.spring_mouseLeave()
-
-            if (_modes.challenge) _gameOver.update(true)
+    
+            if (target && target.classList.contains('icon')) return
+            if (_challenge) _gameOver.update(true)
         }
 
         // --MOVE
@@ -322,6 +298,7 @@
         {
             if (test())
             {
+                // console.log('move')
                 update()
             
                 if (check()) draw()
@@ -347,20 +324,18 @@
             return !(
                _lock
             || _gameOver.on
-            || event.grabbing
-            || (snake.length && snake[0][0] === x && snake[0][1] === y))
+            || event.grabbing)
         }
 
         function check()
         {
-            if (scope) checkInside()
-            else
-            {
-                if (outside || checkOutside()) return false
-            }
+            if (snake.length && snake[0][0] === x && snake[0][1] === y) return false
     
-            if (!options.snake) return false
-
+            if (scope) checkInside()
+            else if (outside || checkOutside()) return false
+    
+            if (!_snakeOption) return false
+    
             return true
         }
 
@@ -368,7 +343,7 @@
         {
             if (outside) outside = false
     
-            if (!options.snake)
+            if (!_snakeOption)
             {
                 if (spring.lock) spring.spring_mouseLeave()
             }
@@ -392,12 +367,13 @@
             const [snakeX, snakeY] = [part[0], part[1]]
     
             if (snakeX === apple[0] && snakeY === apple[1]) updateGamePlan()
-            if (!_invincible && scope && snakeX === x && snakeY === y) _modes.challenge ? _gameOver.update(true) : snake.pop()
+            if (!_invincible && scope && snakeX === x && snakeY === y) _challenge ? _gameOver.update(true) : snake.pop()
         }
 
         // --DRAW-CLEAR
         function draw()
         {
+            // console.log('draw')
             const [snakeX, snakeY] = [snake[0][0], snake[0][1]]
 
             let
@@ -440,16 +416,18 @@
                 const part = snake[i]
 
                 checkSnakePart(part)
-                drawSnakeBody(part, i)
+                drawSnakeBody(part, i, x, y)
             }
 
             drawSnakeHead(x, y)
         }
 
-        function drawSnakeBody(part, i)
+        function drawSnakeBody(part, i, x, y)
         {
             const
-            model = getModel(snake[i+1], part, snake[i-2]),
+            pre = snake[i+1],
+            next = snake[i-2] ?? [x, y],
+            model = getModel(pre, part, next),
             [offsetX, offsetY, blockWidth, blockHeight] = getDimensions(model)
 
             context.fillRect(part[0] * blockSize + offsetX, part[1] * blockSize + offsetY, blockWidth, blockHeight)
@@ -464,38 +442,6 @@
             context.fillStyle = _colors.primary
             context.fillRect(snake[0][0] * blockSize, snake[0][1] * blockSize, blockSize, blockSize)
         }
-
-        // --CODE
-        function animation(draw, max = -1) // dessine ou supprime de façon animé (serpent et pomme)
-        {
-            let delay = 0
-
-            for (let i = snake.length - 1; i >= max; i--)
-            {
-                const part = i >= 0 ? snake[i] : apple
-
-                setTimeout(() => requestAnimationFrame(() =>
-                {
-                    if (draw) context.fillStyle = _colors[i > 0 ? 'oPrimary' : i === 0 ? 'primary' : 'indicator']
-        
-                    context[draw ? 'fillRect' : 'clearRect'](part[0] * blockSize, part[1] * blockSize, blockSize, blockSize)
-                }), delay += 16)
-            }
-        }
-
-
-
-
-    
-    
-
-    
-
-
-
-    
-
-    function hidden() { for (let i = 0; i < cards.length; i++) cards[i].hidden() }
 
     // #CYCLE
 
@@ -526,119 +472,23 @@ lang="scss"
     /* #IMPORTS */
 
     @import
-    '../../assets/scss/styles/flex.scss',
     '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/background.scss',
-    '../../assets/scss/styles/font.scss';
+    '../../assets/scss/styles/size.scss';
 
     /* #GROUPS */
 
     .snake-game
     {
-        @include relative;
+        @include xy-start(true);
 
-        display: inline-block;
-        
-        z-index: 1;
-
-        .card-container
+        &::after
         {
-            h3
-            {
-                @include title-3($o-primary);
-
-                padding-right: 30px;
-
-                white-space: nowrap;
-            }
-
-            .content
-            {
-                margin: 10px 0 0 30px;
-                padding: 10px 0 0 30px;
-
-                border-top: solid 1px $o-primary;
-            }
-
-            p
-            {
-                @include text-command;
-
-                color: $light;
-                user-select: none;
-            }
-        }
-
-        .game-over
-        {
-            h6
-            {
-                @include title($light, 90px, 77px);
-
-                margin-bottom: 10px;
-                white-space: nowrap;
-            }
-
-            p { text-align: center; }
-        }
-
-        canvas { @include relative; }
-    
-        .frame
-        {
-            &,
-            nav
-            {
-                @include flex;
-
-                align-items: flex-end;
-            }
-
             @include xy-start(true);
             @include any;
 
-            justify-content: space-between;
+            content: '';
 
-            z-index: 2;
-
-            box-sizing: border-box;
             box-shadow: inset -15px -15px 15px $dark, inset 15px 15px 15px $dark;
-
-            p { @include text-info; }
-
-            nav
-            {
-                @include f-center(true);
-                @include f-column;
-                @include absolute;
-                @include any-h;
-                @include black-glass(blur(3px));
-
-                gap: 30px;
-
-                top: 0;
-
-                z-index: -1;
-
-                transition: transform 0.5s ease;
-
-                border-left: solid 4px $s-light;
-
-                box-sizing: border-box;
-            }
-
-            h4
-            {
-                @include title-4;
-                @include any-w;
-
-                text-align: right;
-            }
-
-            ul { @include any-w; }
-
-            li { margin-bottom: 20px; }
         }
     }
 </style>
