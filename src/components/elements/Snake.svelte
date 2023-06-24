@@ -6,7 +6,7 @@
         // --PROPS
         export let
         _size,
-        _snakeOption,
+        _snakeParam,
         _challenge,
         _gameOver,
         _lock,
@@ -53,7 +53,7 @@
         import { spring } from '../field/Main.svelte'
 
         // #SVELTE
-        import { onMount } from 'svelte'
+        import { onMount, onDestroy } from 'svelte'
 
     // #CONSTANTES
 
@@ -64,7 +64,7 @@
 
     // #VARIABLES
 
-        // --THIS
+        // --ELEMENT-SNAKE
         let
         canvas,
         columns,
@@ -130,7 +130,7 @@
             for (let i = 0; i < 10; i++) snake.push([-1 - i, startY])
         }
 
-        function setCommand() { app.add('snakeSize', snakeSize, true) }
+        function setCommand() { app.add('snakeSize', snakeSize, true), app.add('canvas', () => console.log(canvas)) }
 
         function setEvent()
         {
@@ -244,10 +244,20 @@
             snake.push([])
         }
 
+        // --DESTROY
+        function destroy()
+        {
+            event.remove('scroll', snake_scroll)
+            event.remove('mouseMove', snake_mouseMove)
+            event.remove('mouseDown', snake_mouseDown)
+        }
+
         // --COMMAND
-        async function snakeSize(size)
+        function snakeSize(size)
         {
             size = app.testDefault(size) ? _size : app.testNumber(size, 10, 70)
+
+            if (size === blockSize) return
 
             blockSize = size
             localStorage.setItem('snakeSize', size)
@@ -255,7 +265,7 @@
     
             app.success('snakeSize ' + size)
         }
-    
+
         // --EVENTS
         async function snake_scroll()
         {
@@ -287,8 +297,7 @@
         {
             const target = e.relatedTarget
     
-            spring.spring_mouseLeave()
-    
+            if (spring.lock) spring.spring_mouseLeave()
             if (target && target.classList.contains('icon')) return
             if (_challenge) _gameOver.update(true)
         }
@@ -334,7 +343,7 @@
             if (scope) checkInside()
             else if (outside || checkOutside()) return false
     
-            if (!_snakeOption) return false
+            if (!_snakeParam) return false
     
             return true
         }
@@ -343,7 +352,7 @@
         {
             if (outside) outside = false
     
-            if (!_snakeOption)
+            if (!_snakeParam)
             {
                 if (spring.lock) spring.spring_mouseLeave()
             }
@@ -373,21 +382,19 @@
         // --DRAW-CLEAR
         function draw()
         {
-            // console.log('draw')
             const [snakeX, snakeY] = [snake[0][0], snake[0][1]]
 
             let
             gapX = snakeX - x,
             gapY = snakeY - y,
-            // step = Math.max(Math.abs(gapX), Math.abs(gapY)),
+            addX = x < snakeX ? -1 : 1,
+            addY = y < snakeY ? -1 : 1,
             i = 0
-
-            // console.log(step + ' - ' + (gapX / step) + ' - ' + (gapY / step))
 
             while(i++ < 20)
             {
-                if (gapX !== 0) x < snakeX ? gapX-- : gapX++
-                if (gapY !== 0) y < snakeY ? gapY-- : gapY++
+                if (gapX !== 0) gapX += addX
+                if (gapY !== 0) gapY += addY
 
                 clear()
                 drawApple()
@@ -443,9 +450,10 @@
             context.fillRect(snake[0][0] * blockSize, snake[0][1] * blockSize, blockSize, blockSize)
         }
 
-    // #CYCLE
+    // #CYCLES
 
     onMount(set)
+    onDestroy(destroy)
 </script>
 
 <!-- #HTML -->

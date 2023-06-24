@@ -37,7 +37,13 @@
     // #FUNCTIONS
 
         // --CYCLES
-        function set() { app.cmd = cmd }
+        function set()
+        {
+            cmd.input = input
+            cmd.analyse = analyse
+
+            app.cmd = cmd
+        }
 
         function reset()
         {
@@ -55,7 +61,7 @@
             value = command
             input.focus()
             input.setSelectionRange(length, length)
-            writingEvent()
+            inputEvent()
         }
 
         function update(action, values = [])
@@ -66,14 +72,14 @@
         }
 
         // --EVENTS
-        function writingEvent()
+        function inputEvent()
         {
             (value.length === 3 || value[3] === ' ') && value.substring(0, 3) === 'app'
             ? analyse(value)
             : update('remove', [value])
         }
 
-        function keyEvent(e)
+        function keyup(e)
         {
             const key = e.key
 
@@ -138,16 +144,16 @@
 
 <!-- #HTML -->
 
-<section
+<div
 class="console"
 on:mouseenter={spring.spring_mouseEnter.bind(spring)}
 on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 >
-    <div>
+    <section>
         <h3>Console</h3>
 
         <p>RECHERCHER & MODIFIER</p>
-    </div>
+    </section>
 
     <div
     class="cmd"
@@ -171,8 +177,8 @@ on:mouseleave={spring.spring_mouseLeave.bind(spring)}
                 spellcheck="false"
                 bind:this={input}
                 bind:value={value}
-                on:input={writingEvent}
-                on:keyup|preventDefault={keyEvent}
+                on:input={inputEvent}
+                on:keyup|preventDefault={keyup}
                 />
 
                 <div
@@ -189,7 +195,7 @@ on:mouseleave={spring.spring_mouseLeave.bind(spring)}
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <!-- #STYLE -->
 
@@ -216,12 +222,9 @@ lang="scss"
 
         border: solid $dark 4px;
 
-        &,
-        .cmd
-        { box-sizing: border-box }
+        box-sizing: border-box;
 
-        &
-        >div:nth-child(1)
+        section
         {
             @include flex;
 
@@ -248,6 +251,8 @@ lang="scss"
 
             border-right: solid $secondary 2px;
             border-bottom: solid $secondary 2px;
+
+            box-sizing: border-box;
 
             &::-webkit-scrollbar
             {

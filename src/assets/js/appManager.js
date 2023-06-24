@@ -1,6 +1,6 @@
 // #APP-MANAGER
 
-export default class App
+class AppManager
 {
     // --VARIABLES
     keyWords = ['log', 'clear', 'reset', 'success', 'error', 'getFps', 'effect']
@@ -21,19 +21,12 @@ export default class App
 
     testBoolean(value)
     {
-        if (value === 'f' || value === 'false') return false
-        else if (value === 't' || value === 'true') return true
+        if (value === false || value === 'f' || value === 'false') return false
+        else if (value === true || value === 't' || value === 'true') return true
         else this.error('"t" | "true" pour vrai - "f" | "false" pour faux', 'TypeError')
     }
 
-    // --CYCLE
-    clear()
-    {
-        const children = [...this.cmd.children]
-
-        for (let i = children.length - 2; i >= 0; i--) this.cmd.removeChild(children[i])
-    }
-
+    // --RESET
     reset(view)
     {
         for (const key of this.storageKeys) this[key]('d')
@@ -63,7 +56,20 @@ export default class App
     
     error(msg, type) { throw new AppError(type ?? 'Error', msg) }
 
-    // --SET
+    // --DEFAULT-COMMAND
+    clear()
+    {
+        const children = [...this.cmd.children]
+
+        for (let i = children.length - 2; i >= 0; i--) this.cmd.removeChild(children[i])
+    }
+
+    write(value)
+    {
+        this.cmd.input.value = value
+        this.cmd.analyse(value)
+    }
+
     effect(n)
     {
         this.testDefault(n) ? n = .3 : this.testNumber(n, 0, 1)
@@ -74,7 +80,6 @@ export default class App
         this.success('effet ' + n)
     }
 
-    // --GET
     async getFps() { this.log('' + await getFps()) }
 
     // --CODE
@@ -93,3 +98,7 @@ import AppSuccess from './success'
 import AppError from './error'
 
 import getFps from './fps'
+
+// #EXPORT
+
+export default new AppManager()

@@ -15,7 +15,7 @@
         import { event } from '../field/Main.svelte'
 
         // --SVELTE
-        import { onMount } from 'svelte'
+        import { onMount, onDestroy } from 'svelte'
 
         // --COMPONENT-ELEMENTS
         import Die from '../elements/Die.svelte'
@@ -148,6 +148,9 @@
             y = 1 /* set satellites positions */
         }
 
+        // --DESTROY
+        function destroy() { event.remove('scroll', competence_scroll) }
+
         // --EVENT
         async function competence_scroll()
         {
@@ -156,9 +159,10 @@
             y = gap > 0 ? gap < height ? gap / height : 1 : 0
         }
 
-    // #CYCLE
+    // #CYCLES
 
     onMount(set)
+    onDestroy(destroy)
 </script>
 
 <!-- #HTML -->

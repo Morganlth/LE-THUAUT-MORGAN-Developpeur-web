@@ -1,6 +1,6 @@
 // #EVENT-MANAGER
 
-export default class EventManager
+class EventManager
 {
     // --VARIABLES
     manager =
@@ -20,26 +20,28 @@ export default class EventManager
     // --EVENTS
     scroll()
     {
-        if (!this.scrollFrame)
-            this.scrollFrame = requestAnimationFrame(() =>
-            {
-                this.run.call(this.manager.scroll)
+        if (this.scrollFrame) return
 
-                this.scrollFrame = false
-            })
+        this.scrollFrame = requestAnimationFrame(() =>
+        {
+            this.run.call(this.manager.scroll)
+
+            this.scrollFrame = false
+        })
     }
 
     wheel(e) { this.run.call(this.manager.wheel, e.currentTarget, e.deltaY) }
 
     mouseMove(e)
     {
-        if (!this.mouseFrame)
-            this.mouseFrame = requestAnimationFrame(() =>
-            {
-                this.run.call(this.manager.mouseMove, e.clientX, e.clientY)
+        if (this.mouseFrame) return
 
-                this.mouseFrame = false
-            })
+        this.mouseFrame = requestAnimationFrame(() =>
+        {
+            this.run.call(this.manager.mouseMove, e.clientX, e.clientY)
+
+            this.mouseFrame = false
+        })
     }
 
     mouseDown(e) { this.run.call(this.manager.mouseDown, e) }
@@ -49,14 +51,22 @@ export default class EventManager
     // --CODE
     add(category, func)
     {
-        const name = func.name
-        let array = this.manager[category]
+        this.manager[category].push(func)
+    }
+
+    remove(category, func)
+    {
+        const
+        name = func.name,
+        array = this.manager[category]
 
         for (let i = 0; i < array.length; i++)
             if (name === array[i].name) { array.splice(i, 1); break }
-
-        array.push(func)
     }
 
     run() { for (const func of this) func(...arguments) }
 }
+
+// #EXPORT
+
+export default new EventManager()

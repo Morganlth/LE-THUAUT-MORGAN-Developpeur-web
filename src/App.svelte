@@ -22,9 +22,20 @@
         import Header from './components/field/Header.svelte'
         import Main from './components/field/Main.svelte'
 
+        // --COMPONENT-ELEMENT
+        import EcoPopup from './components/elements/EcoPopup.svelte'
+
+    // #CONSTANTE
+
+    const start = performance.now()
+
+    // #VARIABLE
+
+    let eco = false
+
     // #FUNCTIONS
 
-        // --CYCLE
+        // --SET
         function set()
         {
             const appElement = document.body.firstElementChild
@@ -33,8 +44,11 @@
             appElement.style.opacity = 1
 
             restore()
+
+            if (performance.now() - start > 300) eco = true
         }
 
+        // --RESTORE
         function restore()
         {
             for (let i = 0; i < app.storageKeys.length; i++)
@@ -66,4 +80,8 @@
     _colors={colors}
     {_page}
     />
+
+    {#if eco}
+        <EcoPopup />
+    {/if}
 </slot>

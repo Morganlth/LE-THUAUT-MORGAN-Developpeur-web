@@ -25,7 +25,7 @@
         import { event } from '../field/Main.svelte'
 
         // #SVELTE
-        import { onMount } from 'svelte'    
+        import { onMount, onDestroy } from 'svelte'    
     
         // #COVER
         import Icon from '../covers/Icon.svelte'
@@ -121,6 +121,14 @@
         event.add('scroll', die_scroll)
         event.add('mouseMove', die_mouseMove)
         event.add('mouseUp', die_mouseUp)
+    }
+
+    // --DESTROY
+    function destroy()
+    {
+        event.remove('scroll', die_scroll)
+        event.remove('mouseMove', die_mouseMove)
+        event.remove('mouseUp', die_mouseUp)
     }
 
     async function die_scroll()
@@ -284,9 +292,10 @@
         number = n
     }
 
-    // #CYCLE
+    // #CYCLES
 
     onMount(set)
+    onDestroy(destroy)
 </script>
 
 <!-- #HTML -->

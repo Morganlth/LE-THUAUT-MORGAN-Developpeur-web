@@ -20,7 +20,12 @@
             [translateX, translateY] = getPosition(x, y)
             z = 0
         
-            setTimeout(() => animation('clearRect'), delay ?? 0)
+            timeout = setTimeout(() =>
+            {
+                timeout = null
+    
+                animation('clearRect')
+            }, delay ?? 0)
         }
 
         export async function hidden()
@@ -28,6 +33,8 @@
             context.fillStyle = _dark
             z = -1
 
+            if (timeout) clearTimeout(timeout), timeout = null
+    
             animation('fillRect')
         }
 
@@ -43,7 +50,8 @@
         card,
         translateX = 0,
         translateY = 0,
-        z = -1
+        z = -1,
+        timeout = null
 
         // --ELEMENT-CANVAS
         let

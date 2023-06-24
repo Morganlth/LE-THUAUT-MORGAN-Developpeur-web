@@ -1,21 +1,22 @@
 <!-- #SCRIPT -->
+
 <script
 context="module"
 >
     // #EXPORTS
 
-        // --MODULES
-        export let
-        app = new App(),
-        event = new EventManager(),
-        spring = new SpringManager()
+        // #MODULES
+        export const
+        app = a,
+        event = e,
+        spring = s
 
-    // #IMPORT
+    // --IMPORTS
 
-        // --JS
-        import App from '../../assets/js/appManager'
-        import EventManager from '../../assets/js/eventManager'
-        import SpringManager from '../../assets/js/springManager'
+        // #CONTEXTS
+        import a from '../../assets/js/appManager'
+        import e from '../../assets/js/eventManager'
+        import s from '../../assets/js/springManager'
 </script>
 
 <script>
@@ -32,7 +33,7 @@ context="module"
         import '../../assets/scss/components/main.scss'
 
         // --SVELTE
-        import { onMount } from 'svelte'
+        import { onMount, onDestroy } from 'svelte'
 
         // --COMPONENT-MODULES
         import Home from '../modules/Home.svelte'
@@ -73,23 +74,36 @@ context="module"
         let
         coords = spring.coords,
         size = spring.size
-
+    
     // #FUNCTIONS
 
-        // --CYCLE
+        // --SET
         function set()
         {
             max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 // (140vh + 200vw) - 140vh = 200vw
 
+            setCommand()
             setEvent()
             setPage()
         }
 
-        // --SET
+        function setCommand()
+        {
+            app.add('app', () => console.log(app))
+            app.add('event', () => console.log(event))
+
+            app.add('spring', updateSpring, true)
+        }
+
         function setEvent()
         {
             event.add('scroll', scroll)
     
+            setSpringEvent()
+        }
+
+        function setSpringEvent()
+        {
             event.add('mouseMove', spring.spring_mouseMove.bind(spring))
             event.add('mouseDown', spring.spring_mouseDown.bind(spring))
             event.add('mouseUp', spring.spring_mouseUp.bind(spring))
@@ -109,6 +123,37 @@ context="module"
 
                 sideEffects()
             }
+        }
+
+        // --UPDATE
+        function updateSpring(on)
+        {
+            on = app.testDefault(on) ? true : app.testBoolean(on)
+    
+            destroySpringEvent()
+    
+            if (on) { setSpringEvent() }
+
+            spring.on = on
+            spring.size.set(on ? 7 : 0) 
+            localStorage.setItem('spring', on)
+
+            app.success('Spring ' + on)
+        }
+
+        // --DESTROY
+        function destroy()
+        {
+            event.remove('scroll', scroll)
+    
+            destroySpringEvent()
+        }
+
+        function destroySpringEvent()
+        {
+            event.remove('mouseMove', spring.spring_mouseMove.bind(spring))
+            event.remove('mouseDown', spring.spring_mouseDown.bind(spring))
+            event.remove('mouseUp', spring.spring_mouseUp.bind(spring))
         }
 
         // --EVENT
@@ -135,9 +180,10 @@ context="module"
             }
         }
 
-    // #CYCLE
+    // #CYCLES
 
     onMount(set)
+    onDestroy(destroy)
 </script>
 
 <!-- #HTML -->

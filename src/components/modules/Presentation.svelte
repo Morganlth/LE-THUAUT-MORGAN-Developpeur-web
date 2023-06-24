@@ -10,8 +10,9 @@
 
     // #IMPORTS
    
-        // --CONTEXT
+        // --CONTEXTS
         import { app } from '../field/Main.svelte'
+        import { spring } from '../field/Main.svelte'
 
         // --JS
         import getFps from '../../assets/js/fps'
@@ -52,7 +53,8 @@
         // --ELEMENT-CARD
         let
         charged = false,
-        i = 0
+        i = 0,
+        j = -1
 
         // --ELEMENT-CARD-GAME-OVER
         let gameOver = { on: false, update: updateGameOver }
@@ -71,11 +73,11 @@
         fps = 0,
         translateX = 100
 
-        // --OPTIONS
+        // --PARAMS
         let
-        textOption = true,
-        snakeOption = true,
-        fpsOption = false
+        textParam = true,
+        snakeParam = true,
+        fpsParam = false
 
         // --MODES
         let
@@ -89,11 +91,11 @@
         $: updateCard(snakeTail)
 
         // --TO-ITERATE
-        $: options =
+        $: params =
         [
-            { on: textOption, content: 'AFFICHER LE TEXTE' },
-            { on: snakeOption, content: 'AFFICHER LE SERPENT' },
-            { on: fpsOption, content: 'AFFICHER LES FPS' }
+            { on: textParam, content: 'AFFICHER LE TEXTE' },
+            { on: snakeParam, content: 'AFFICHER LE SERPENT' },
+            { on: fpsParam, content: 'AFFICHER LES FPS' }
         ]
         
         $: modes =
@@ -119,7 +121,7 @@
             {
                 charged = true
 
-                if (!snakeOption && textOption) tick().then(viewCards)
+                if (!snakeParam && textParam) tick().then(viewCards)
             })
         }
 
@@ -134,7 +136,7 @@
         {
             fps = await getFps()
 
-            if (fpsOption) setFps()
+            if (fpsParam) setFps()
         }
 
         function setInvincible()
@@ -147,50 +149,54 @@
         // --RESTORE
         function restore()
         {
-            restoreOptions()
+            restoreParams()
             restoreModes()
         }
 
-        function restoreOptions()
+        function restoreParams()
         {
             const
             textStorage = localStorage.getItem('presentation_text'),
             snakeStorage = localStorage.getItem('presentation_snake'),
             fpsStorage = localStorage.getItem('presentation_fps')
 
-            textOption = (!textStorage || textStorage === 'true')
-            snakeOption = (!snakeStorage || snakeStorage === 'true')
-            fpsOption = (!fpsStorage || fpsStorage === 'true') 
+            textParam = (!textStorage || textStorage === 'true')
+            snakeParam = (!snakeStorage || snakeStorage === 'true')
+            fpsParam = (!fpsStorage || fpsStorage === 'true') 
         }
 
         function restoreModes()
         {
-            if (!snakeOption)
+            if (!snakeParam)
             {
-                if (textOption) noneMode = true
+                if (textParam) noneMode = true
         
                 normalMode = false
             }
-            else if (!textOption) normalMode = false
+            else if (!textParam) normalMode = false
         }
 
         function restoreCard()
         {
-            if (--i < 0) i = 0
+            if (j > -1)
+            {
+                i = j
 
-            updateCard(snakeTail)
+                updateCard(snakeTail)
+            }
         }
 
         // --UPDATE
         function updateCard([cardX, cardY])
         {
-            if (!textOption || !charged) return
+            if (!textParam || !charged) return
     
             if (i === cards.length) i = 0
 
-            const j = i - 1
-
             cards[j < 0 ? cards.length - 1 : j].hidden()
+
+            j = i
+
             cards[i++].view(cardX, cardY, 100)
         }
     
@@ -200,22 +206,23 @@
     
             await gameOver[on ? 'view' : 'hidden']()
            
-            if (snakeOption) animation(!on)
-            if (!on) setInvincible()
+            if (snakeParam) animation(!on)
+            
+            on ? spring.spring_mouseLeave() : setInvincible()
         }
 
-        function updateOption(id)
+        function updateParam(id)
         {
             switch (id)
             {
                 case 0:
-                    updateText(!textOption)
+                    updateText(!textParam)
                     break
                 case 1:
-                    updateSnake(!snakeOption)
+                    updateSnake(!snakeParam)
                     break
                 case 2:
-                    updateFps(!fpsOption)
+                    updateFps(!fpsParam)
                     break
                 default:
                     break
@@ -242,11 +249,11 @@
 
         function updateText(on)
         {
-            textOption = on
+            textParam = on
 
             if (on)
             {
-                if (charged) snakeOption ? restoreCard() : viewCards()
+                if (charged) snakeParam ? restoreCard() : viewCards()
                 
                 challengeMode = false
             }
@@ -263,17 +270,17 @@
 
         function updateSnake(on)
         {
-            snakeOption = on
+            snakeParam = on
         
             if (on)
             {
-                if (textOption && charged) hiddenCards()
+                if (textParam && charged) hiddenCards(), restoreCard()
             
                 noneMode = false
             }
             else
             {
-                if (textOption && charged) viewCards()
+                if (textParam && charged) viewCards()
     
                 normalMode = false
                 challengeMode = false
@@ -288,7 +295,7 @@
         {
             if (on) setFps()
 
-            fpsOption = on
+            fpsParam = on
 
             localStorage.setItem('presentationFps', on)
         }
@@ -297,8 +304,8 @@
         {
             if (on)
             {
-                if (!textOption) updateText(true)
-                if (snakeOption) updateSnake(false)
+                if (!textParam) updateText(true)
+                if (snakeParam) updateSnake(false)
                 if (gameOver.on) gameOver.update(false)
     
                 normalMode = false
@@ -312,8 +319,8 @@
         {
             if (on)
             {
-                if (!textOption) updateText(true)
-                if (!snakeOption) updateSnake(true)
+                if (!textParam) updateText(true)
+                if (!snakeParam) updateSnake(true)
                 if (gameOver.on) gameOver.update(false)
                 
                 noneMode = false
@@ -327,8 +334,8 @@
         {
             if (on)
             {
-                if (textOption) updateText(false)
-                if (!snakeOption) updateSnake(true)
+                if (textParam) updateText(false)
+                if (!snakeParam) updateSnake(true)
                 
                 noneMode = false
                 normalMode = false
@@ -465,7 +472,7 @@ style:width={_width}
 
     <Snake
     _size={size}
-    _snakeOption={snakeOption}
+    _snakeParam={snakeParam}
     _challenge={challengeMode}
     _gameOver={gameOver}
     _lock={lock}
@@ -487,7 +494,7 @@ style:width={_width}
             SCORE {score}
         </p>
 
-        {#if fpsOption}
+        {#if fpsParam}
             <p>
                 FPS {fps}
             </p>
@@ -510,19 +517,19 @@ style:width={_width}
         style:padding="{size * 2}px {size}px"
         on:mouseleave={mouseLeave}
         >
-            <h4>OPTIONS</h4>
+            <h4>PARAMÈTRES</h4>
 
             <ul>
-                {#each options as option, i}
+                {#each params as param, i}
                     <li>
                         <Cell
                         _style="display: block; width: 100%; border: none; cursor: pointer"
-                        on:click={updateOption.bind(null, i)}
+                        on:click={updateParam.bind(null, i)}
                         >
                             <Toggle
-                            _check={option.on}
+                            _check={param.on}
                             >
-                                {option.content}
+                                {param.content}
                             </Toggle>
                         </Cell>
                     </li>

@@ -14,8 +14,7 @@
         import { event } from '../field/Main.svelte'
 
         // #SVELTE
-        import { onMount } from 'svelte'
-        import { onDestroy } from 'svelte'
+        import { onMount, onDestroy } from 'svelte'
 
     // #CONSTANTES
 
@@ -88,10 +87,18 @@
 
             if (deltaY > 0 && scrollTop >= offsetTop) move()
         }
-        else destroy()
+        else destroyFrame()
     }
 
+    // --DESTROY
     function destroy()
+    {
+        event.remove('wheel', project_wheel)
+        
+        destroyFrame()
+    }
+
+    function destroyFrame()
     {
         if (frameId)
         {

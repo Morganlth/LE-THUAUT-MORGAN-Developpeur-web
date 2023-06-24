@@ -1,8 +1,9 @@
 // #SPRING-MANAGER
 
-export default class SpringManager
+class SpringManager
 {
     // --VARIABLES
+    on = true
     lock = false
     timeout = null
 
@@ -32,20 +33,34 @@ export default class SpringManager
 
     async spring_mouseEnter()
     {
-        this.lock = true
-        this.size.set(0)
+        if (this.on)
+        {
+            this.lock = true
+            this.size.set(0)
+    
+            // console.log('enter')
+        }
     }
 
     async spring_mouseLeave()
     {
-        this.lock = false
-        this.size.set(7)
+        if (this.on)
+        {
+            this.lock = false
+            this.size.set(7)
+
+        // console.log('leave')
+        }
     }
 }
 
 // #IMPORT
 
 import { spring } from 'svelte/motion'
+
+// #EXPORT
+
+export default new SpringManager()
 
 // desactiver spring par command
 // verifier les performances de l'appareil et desactiver spring et d'autres paramètres inutiles si performances faibles
