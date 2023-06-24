@@ -11,7 +11,7 @@
     // #IMPORTS
 
         // --CONTEXTS
-        import { app } from '../field/Main.svelte'
+        import { app, router } from '../field/Main.svelte'
         import { event } from '../field/Main.svelte'
 
         // --SVELTE
@@ -60,14 +60,14 @@
 
     // #VARIABLES
 
-        // --THIS
+        // --ELEMENT-MAIN
+        let main
+
+        // --ELEMENT-COMPETENCE
         let
         competence,
         offsetTop,
         height
-        
-        // --ELEMENT-MAIN
-        let main
 
         // --ELEMENT-DIE
         let
@@ -89,41 +89,18 @@
 
     // #FUNCTIONS
 
-        // --CYCLE
-        function set()
-        {
-            setElement()
-            setEvent()
-            setCommand()
-        }
-
         // --SET
-        function setElement()
+        function set()
         {
             setMain()
             setCompetence()
             setDie()
             setSatellite()
+            setCommand()
+            setEvent()
+            setRouter()
         }
 
-        function setEvent() { event.add('scroll', competence_scroll) }
-
-        function setCommand()
-        {
-            const name = 'spaceDimension'
-        
-            app.add(name, (n) =>
-            {
-                n = app.testDefault(n) ? 6 : app.testNumber(n, 1, 6)
-
-                number = n
-                localStorage.setItem(name, n)
-        
-                app.success(name + ' ' + n)
-            }, true)
-        }
-
-        // --SET-ELEMENTS
         function setMain() { main = document.querySelector('main') }
 
         function setCompetence()
@@ -148,8 +125,30 @@
             y = 1 /* set satellites positions */
         }
 
+        function setCommand() { app.add('spaceDimension', spaceDimension, true) }
+
+        function setEvent() { event.add('scroll', competence_scroll) }
+
+        function setRouter()
+        {
+            const start = competence.parentNode.offsetTop
+    
+            router.add(2, 'competence', start)
+        }
+
         // --DESTROY
         function destroy() { event.remove('scroll', competence_scroll) }
+
+        // --COMMAND
+        function spaceDimension(n)
+        {
+            n = app.testDefault(n) ? 6 : app.testNumber(n, 1, 6)
+
+            number = n
+            localStorage.setItem('spaceDimension', n)
+    
+            app.success('spaceDimension ' + n)
+        }
 
         // --EVENT
         async function competence_scroll()
@@ -243,6 +242,8 @@ lang="scss"
             @include f-center(true);
             @include f-column;
             @include any-w;
+
+            /* padding: 100px 0; */
         }
 
         p

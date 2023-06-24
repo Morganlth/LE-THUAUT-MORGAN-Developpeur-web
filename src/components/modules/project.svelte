@@ -10,8 +10,9 @@
 
     // #IMPORTS
 
-        // #CONTEXT
+        // #CONTEXTS
         import { event } from '../field/Main.svelte'
+        import { router } from '../field/Main.svelte'
 
         // #SVELTE
         import { onMount, onDestroy } from 'svelte'
@@ -25,6 +26,8 @@
     cards = ['', '', '', '', '', '', '', '', '', '']
 
     // #VARIABLES
+
+    let project
 
     let
     frameId = null,
@@ -59,23 +62,24 @@
 
     function set()
     {
-        const parent = canvas.parentNode
-
         width = window.innerWidth
         height = window.innerHeight
         size = Math.sqrt(width * width + height * height)
 
-        offsetTop = parent.offsetTop + parent.parentNode.offsetTop + height
+        offsetTop = project.offsetTop + project.parentNode.offsetTop + height - 5 // 5 pour une marge d'erreur dans les calculs (utile pour project_wheel avec scrollTop et offsetTop)
     
         initTrack()
         initCanvas()
         setEvent()
+        setRouter()
     }
 
     function setEvent()
     {
         event.add('wheel', project_wheel)
     }
+
+    function setRouter() { router.add(3, 'project', offsetTop) }
 
     async function project_wheel(target, deltaY)
     {
@@ -233,6 +237,7 @@
 <div
 id="project"
 style:height={_height}
+bind:this={project}
 >
     <canvas
     bind:this={canvas}

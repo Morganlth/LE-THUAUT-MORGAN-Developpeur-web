@@ -11,7 +11,8 @@
     // #IMPORTS
    
         // --CONTEXTS
-        import { app } from '../field/Main.svelte'
+        import { app, event } from '../field/Main.svelte'
+        import { router } from '../field/Main.svelte'
         import { spring } from '../field/Main.svelte'
 
         // --JS
@@ -49,6 +50,9 @@
         ]
 
     // #VARIABLES
+
+        // --ELEMENT-PRESENTATION
+        let presentation
 
         // --ELEMENT-CARD
         let
@@ -113,6 +117,7 @@
             restore()
             setCard()
             setCommand()
+            setRouter()
         }
 
         function setCard()
@@ -130,6 +135,13 @@
             app.add('presentationText', presentationText, true)
             app.add('presentationSnake', presentationSnake, true)
             app.add('presentationFps', presentationFps, true)
+        }
+
+        function setRouter()
+        {
+            const start = presentation.offsetLeft
+
+            router.add(1, 'presentation', start, presentation_call)
         }
         
         async function setFps()
@@ -277,6 +289,8 @@
                 if (textParam && charged) hiddenCards(), restoreCard()
             
                 noneMode = false
+
+                app.eco(false)
             }
             else
             {
@@ -347,25 +361,6 @@
             challengeMode = on
         }
 
-        // --EVENTS  
-        function click()
-        {
-            translateX = translateX ? 0 : 100
-            translateX ? (lock = false, setTimeout(() => { invincible = false }, 100)) : (lock = true, invincible = true)
-        }
-
-        function mouseLeave(e)
-        {
-            const target = e.relatedTarget
-
-            if (!target || target.classList.contains('icon')) return
-        
-            setTimeout(() => { invincible = false }, 200)
-
-            translateX = 100
-            lock = false
-        }
-
         // --COMMANDS
         async function presentationText(on)
         {
@@ -394,6 +389,28 @@
             app.success('presentationFps ' + on)
         }
 
+        // --EVENTS  
+        function click()
+        {
+            translateX = translateX ? 0 : 100
+            translateX ? (lock = false, setTimeout(() => { invincible = false }, 100)) : (lock = true, invincible = true)
+        }
+
+        function mouseLeave(e)
+        {
+            const target = e.relatedTarget
+
+            if (!target || target.classList.contains('icon')) return
+        
+            setTimeout(() => { invincible = false }, 200)
+
+            translateX = 100
+            lock = false
+        }
+
+        // --ROUTER-CALL
+        function presentation_call() { setTimeout(event.scroll.bind(event), 50) }
+
         // --CODE
         function viewCards()
         {
@@ -412,6 +429,7 @@
         }
 
         function hiddenCards() { for (let i = 0; i < cards.length; i++) cards[i].hidden() }
+
     // #CYCLE
 
     onMount(set)
@@ -422,6 +440,7 @@
 <div
 id="presentation"
 style:width={_width}
+bind:this={presentation}
 >
     <div
     class="card-container"

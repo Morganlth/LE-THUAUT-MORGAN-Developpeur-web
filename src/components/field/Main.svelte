@@ -9,6 +9,7 @@ context="module"
         export const
         app = a,
         event = e,
+        router = r,
         spring = s
 
     // --IMPORTS
@@ -16,6 +17,7 @@ context="module"
         // #CONTEXTS
         import a from '../../assets/js/appManager'
         import e from '../../assets/js/eventManager'
+        import r from '../../assets/js/routerManager'
         import s from '../../assets/js/springManager'
 </script>
 
@@ -25,7 +27,7 @@ context="module"
         // --PROPS
         export let
         _colors,
-        _page
+        _pageId
 
     // #IMPORTS
 
@@ -54,7 +56,7 @@ context="module"
             unit: 'vw'
         },
         {
-            e1: 600,
+            e1: 550,
             e2: 200,
             unit: 'vh'
         }
@@ -82,47 +84,43 @@ context="module"
         {
             max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 // (140vh + 200vw) - 140vh = 200vw
 
+            setRouter()
             setCommand()
             setEvent()
-            setPage()
+        }
+
+        function setRouter()
+        {
+            router.main = main
+        
+            router.setPage(_pageId)
         }
 
         function setCommand()
         {
             app.add('app', () => console.log(app))
             app.add('event', () => console.log(event))
+            app.add('router', () => console.log(router))
 
             app.add('spring', updateSpring, true)
         }
 
         function setEvent()
         {
-            event.add('scroll', scroll)
-    
+            setMainEvent()
+            setRouterEvent()
             setSpringEvent()
         }
+
+        function setMainEvent() { event.add('scroll', scroll) }
+
+        function setRouterEvent() { event.add('scroll', router.router_scroll.bind(router) )}
 
         function setSpringEvent()
         {
             event.add('mouseMove', spring.spring_mouseMove.bind(spring))
             event.add('mouseDown', spring.spring_mouseDown.bind(spring))
             event.add('mouseUp', spring.spring_mouseUp.bind(spring))
-        }
-
-        function setPage()
-        {
-            if (_page !== -1)
-            {
-                const 
-                element = document.getElementById(['presentation', 'competence', 'project'][_page]),
-                parent = element.parentNode,
-                offsetTop = parent.offsetTop + element.offsetTop + (_page ? window.innerHeight : 0), /* competence & projet demande un peux plus de profondeur */
-                offsetLeft = parent.offsetLeft + element.offsetLeft
-
-                main.scrollTo({ top: offsetTop + offsetLeft, behavior: 'instant' })
-
-                sideEffects()
-            }
         }
 
         // --UPDATE
@@ -132,7 +130,12 @@ context="module"
     
             destroySpringEvent()
     
-            if (on) { setSpringEvent() }
+            if (on)
+            {
+                setSpringEvent()
+    
+                app.eco(false)
+            }
 
             spring.on = on
             spring.size.set(on ? 7 : 0) 
@@ -144,10 +147,14 @@ context="module"
         // --DESTROY
         function destroy()
         {
-            event.remove('scroll', scroll)
-    
+            destroyMainEvent()
+            destroyRouterEvent()
             destroySpringEvent()
         }
+
+        function destroyMainEvent() { event.remove('scroll', scroll) }
+
+        function destroyRouterEvent() { event.remove('scroll', router.router_scroll.bind(router)) }
 
         function destroySpringEvent()
         {
@@ -167,7 +174,7 @@ context="module"
         // --CODE-PAGE
         function sideEffects()
         {
-            switch (_page)
+            switch (_pageId)
             {
                 case 0:
                     setTimeout(event.scroll.bind(event), 100) /* appel de scroll pour set les positions dans le snake */

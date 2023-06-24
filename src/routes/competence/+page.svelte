@@ -8,5 +8,5 @@
 </script>
 
 <App
-_page={1}
+_pageId={2}
 />

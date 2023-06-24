@@ -3,7 +3,7 @@
 class AppManager
 {
     // --VARIABLES
-    keyWords = ['log', 'clear', 'reset', 'success', 'error', 'getFps', 'effect']
+    keyWords = ['log', 'clear', 'reset', 'success', 'error', 'getFps', 'effect', 'eco']
     storageKeys = ['effect']
 
     cmd = null
@@ -78,12 +78,30 @@ class AppManager
         localStorage.setItem('effect', n)
     
         this.success('effet ' + n)
+
+        if (n != 0) this.eco(false)
     }
 
     async getFps() { this.log('' + await getFps()) }
 
+    eco(value)
+    {
+        value = this.testDefault(value) ? true : this.testBoolean(value)
+
+        if (value)
+        {
+            this.effect(0)
+            this.spring(false)
+            this.presentationSnake(false)
+    
+            this.write('app clear click et Entrée')
+        }
+
+        localStorage.setItem('mode', value ? 'eco' : 'personnalisé')
+    }
+
     // --CODE
-    add(name, command, storage)
+    add(name, command, storage) // ajouter function remove lié aux destroy des elements
     {
         if (!this.keyWords.includes(name)) this.keyWords.push(name)
         if (storage && !this.storageKeys.includes(name)) this.storageKeys.push(name)

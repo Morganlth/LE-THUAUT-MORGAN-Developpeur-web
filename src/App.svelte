@@ -4,7 +4,7 @@
     // #EXPORT
 
         // --PROP
-        export let _page = -1
+        export let _pageId = 0
 
     // #IMPORTS
 
@@ -44,8 +44,7 @@
             appElement.style.opacity = 1
 
             restore()
-
-            if (performance.now() - start > 300) eco = true
+            testPerformance()
         }
 
         // --RESTORE
@@ -64,6 +63,14 @@
             app.clear()
         }
 
+        // --TEST
+        function testPerformance()
+        {
+            const mode = localStorage.getItem('mode')
+            
+            if (mode !== 'eco' && performance.now() - start > 300) eco = true
+        }
+
     // #CYCLE
 
     onMount(set)
@@ -78,7 +85,7 @@
 
     <Main
     _colors={colors}
-    {_page}
+    {_pageId}
     />
 
     {#if eco}
