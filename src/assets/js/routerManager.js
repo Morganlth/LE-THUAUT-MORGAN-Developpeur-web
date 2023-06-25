@@ -16,8 +16,6 @@ class RouterManager
     
         this.main.scrollTo({ top: page.start, behavior: 'instant' })
 
-        console.log(page)
-
         if (page.call) page.call()
     }
 

@@ -8,12 +8,22 @@
 
     // #VARIABLE
 
-    let popup
+        // --ELEMENT-POPUP
+        let
+        popup,
+        opacity = 1,
+        blur = 20
 
     // #FUNCTIONS
 
         // --CLEAR
-        function clear() { popup.remove() }
+        function clear()
+        {
+            opacity = 0
+            blur = 0
+
+            setTimeout(() => popup.remove(), 1000)
+        }
 
         // --MODE
         function economics()
@@ -35,6 +45,8 @@
 
 <div
 class="eco-popup"
+style:--blur="blur({blur}px)"
+style:opacity={opacity}
 bind:this={popup}
 >
     <section>
@@ -142,9 +154,11 @@ lang="scss"
         @include f-center;
         @include xy-start;
         @include any;
-        @include black-glass(blur(20px));
+        @include black-glass(var(--blur));
 
         position: fixed;
+
+        transition: backdrop-filter 1s, opacity 1s;
 
         section
         {
@@ -193,6 +207,10 @@ lang="scss"
         strong { font-weight: 600; }
         .command
         {
+            padding: 1px 10px 4px;
+    
+            background-color: $dark;
+    
             span:nth-child(1) { color: $primary; }
             span:nth-child(2) { color: $secondary; }
         }

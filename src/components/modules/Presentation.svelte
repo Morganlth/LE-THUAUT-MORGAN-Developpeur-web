@@ -409,7 +409,7 @@
         }
 
         // --ROUTER-CALL
-        function presentation_call() { setTimeout(event.scroll.bind(event), 50) }
+        function presentation_call() { setTimeout(() => event.manager.scroll.find(f => f.name === 'snake_scroll')(), 50) }
 
         // --CODE
         function viewCards()

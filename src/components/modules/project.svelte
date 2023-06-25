@@ -79,7 +79,7 @@
         event.add('wheel', project_wheel)
     }
 
-    function setRouter() { router.add(3, 'project', offsetTop) }
+    function setRouter() { router.add(3, 'project', offsetTop, project_call) }
 
     async function project_wheel(target, deltaY)
     {
@@ -93,6 +93,9 @@
         }
         else destroyFrame()
     }
+
+    // --ROUTER-CALL
+    function project_call() { project_wheel(router.main, true) }
 
     // --DESTROY
     function destroy()
