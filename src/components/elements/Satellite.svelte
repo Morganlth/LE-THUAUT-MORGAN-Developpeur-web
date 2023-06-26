@@ -8,9 +8,7 @@
         _rotate = 0,
         _offset = 0,
         _r = 0,
-        _y = 0,
-        _content,
-        _color
+        _y = 0
 
     // #IMPORT
 
@@ -45,15 +43,13 @@
 
 <div
 class="orbit"
+style:perspective="{_r * 2}px"
 style:transform="rotate({_rotate}deg)"
 >
     <Cube
-    _perspective={_r * 3}
     _translateX={translateX}
     _translateZ={translateZ}
     _rotateY={rotateY}
-    {_content}
-    {_color}
     />
 </div>
 

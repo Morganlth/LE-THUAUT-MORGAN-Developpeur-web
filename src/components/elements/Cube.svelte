@@ -5,27 +5,30 @@
 
         // #PROPS
         export let
-        _perspective = 0,
         _translateX = 0,
         _translateZ = 0,
-        _rotateY = 0,
-        _content = ['', ''],
-        _color = '#FFF'
+        _rotateY = 0
 </script>
 
 <!-- #HTML -->
 
 <div
 class="cube"
-style:transform="perspective({_perspective}px) translateX({_translateX}px) translateZ({_translateZ}px) rotateY({_rotateY}rad)"
+style:transform="translateX({_translateX}px) translateZ({_translateZ}px) rotateY({_rotateY}rad)"
 >
     {#each [0, 1, 2, 3, 4, 5] as side}
         <div
         class="side"
-        style:border-color={_color}
         >
-            {_content[0]} <br>
-            {_content[1]}
+            <svg
+            viewBox="0 0 80 80"
+            fill="none"
+            stroke-width="10"
+            xmlns="http://www.w3.org/2000/svg"
+            >
+                <rect x="5" y="5" width="70" height="70"/>
+                <rect x="5" y="5" width="38" height="38"/>
+            </svg>
         </div>
     {/each}
 </div>
@@ -35,13 +38,18 @@ style:transform="perspective({_perspective}px) translateX({_translateX}px) trans
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #USE */
 
-    @import
-    '../../assets/scss/styles/flex.scss',
-    '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/font.scss',
-    '../../assets/scss/styles/cursor.scss';
+    @use 'sass:math';
+
+    @use '../../assets/scss/styles/flex.scss' as *;
+    @use '../../assets/scss/styles/size.scss' as *;
+    @use '../../assets/scss/styles/font.scss' as *;
+    @use '../../assets/scss/styles/cursor.scss' as *;
+
+    /* #VARIABLE */
+
+    $size: 200px;
 
     /* #GROUPS */
 
@@ -49,8 +57,8 @@ lang="scss"
     {
         @include pointer;
     
-        width: 250px;
-        height: 250px;
+        width: $size;
+        height: $size;
 
         transform-style: preserve-3d;
         transform-origin: center;
@@ -63,7 +71,7 @@ lang="scss"
 
             background-color: $dark;
 
-            border: solid 8px;
+            border: solid 8px rgba($light, .1);
 
             box-sizing: border-box;
 
@@ -71,10 +79,18 @@ lang="scss"
             font-size: 36px;
             text-align: center;
             user-select: none;
+
+            svg
+            {
+                width: 30%;
+                height: 30%;
+    
+                stroke: rgba($light, 1);
+            }
         }
         .side:nth-child(1)
         {
-            transform: translateZ(125px);
+            transform: translateZ(math.div($size, 2));
         }
         .side:nth-child(2)
         {
@@ -94,7 +110,7 @@ lang="scss"
         }
         .side:nth-child(6)
         {
-            transform: translateY(-500%) translateZ(-125px);
+            transform: translateY(-500%) translateZ(math.div(-$size, 2));
         }
     }
 </style>

@@ -56,7 +56,7 @@ context="module"
             unit: 'vw'
         },
         {
-            e1: 550,
+            e1: 800,
             e2: 200,
             unit: 'vh'
         }

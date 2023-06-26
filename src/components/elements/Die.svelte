@@ -306,8 +306,8 @@ style:transform="translateX({translateX}px) translateY({translateY}px)"
 style:transition="transform {delay}ms"
 style:cursor={cursor}
 on:mousedown={grab}
-on:mouseenter={spring.spring_mouseEnter}
-on:mouseleave={spring.spring_mouseLeave}
+on:mouseenter={spring.spring_mouseEnter.bind(spring)}
+on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 >
     <div
     class="die-3d"
@@ -377,7 +377,7 @@ lang="scss"
 
                 background-color: $dark;
 
-                border: solid $indicator 4px;
+                border: solid $o-primary 4px;
 
                 box-sizing: border-box;
 

@@ -2,6 +2,8 @@
 
 /* #USE */
 
+@use '../../../../static/variables.scss' as *;
+
 @use './position.scss' as *;
 @use './size.scss' as *;
 @use './cursor.scss' as *;
