@@ -30,7 +30,7 @@
 
     function update(y)
     {
-        const angle = 3 * y * Math.PI + _offset
+        const angle = 4 * y * Math.PI + _offset
 
         translateX = _r * Math.cos(angle)
         translateZ = _r * Math.sin(angle)

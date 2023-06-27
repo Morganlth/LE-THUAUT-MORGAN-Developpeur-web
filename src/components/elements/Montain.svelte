@@ -43,6 +43,7 @@
             h_20 = height * .2
 
             draw()
+            // console.log()
         }
 
         // --DRAW
@@ -52,7 +53,7 @@
     
             let
             a = 0.7,
-            h = h_20 * 4 + Math.random() * h_20
+            h = h_20 * 5 + Math.random() * h_20
 
             for (let i = 0; i < 8; i++)
             {
@@ -61,7 +62,7 @@
                 if (a >= 1)
                 {
                     a = 0.7
-                    h = h_20 * 4 + Math.random() * h_20
+                    h = h_20 * 5 + Math.random() * h_20
                 }
                 else
                 {

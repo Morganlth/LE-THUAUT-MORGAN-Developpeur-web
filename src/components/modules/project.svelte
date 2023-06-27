@@ -340,7 +340,7 @@ lang="scss"
 
             transform-origin: left;
 
-            background-color: $s-light;
+            background-color: $dark;
 
             border: solid $light 4px;
 

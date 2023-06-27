@@ -43,8 +43,6 @@
             h_10 = height * .1
 
             draw()
-
-            // console.log()
         }
 
         // --DRAW
@@ -75,7 +73,7 @@
         {
             const
             x = Math.random() * w_10 * 4 + (left ? -w_10 * 2 : w_10 * 7),
-            y = Math.random() * h_10 * 5,
+            y = Math.random() * h_10 * 3,
             w = Math.random() * w_10 * .3 + w_10 * .3,
             s = x + w / 2
 
@@ -83,7 +81,9 @@
             context.moveTo(s, y)
             context.lineTo(x + w, h)
             context.lineTo(x, h)
-            context.fillStyle = _colors[Math.round(Math.random()) ? 'secondary' : 'secondary']
+            context.fillStyle = _colors.secondary
+            context.fill()
+            context.fillStyle = `rgba(${r}, ${g}, ${b}, .3)`
             context.fill()
             context.closePath()
 
@@ -128,7 +128,7 @@ lang="scss"
     {
         @include absolute;
         
-        top: 50%;
+        top: 60vh;
         left: 0;
     }
 </style>

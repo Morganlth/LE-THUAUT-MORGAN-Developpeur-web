@@ -23,8 +23,9 @@
         import Satellite from '../elements/Satellite.svelte'
         import Montain from '../elements/Montain.svelte'
         import Forest from '../elements/Forest.svelte'
+        import Sky from '../elements/Sky.svelte'
 
-    // #CONSTANTES
+    // #CONSTANTE
 
         // --TO-ITERATE
         const satellites =
@@ -71,17 +72,19 @@
         number = 6
 
         // --ELEMENT-SPACE
-        let ratio = 1
+        let
+        ratio = 1,
+        translateY = 0
 
         // --ELEMENT-SATELLITE
         let
         r,
         y
 
-        // --ELEMENT-CONTAINER
+        // --ELEMENT-LAND
         let
-        container,
-        containerOffsetTop
+        land,
+        zoom = 1
 
     // #REACTIVE
 
@@ -96,10 +99,11 @@
             setCompetence()
             setDie()
             setSatellite()
-            setContainer()
             setCommand()
             setEvent()
             setRouter()
+
+            // console.log()
         }
 
         function setMain() { main = document.querySelector('main') }
@@ -108,8 +112,8 @@
         {
             const innerHeight = window.innerHeight
 
-            offsetTop = main.scrollTop + competence.getBoundingClientRect().top - innerHeight
-            height = competence.offsetHeight + innerHeight
+            offsetTop = main.scrollTop + competence.getBoundingClientRect().top - innerHeight * .6
+            height = competence.offsetHeight + innerHeight / 2
         }
 
         function setDie()
@@ -127,8 +131,6 @@
             r = maxX / 2
             y = 1 /* set satellites positions */
         }
-
-        function setContainer() { containerOffsetTop = container.offsetTop }
 
         function setCommand() { app.add('spaceDimension', spaceDimension, true) }
 
@@ -159,8 +161,8 @@
         async function competence_scroll()
         {
             const gap = main.scrollTop - offsetTop
-
-            ratio = gap >= containerOffsetTop ? .3 : 1
+    
+            ;[ratio, translateY, zoom] = gap >= land.offsetTop ? [.25, -100, 1] : [1, 0, 2]
             y = gap > 0 ? gap < height ? gap / height : 1 : 0
         }
 
@@ -181,7 +183,7 @@ bind:this={competence}
     class="space"
     >
         <div
-        style:transform="scale({scale})"
+        style:transform="scale({scale}) translateY({translateY}%)"
         >
             <Moon
             {_colors}
@@ -198,32 +200,47 @@ bind:this={competence}
     </div>
 
     <div
-    class="container"
-    bind:this={container}
+    class="land"
+    bind:this={land}
     >
-        <Montain
-        {_colors}
-        />
-
-        <Forest
-        {_colors}
-        />
-
         <div
-        class="content"
+        style:transform="scale({zoom})"
         >
-            <Die
-            _main={main}
-            _pageY={pageY}
-            _maxX={maxX}
-            _maxY={maxY}
-            _initX={initX}
-            _initY={initY}
-            _color={_colors.light}
-            bind:number={number}
+            <div
+            class="background"
+            >
+                <div></div>
+                <div></div>
+            </div>
+
+            <Montain
+            {_colors}
             />
 
-            <p>CE DÉ NE SERT ABSOLUMENT A RIEN.</p>
+            <Forest
+            {_colors}
+            />
+
+            <div
+            class="content"
+            >
+                <Die
+                _main={main}
+                _pageY={pageY}
+                _maxX={maxX}
+                _maxY={maxY}
+                _initX={initX}
+                _initY={initY}
+                _color={_colors.light}
+                bind:number={number}
+                />
+
+                <p>CE DÉ NE SERT ABSOLUMENT A RIEN.</p>
+            </div>
+
+            <Sky
+            {_colors}
+            />
         </div>
     </div>
 </div>
@@ -254,7 +271,7 @@ lang="scss"
 
         width: 100vw;
 
-        padding: 50vh 0 30vh;
+        padding: 60vh 0 100vh;
 
         box-sizing: border-box;
 
@@ -273,18 +290,95 @@ lang="scss"
     
                 height: 100vh;
 
-                transition: transform 1s;
+                transition: transform .5s ease-in-out;
             }
         }
 
-        .container
+        .land
         {
             @include absolute;
 
             bottom: 0;
             left: 0;
 
-            height: 100vh;
+            z-index: -1;
+
+            height: 400vh;
+
+            &
+            >div
+            {
+                @include sticky(true);
+                @include any-w;
+
+                height: 130vh;
+
+                transition: transform .7s ease-in-out;
+            }
+        }
+
+        .background
+        {
+            @include absolute;
+            @include any;
+
+            z-index: -1;
+
+            div:nth-child(1)
+            {
+                @include neon;
+            }
+    
+            div:nth-child(2)
+            {
+                @include absolute;
+                @include any-w;
+
+                bottom: 0;
+                left: 0;
+
+                height: 50%;
+
+                background-color: $s-dark;
+
+                &::before,
+                &::after
+                {
+                    @include absolute;
+
+                    content: '';
+
+                    left: 50%;
+            
+                    width: 200%;
+                    height: 15vh;
+
+                    border-radius: 50%;
+                }
+
+                &::before
+                {
+                    content: '';
+
+                    top: 0;
+
+                    transform: translate(-50%, -7%);
+
+                    background-color: $s-dark;
+                }
+
+                &::after
+                {
+                    bottom: 0;
+
+                    transform: translate(-50%, 50%);
+
+                    background-color: $dark;
+
+                    border: solid rgba($light, .1) 8px;
+                    border-bottom: none;
+                }
+            }
         }
 
         .content
@@ -295,16 +389,14 @@ lang="scss"
 
             justify-content: flex-end;
 
-            height: 30%;
+            height: 30vh;
 
             p
             {
                 @include text-info;
 
-                background-color: $s-dark;
-
-                margin-top: 30px;
-                padding: 15px 30px;
+                margin: 30px 0;
+                padding: 15px 0;
             }
         }
     }
