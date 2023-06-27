@@ -74,5 +74,7 @@ lang="scss"
         @include any;
 
         transform-style: preserve-3d;
+
+        transition: transform .3s;
     }
 </style>

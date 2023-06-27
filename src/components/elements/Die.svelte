@@ -119,7 +119,7 @@
     function setEvent()
     {
         event.add('scroll', die_scroll)
-        event.add('mouseMove', die_mouseMove)
+        // event.add('mouseMove', die_mouseMove)
         event.add('mouseUp', die_mouseUp)
     }
 

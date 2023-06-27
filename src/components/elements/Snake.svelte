@@ -130,7 +130,7 @@
             for (let i = 0; i < 10; i++) snake.push([-1 - i, startY])
         }
 
-        function setCommand() { app.add('snakeSize', snakeSize, true), app.add('canvas', () => console.log(canvas)) }
+        function setCommand() { app.add('snakeSize', snakeSize, true) }
 
         function setEvent()
         {
@@ -256,8 +256,6 @@
         function snakeSize(size)
         {
             size = app.testDefault(size) ? _size : app.testNumber(size, 10, 70)
-
-            if (size === blockSize) return
 
             blockSize = size
             localStorage.setItem('snakeSize', size)

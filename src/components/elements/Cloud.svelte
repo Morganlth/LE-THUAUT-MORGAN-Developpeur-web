@@ -1,10 +1,12 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORT
+    // #EXPORTS
 
-        // --PROP
-        export let _colors
+        // --PROPS
+        export let
+        _translateX = 0,
+        _colors
 
     // #IMPORT
 
@@ -13,7 +15,7 @@
 
     // #CONSTANTE
 
-    const canvases = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
+    const speed = Math.random() + .5
 
     // #VARIABLES
 
@@ -30,34 +32,30 @@
         function set()
         {
             width = window.innerWidth
-            height = window.innerHeight * .8
-
+            height = window.innerHeight
+    
             canvas.width = width
             canvas.height = height
 
             context = canvas.getContext('2d')
     
             draw()
-
-            console.log()
         }
 
         // --DRAW
-        function draw() { for (let i = 0; i < 13; i++) drawCloud() }
-
-        function drawCloud()
+        function draw()
         {
             const
-            a = Math.floor(Math.random() * 130) + 130,
+            a = Math.floor(Math.random() * 150) + 150,
             b = Math.floor(Math.random() * 30) + 20,
-            x = Math.random() * width,
+            x = Math.random() * (width - 2 * a) + a,
             y = Math.random() * (height - 360) + 180
             
-            drawSheepCloud(a, b, x, y)
+            drawCloud(a, b, x, y)
             drawEllipse(a, b, x, y)
         }
 
-        function drawSheepCloud(a, b, x, y)
+        function drawCloud(a, b, x, y)
         {
             let
             pX = -a + Math.random() * 20,
@@ -114,24 +112,24 @@
 <!-- #HTML -->
 
 <div
-class="sky"
+class="cloud"
+style:transform="translateX({_translateX * speed}px)"
 >
     <canvas
     bind:this={canvas}
-    style:width={width}
-    style:height={height}
+    style:width="{width}px"
+    style:height="{height}px"
     >
     </canvas>
-
-    {#each canvases as canvas}
-        <canvas
-        bind:this={canvas}
-        style:width={width}
-        style:height={height}
-        >
-        </canvas>
-    {/each}
 </div>
 
 <!-- #STYLE -->
 
+<style>
+    .cloud
+    {
+        position: absolute;
+
+        transition: transform .3s;
+    }
+</style>

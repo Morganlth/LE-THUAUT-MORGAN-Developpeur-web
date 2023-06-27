@@ -76,7 +76,7 @@ lang="scss"
 
         z-index: 2;
 
-        height: 60px;
+        height: 70px;
 
         padding: 0 60px;
 

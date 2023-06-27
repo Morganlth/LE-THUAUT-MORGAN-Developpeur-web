@@ -63,6 +63,8 @@ lang="scss"
         transform-style: preserve-3d;
         transform-origin: center;
 
+        transition: transform .3s;
+
         .side
         {
             @include f-center(true);

@@ -93,7 +93,6 @@
         linear-gradient(0deg, transparent 0, rgba($primary, .2) 1%, transparent 80%),
         linear-gradient(0deg, transparent 0, $secondary 30%, transparent 90%),
         linear-gradient(0deg, transparent 0, rgba($light, .1) 40%, transparent 100%);
-        // mix-blend-mode: color-dodge;
 
         animation: scan linear infinite 20s;
 

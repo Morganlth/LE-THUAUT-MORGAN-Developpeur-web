@@ -5,16 +5,16 @@ context="module"
 >
     // #EXPORTS
 
-        // #MODULES
+        // --MODULES
         export const
         app = a,
         event = e,
         router = r,
         spring = s
 
-    // --IMPORTS
+    // #IMPORTS
 
-        // #CONTEXTS
+        // --CONTEXTS
         import a from '../../assets/js/appManager'
         import e from '../../assets/js/eventManager'
         import r from '../../assets/js/routerManager'
@@ -56,7 +56,7 @@ context="module"
             unit: 'vw'
         },
         {
-            e1: 1000,
+            e1: 900,
             e2: 200,
             unit: 'vh'
         }
@@ -64,18 +64,13 @@ context="module"
 
     // #VARIABLES
 
-        // --THIS
+        // --ELEMENT-MAIN
         let main
 
         // --ELEMENT-WRAPPER-1
         let
         max,
         translateX = 0
-
-        // --ELEMENT-SPRING
-        let
-        coords = spring.coords,
-        size = spring.size
     
     // #FUNCTIONS
 
@@ -171,22 +166,6 @@ context="module"
             translateX = - (scrollTop < max ? scrollTop : max)
         }
 
-        // --CODE-PAGE
-        function sideEffects()
-        {
-            switch (_pageId)
-            {
-                case 0:
-                    setTimeout(event.scroll.bind(event), 100) /* appel de scroll pour set les positions dans le snake */
-                    break
-                case 2:
-                    event.wheel({ deltaY: true, currentTarget: main }) /* event artificiel */
-                    break
-                default:
-                    break
-            }
-        }
-
     // #CYCLES
 
     onMount(set)
@@ -239,16 +218,6 @@ on:mouseleave={event.mouseUp.bind(event)}
             />
         </Wrapper>
     </div>
-
-    <svg
-    class="spring"
-    >
-	    <circle
-        cx={$coords.x}
-        cy={$coords.y}
-        r={$size < 0 ? 0 : $size}
-        />
-    </svg>
 </main>
 
 <!-- #STYLE -->
@@ -256,12 +225,9 @@ on:mouseleave={event.mouseUp.bind(event)}
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #USE */
 
-    @import
-    '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/cursor.scss';
+    @use '../../assets/scss/styles/size.scss' as *;
 
     /* #GROUPS */
 
@@ -271,17 +237,6 @@ lang="scss"
 
         overflow-x: clip;
         overflow-y: scroll;
-
-        .spring
-        {
-            @include xy-start(true);
-            @include any;
-            @include no-event;
-
-            mix-blend-mode: difference;
-
-            circle { fill: $light; }
-	    }
 
         scrollbar-width: none !important;
         &::-webkit-scrollbar

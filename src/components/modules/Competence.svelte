@@ -84,7 +84,17 @@
         // --ELEMENT-LAND
         let
         land,
+        landOffsetTop,
+        landBreakPoint,
         zoom = 1
+
+        // --ELEMENT-SKY
+        let translate = 0
+
+        // --EVENT
+        let
+        last = +new Date(),
+        timeout
 
     // #REACTIVE
 
@@ -99,6 +109,7 @@
             setCompetence()
             setDie()
             setSatellite()
+            setLand()
             setCommand()
             setEvent()
             setRouter()
@@ -132,6 +143,12 @@
             y = 1 /* set satellites positions */
         }
 
+        function setLand()
+        {
+            landOffsetTop = land.offsetTop
+            landBreakPoint = land.scrollHeight + landOffsetTop - window.innerHeight * .6
+        }
+
         function setCommand() { app.add('spaceDimension', spaceDimension, true) }
 
         function setEvent() { event.add('scroll', competence_scroll) }
@@ -141,6 +158,16 @@
             const start = competence.parentNode.offsetTop
     
             router.add(2, 'competence', start)
+        }
+
+        // --UPDATE
+        function update()
+        {
+            const gap = main.scrollTop - offsetTop
+            
+            ;[ratio, translateY, zoom] = gap >= landOffsetTop ? [.3, -100, 1] : [1, 0, 1.5]
+            y = gap > 0 ? gap < height ? gap / height : 1 : 0
+            translate = gap > landBreakPoint ? gap - landBreakPoint : 0
         }
 
         // --DESTROY
@@ -160,10 +187,12 @@
         // --EVENT
         async function competence_scroll()
         {
-            const gap = main.scrollTop - offsetTop
-    
-            ;[ratio, translateY, zoom] = gap >= land.offsetTop ? [.25, -100, 1] : [1, 0, 2]
-            y = gap > 0 ? gap < height ? gap / height : 1 : 0
+            const now = +new Date()
+
+            clearTimeout(timeout)
+
+            if (now > last + 100) update(), last = now
+            else timeout = setTimeout(update, 50)
         }
 
     // #CYCLES
@@ -239,6 +268,7 @@ bind:this={competence}
             </div>
 
             <Sky
+            _translate={translate}
             {_colors}
             />
         </div>
@@ -271,7 +301,7 @@ lang="scss"
 
         width: 100vw;
 
-        padding: 60vh 0 100vh;
+        padding: 60vh 0 30vh;
 
         box-sizing: border-box;
 
@@ -290,7 +320,7 @@ lang="scss"
     
                 height: 100vh;
 
-                transition: transform .5s ease-in-out;
+                transition: transform .9s;
             }
         }
 
@@ -313,7 +343,7 @@ lang="scss"
 
                 height: 130vh;
 
-                transition: transform .7s ease-in-out;
+                transition: transform 1s;
             }
         }
 
@@ -347,36 +377,34 @@ lang="scss"
                     @include absolute;
 
                     content: '';
-
-                    left: 50%;
-            
-                    width: 200%;
-                    height: 15vh;
-
-                    border-radius: 50%;
                 }
 
                 &::before
                 {
-                    content: '';
-
                     top: 0;
+                    left: 50%;
 
                     transform: translate(-50%, -7%);
+            
+                    width: 200%;
+                    height: 15vh;
 
                     background-color: $s-dark;
+
+                    border: solid rgba($light, .1) 4px;
+                    border-bottom: none;
+                    border-radius: 50%;
                 }
 
                 &::after
                 {
-                    bottom: 0;
+                    @include any-w;
+    
+                    bottom: -60vh;
 
-                    transform: translate(-50%, 50%);
+                    height: 80vh;
 
-                    background-color: $dark;
-
-                    border: solid rgba($light, .1) 8px;
-                    border-bottom: none;
+                    background: linear-gradient(0deg, transparent 0%, $dark 20% 80%, transparent 100%);
                 }
             }
         }

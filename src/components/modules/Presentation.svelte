@@ -174,7 +174,7 @@
 
             textParam = (!textStorage || textStorage === 'true')
             snakeParam = (!snakeStorage || snakeStorage === 'true')
-            fpsParam = (!fpsStorage || fpsStorage === 'true') 
+            fpsParam = fpsStorage === 'true'
         }
 
         function restoreModes()
@@ -411,12 +411,12 @@
         // --ROUTER-CALL
         function presentation_call() { setTimeout(() => event.manager.scroll.find(f => f.name === 'snake_scroll')(), 50) }
 
-        // --CODE
+        // --UTILS
         function viewCards()
         {
-            // if (textOff || !snakeOff) return
+            let y = size + 30
 
-            let y = size
+            console.log(y)
 
             for (const card of cards)
             {

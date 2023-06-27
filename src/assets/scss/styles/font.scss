@@ -1,3 +1,7 @@
+/* #USE */
+
+@use '../../../../static/variables.scss' as *;
+
 /* #FONT */
 
 @mixin font-primary { font-family: 'Montserrat'; }
