@@ -389,7 +389,7 @@
             addY = y < snakeY ? -1 : 1,
             i = 0
 
-            while(i++ < 20)
+            while(i++ < 3)
             {
                 if (gapX !== 0) gapX += addX
                 if (gapY !== 0) gapY += addY

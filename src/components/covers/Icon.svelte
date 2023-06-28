@@ -41,30 +41,29 @@
             }
         }
 
+        // --UPDATE
+        function update(on, lock, hover, size)
+        {
+            spring.on = on
+            spring.lock = lock
+            spring.hover = hover
+            spring.size.set(size)
+        }
+
         // --EVENTS
         function icon_mouseEnter()
         {
             const
             boundingClientRect = icon.getBoundingClientRect(),
-            top = boundingClientRect.top,
-            left = boundingClientRect.left,
-            width = boundingClientRect.width,
-            height = boundingClientRect.height
+            x = boundingClientRect.left + boundingClientRect.width / 2,
+            y = boundingClientRect.top + boundingClientRect.height / 2
 
-            console.log(boundingClientRect)
-
-            spring.on = false
-            spring.lock = true
-            spring.size.set(width)
-            spring.spring_mouseMove(left + width / 2, top + height / 2)
+            update(false, true, true, boundingClientRect.width)
+    
+            requestAnimationFrame(() => spring.setPosition(x, y))
         }
 
-        function icon_mouseLeave()
-        {
-            spring.on = true
-            spring.lock = false
-            spring.size.set(7)
-        }
+        function icon_mouseLeave() { update(true, false, false, 7) }
 
     // #CYCLE
 

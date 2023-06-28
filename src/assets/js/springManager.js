@@ -5,6 +5,7 @@ class SpringManager
     // --VARIABLES
     on = true
     lock = false
+    hover = false
     timeout = null
 
     coords
@@ -17,8 +18,11 @@ class SpringManager
         this.size = spring(7)
     }
 
+    // --SET
+    setPosition(x, y) { this.coords.set({ x: x, y: y }) }
+
     // --EVENTS
-    async spring_mouseMove(x, y) { this.coords.set({ x: x, y: y }) }
+    async spring_mouseMove(x, y) { if (!this.hover) this.coords.set({ x: x, y: y }) }
 
     async spring_mouseDown() { if (!this.lock) this.timeout = setTimeout(() => { this.size.set(150) }, 200) }
 

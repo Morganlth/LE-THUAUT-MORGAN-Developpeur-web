@@ -126,6 +126,7 @@ style:width={_width}
                 <Icon
                 _transform="rotate(-90deg)"
                 _size="20px"
+                _spring={false}
                 _color={_colors.sLight}
                 >
                     <Mouse />

@@ -201,6 +201,7 @@ on:mouseleave={spring.spring_mouseLeave.bind(spring)}
             <Icon
             _opacity={opacity}
             _size="30px"
+            _spring={false}
             _color={cell === ai ? _colors.secondary : _colors.primary}
             >
                 {#if cell === player}
