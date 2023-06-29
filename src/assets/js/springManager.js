@@ -53,7 +53,7 @@ class SpringManager
             this.lock = false
             this.size.set(7)
 
-        // console.log('leave')
+            // console.log('leave')
         }
     }
 }

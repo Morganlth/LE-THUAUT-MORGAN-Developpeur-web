@@ -18,11 +18,9 @@
         import { onMount, onDestroy } from 'svelte'
 
         // --COMPONENT-ELEMENTS
-        import Die from '../elements/Die.svelte'
         import Moon from '../elements/Moon.svelte'
-        import Satellite from '../elements/Satellite.svelte'
-        import Montain from '../elements/Montain.svelte'
-        import Forest from '../elements/Forest.svelte'
+        import Orbit from '../elements/Orbit.svelte'
+        import Scene from '../elements/Scene.svelte'
         import Sky from '../elements/Sky.svelte'
 
     // #CONSTANTE
@@ -63,20 +61,14 @@
         height
 
         // --ELEMENT-DIE
-        let
-        pageY,
-        maxX,
-        maxY,
-        initX,
-        initY,
-        number = 6
+        let number = 6
 
         // --ELEMENT-SPACE
         let
         ratio = 1,
         translateY = 0
 
-        // --ELEMENT-SATELLITE
+        // --ELEMENT-ORBIT
         let
         r,
         y
@@ -84,9 +76,8 @@
         // --ELEMENT-LAND
         let
         land,
-        landOffsetTop,
-        landBreakPoint,
-        zoom = 1
+        start,
+        end
 
         // --ELEMENT-SKY
         let translate = 0
@@ -98,7 +89,7 @@
 
     // #REACTIVE
 
-    $: scale = number / 6 * ratio
+    $: scale = number / 6 * ratio // modifier cette partie pour que le dé retourne directement le calcul dans une variable scale sans réactivité
 
     // #FUNCTIONS
 
@@ -107,14 +98,11 @@
         {
             setMain()
             setCompetence()
-            setDie()
             setSatellite()
             setLand()
             setCommand()
             setEvent()
             setRouter()
-
-            // console.log()
         }
 
         function setMain() { main = document.querySelector('main') }
@@ -123,30 +111,30 @@
         {
             const innerHeight = window.innerHeight
 
-            offsetTop = main.scrollTop + competence.getBoundingClientRect().top - innerHeight * .6
+            offsetTop = main.scrollTop + competence.getBoundingClientRect().top
+            // - innerHeight * .6
             height = competence.offsetHeight + innerHeight / 2
         }
 
         function setDie()
         {
-            const die = competence.querySelector('.die')
-
-            maxX = window.innerWidth
-            maxY = main.scrollHeight
-            initX = maxX / 2
-            initY = main.scrollTop + die.getBoundingClientRect().top + die.offsetHeight / 2
+            // maxX = window.innerWidth
+            // maxY = main.scrollHeight
+            // initX = maxX / 2
+            // initY = scrollTop + die.getBoundingClientRect().top + die.offsetHeight / 2
         }
 
         function setSatellite()
         {
-            r = maxX / 2
+            r = window.innerWidth / 2
             y = 1 /* set satellites positions */
         }
 
         function setLand()
         {
-            landOffsetTop = land.offsetTop
-            landBreakPoint = land.scrollHeight + landOffsetTop - window.innerHeight * .6
+            start = land.offsetTop - window.innerHeight * .7
+            end = land.scrollHeight + start - window.innerHeight
+            // - window.innerHeight * .6
         }
 
         function setCommand() { app.add('spaceDimension', spaceDimension, true) }
@@ -165,9 +153,9 @@
         {
             const gap = main.scrollTop - offsetTop
             
-            ;[ratio, translateY, zoom] = gap >= landOffsetTop ? [.3, -100, 1] : [1, 0, 1.5]
-            y = gap > 0 ? gap < height ? gap / height : 1 : 0
-            translate = gap > landBreakPoint ? gap - landBreakPoint : 0
+            ;[ratio, translateY, zoom] = gap >= start ? [.3, -100, 1] : [1, 0, 1.5]
+            y = (gap > 0 ? gap < height ? gap / height : 1 : 0) * 5
+            translate = gap > end ? gap - end : 0
         }
 
         // --DESTROY
@@ -219,7 +207,7 @@ bind:this={competence}
             />
 
             {#each satellites as satellite}
-                <Satellite
+                <Orbit
                 {...satellite}
                 _r={r}
                 _y={y}
@@ -232,46 +220,14 @@ bind:this={competence}
     class="land"
     bind:this={land}
     >
-        <div
-        style:transform="scale({zoom})"
-        >
-            <div
-            class="background"
-            >
-                <div></div>
-                <div></div>
-            </div>
+        <Scene
+        {_colors}
+        />
 
-            <Montain
-            {_colors}
-            />
-
-            <Forest
-            {_colors}
-            />
-
-            <div
-            class="content"
-            >
-                <Die
-                _main={main}
-                _pageY={pageY}
-                _maxX={maxX}
-                _maxY={maxY}
-                _initX={initX}
-                _initY={initY}
-                _color={_colors.light}
-                bind:number={number}
-                />
-
-                <p>CE DÉ NE SERT ABSOLUMENT A RIEN.</p>
-            </div>
-
-            <Sky
-            _translate={translate}
-            {_colors}
-            />
-        </div>
+        <Sky
+        _translate={translate}
+        {_colors}
+        />
     </div>
 </div>
 
@@ -281,15 +237,11 @@ bind:this={competence}
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #USES */
 
-    @import
-    '../../assets/scss/styles/grid.scss',
-    '../../assets/scss/styles/flex.scss',
-    '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/background.scss',
-    '../../assets/scss/styles/font.scss';
+    @use '../../assets/scss/styles/flex.scss' as *;
+    @use '../../assets/scss/styles/position.scss' as *;
+    @use '../../assets/scss/styles/size.scss' as *;
 
     /* #GROUPS */
 
@@ -301,7 +253,7 @@ lang="scss"
 
         width: 100vw;
 
-        padding: 60vh 0 30vh;
+        padding: 60vh 0 0;
 
         box-sizing: border-box;
 
@@ -331,101 +283,7 @@ lang="scss"
             bottom: 0;
             left: 0;
 
-            z-index: -1;
-
             height: 400vh;
-
-            &
-            >div
-            {
-                @include sticky(true);
-                @include any-w;
-
-                height: 130vh;
-
-                transition: transform 1s;
-            }
-        }
-
-        .background
-        {
-            @include absolute;
-            @include any;
-
-            z-index: -1;
-
-            div:nth-child(1)
-            {
-                @include neon;
-            }
-    
-            div:nth-child(2)
-            {
-                @include absolute;
-                @include any-w;
-
-                bottom: 0;
-                left: 0;
-
-                height: 50%;
-
-                background-color: $s-dark;
-
-                &::before,
-                &::after
-                {
-                    @include absolute;
-
-                    content: '';
-                }
-
-                &::before
-                {
-                    top: 0;
-                    left: 50%;
-
-                    transform: translate(-50%, -7%);
-            
-                    width: 200%;
-                    height: 15vh;
-
-                    background-color: $s-dark;
-
-                    border: solid rgba($light, .1) 4px;
-                    border-bottom: none;
-                    border-radius: 50%;
-                }
-
-                &::after
-                {
-                    @include any-w;
-    
-                    bottom: -60vh;
-
-                    height: 80vh;
-
-                    background: linear-gradient(0deg, transparent 0%, $dark 20% 80%, transparent 100%);
-                }
-            }
-        }
-
-        .content
-        {
-            @include flex;
-            @include f-column;
-            @include f-a-center;
-
-            justify-content: flex-end;
-
-            height: 30vh;
-
-            p
-            {
-                @include text-info;
-
-                margin: 30px 0;
-                padding: 15px 0;
-            }
         }
     }
 </style>

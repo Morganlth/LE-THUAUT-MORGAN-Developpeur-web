@@ -305,7 +305,6 @@
         {
             if (test())
             {
-                // console.log('move')
                 update()
             
                 if (check()) draw()

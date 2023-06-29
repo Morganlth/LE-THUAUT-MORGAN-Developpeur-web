@@ -416,8 +416,6 @@
         {
             let y = size + 30
 
-            console.log(y)
-
             for (const card of cards)
             {
                 const x = Math.random() * (window.innerWidth - card.width - size * 2) + size

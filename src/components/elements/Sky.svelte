@@ -16,7 +16,7 @@
     // #CONSTANTE
 
         // --TO-ITERATE
-        const clouds = [1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1]
+        const directions = [1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1]
 </script>
 
 <!-- #HTML -->
@@ -24,9 +24,10 @@
 <div
 class="sky"
 >
-    {#each clouds as cloud}
+    {#each directions as d}
         <Cloud
-        _translateX={_translate * cloud}
+        _d={d}
+        _translate={_translate}
         {_colors}
         />
     {/each}
@@ -34,6 +35,28 @@ class="sky"
 
 <!-- #STYLE -->
 
-<style>
-    .sky { position: relative; }
+<style
+lang="scss"
+>
+    /* #USES */
+
+    @use '../../assets/scss/styles/position.scss' as *;
+    @use '../../assets/scss/styles/size.scss' as *;
+    @use '../../assets/scss/styles/cursor.scss' as *;
+
+    /* #GROUP */
+
+    .sky
+    {
+        @include absolute;
+        @include any-w;
+        @include no-event;
+
+        bottom: 0;
+        left: 0;
+
+        transform: translateY(20%);
+
+        height: 100vh;
+    }
 </style>

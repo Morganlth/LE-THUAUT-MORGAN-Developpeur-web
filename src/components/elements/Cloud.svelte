@@ -5,7 +5,8 @@
 
         // --PROPS
         export let
-        _translateX = 0,
+        _d,
+        _translate,
         _colors
 
     // #IMPORT
@@ -15,7 +16,8 @@
 
     // #CONSTANTE
 
-    const speed = Math.random() + .5
+        // --GLOBAL
+        const speed = Math.random() + .4
 
     // #VARIABLES
 
@@ -24,32 +26,67 @@
         canvas,
         context,
         width,
-        height
+        height,
+        a,
+        b,
+        x,
+        y,
+        translateX,
+        translateY
 
     // #FUNCTIONS
 
         // --SET
         function set()
         {
-            width = window.innerWidth
-            height = window.innerHeight
+            setVar()
+            setCanvas()
+            setPosition()
+
+            // width = window.innerWidth
+            // height = window.innerHeight
     
+            // console.log()
+            draw()
+        }
+
+        function setVar()
+        {
+            a = Math.floor(Math.random() * 150) + 150
+            b = Math.floor(Math.random() * 30) + 20
+
+            width = a * 2 + 320
+            height = b * 2 + 320
+
+            x = width / 2
+            y = height / 2
+
+            // x = Math.random() * (width - 2 * a) + a
+            // y = Math.random() * (height - 360) + 180
+        }
+
+        function setCanvas()
+        {
             canvas.width = width
             canvas.height = height
 
             context = canvas.getContext('2d')
-    
-            draw()
+        }
+
+        function setPosition()
+        {
+            translateX = Math.random() * (window.innerWidth + width) - width
+            translateY = Math.random() * window.innerHeight
         }
 
         // --DRAW
         function draw()
         {
-            const
-            a = Math.floor(Math.random() * 150) + 150,
-            b = Math.floor(Math.random() * 30) + 20,
-            x = Math.random() * (width - 2 * a) + a,
-            y = Math.random() * (height - 360) + 180
+            // const
+            // a = Math.floor(Math.random() * 150) + 150,
+            // b = Math.floor(Math.random() * 30) + 20,
+            // x = Math.random() * (width - 2 * a) + a,
+            // y = Math.random() * (height - 360) + 180
             
             drawCloud(a, b, x, y)
             drawEllipse(a, b, x, y)
@@ -113,22 +150,35 @@
 
 <div
 class="cloud"
-style:transform="translateX({_translateX * speed}px)"
+style:transform="translateX(calc((100% - {_translate * speed}px) * {_d}))"
 >
     <canvas
-    bind:this={canvas}
+    style:transform="translate({translateX}px, {translateY}px)"
     style:width="{width}px"
     style:height="{height}px"
+    bind:this={canvas}
     >
     </canvas>
 </div>
 
 <!-- #STYLE -->
 
-<style>
+<style
+lang="scss"
+>
+    /* #USES */
+
+    @use '../../assets/scss/styles/position.scss' as *;
+    @use '../../assets/scss/styles/size.scss' as *;
+
+    /* #GROUP */
+
     .cloud
     {
-        position: absolute;
+        @include xy-start(true);
+        @include any;
+
+        pointer-events: auto;
 
         transition: transform .3s;
     }

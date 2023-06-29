@@ -3,18 +3,15 @@
 <script>
     // #EXPORTS
 
-        // #PROPS
+        // --PROPS
         export let
-        _main,
-        _pageY = 0,
-        _maxX = 0,
-        _maxY = 0,
-        _initX = 0,
-        _initY = 0,
+        _offsetTop,
         _color
 
-        // #BIND
-        export let number = 0
+        // --BINDS
+        export let
+        main,
+        number = 0
 
     // #IMPORTS
 
@@ -37,7 +34,6 @@
 
     const
     gravity = 9,
-    force = 1,
     modelX = [1, 4, 6, 2],
     modelY = [1, 3, 6, 5],
     modelZ = [2, 3, 4, 5],
@@ -75,193 +71,257 @@
         ]
     ]
 
+    $: console.log(_offsetTop)
     // #VARIABLES
 
-    let
-    delay = 50,
-    last = +new Date(),
-    x = 0,
-    y = 0,
-    vX = 0,
-    vY = 0,
-    anchor = 0,
-    translateX = 0,
-    translateY = 0,
-    rotateX = 0,
-    rotateY = -20,
-    rotateZ = 0,
-    rotateDelay = 0,
-    cursor = 'grab',
-    launchedInterval = null,
-    rotateInterval = null
+        // --GLOBALS
+        let
+        delay = 50,
+        rotateDelay = 0,
+        last = +new Date(),
+        cursor = 'grab',
+        timeout,
+        launchedInterval = null,
+        rotateInterval = null
+    
+        // --ELEMENT-MAIN
+        let scrollTop
+
+        // --ELEMENT-DIE
+        let
+        die,
+        x = 0,
+        y = 0,
+        r,
+        vX = 0,
+        vY = 0,
+        maxX,
+        maxY,
+        initX,
+        initY,
+        translateX = 0,
+        translateY = 0
+
+        // --ELEMENT-DIE-3D
+        let
+        rotateX = 0,
+        rotateY = -20,
+        rotateZ = 0
 
     // #FUNCTIONS
 
-    function set()
-    {
-        setEvent()
-        setVar(_initX, _initY)
-    }
-
-    function setVar(xNow, yNow)
-    {
-        rotateDelay = delay
-        x = xNow
-        y = yNow
-        vX = 0
-        vY = 0
-        anchor = yNow
-        rotateX %= 360
-        rotateY %= 360
-        rotateZ %= 360
-    }
-
-    function setEvent()
-    {
-        event.add('scroll', die_scroll)
-        // event.add('mouseMove', die_mouseMove)
-        event.add('mouseUp', die_mouseUp)
-    }
-
-    // --DESTROY
-    function destroy()
-    {
-        event.remove('scroll', die_scroll)
-        event.remove('mouseMove', die_mouseMove)
-        event.remove('mouseUp', die_mouseUp)
-    }
-
-    async function die_scroll()
-    {
-        const pageYNow = _main.scrollTop
-
-        delay = 0
-
-        if (event.grabbing)
+        // --SET
+        function set()
         {
-            y += pageYNow - _pageY
-            anchor = y
-    
-            updateTranslate()
-            updateRotate()
+            setMain()
+            setVar()
+            setEvent()
         }
-    
-        _pageY = pageYNow
-    }
 
-    async function die_mouseMove(xNow, yNow)
-    {
-        if (!event.grabbing) return
-
-        const
-        now = +new Date(),
-        coords = getCoords(xNow, yNow)
-
-        delay = 50
-
-        if (coords)
+        function setMain()
         {
-            [xNow, yNow] = coords
+            main = document.querySelector('main')
 
-            vX = Math.floor(xNow - x) * force
-            vY = Math.floor(yNow - y) * force
+            scrollTop = main.scrollTop
+        }
+
+        function setVar()
+        {
+            r = die.offsetWidth / 2
+    
+            maxX = window.innerWidth
+            maxY = main.scrollHeight
+
+            setInitialPosition()
+        }
+
+        function setInitialPosition()
+        {
+            const boundingClientRect = die.getBoundingClientRect()
+
+            initX = boundingClientRect.left + r
+            initY = scrollTop + boundingClientRect.top + r
+        }
+
+        function setEvent()
+        {
+            event.add('scroll', die_scroll)
+            event.add('mouseMove', die_mouseMove)
+            event.add('mouseUp', die_mouseUp)
+        }
+
+        // --GET
+        function getCoords(x, y)
+        {
+            let
+            xNow = Math.floor(x),
+            yNow = _main.scrollTop + Math.floor(y)
+
+            return (xNow < 0 || xNow > _maxX || yNow < 0 || yNow > _maxY) ? null : [xNow, yNow]
+        }
+
+        // --RESET
+        function reset(xNow, yNow)
+        {
+            rotateDelay = delay
             x = xNow
             y = yNow
-    
-            if (now > last + delay)
+            vX = 0
+            vY = 0
+            rotateX %= 360
+            rotateY %= 360
+            rotateZ %= 360
+        }
+
+        // --UPDATE
+        function update(c, g, u)
+        {
+            cursor = c
+            event.grabbing = g
+            document.body.style.userSelect = u
+        }
+
+        function updatePosition(xNow, yNow)
+        {
+            vX = Math.floor(xNow - x) / delay
+            vY = Math.floor(yNow - y) / delay
+            x = xNow
+            y = yNow
+        }
+
+        function updateTranslate(xNow, yNow)
+        {
+            translateX = xNow ?? x
+            translateY = yNow ?? y
+        }
+
+        function updateRotate()
+        {
+            rotateX = Math.floor(y * 360 / initY)
+            rotateY = Math.floor(x * 360 / initX)
+        }
+
+        // --DESTROY
+        function destroy()
+        {
+            event.remove('scroll', die_scroll)
+            event.remove('mouseMove', die_mouseMove)
+            event.remove('mouseUp', die_mouseUp)
+        }
+
+        // --EVENTS
+        function die_mouseDown()
+        {
+            // clear()
+
+            update('grabbing', true, 'none')
+        }
+
+        async function die_mouseUp()
+        {
+            update('grab', false, 'auto')
+
+            // if (!launchedInterval && (Math.abs(vX) > gravity || Math.abs(vY) > gravity)) launched()
+        }
+
+        async function die_scroll()
+        {
+            const scrollTopNow = main.scrollTop
+
+            initY = scrollTopNow + die.getBoundingClientRect().top + r
+
+            // setInitialPosition()
+
+            if (event.grabbing)
             {
+                delay = 0
+    
+                // y += scrollTopNow - scrollTop
+        
                 updateTranslate()
                 updateRotate()
 
-                last = now
+                delay = 50
+            }
+        
+            scrollTop = scrollTopNow
+        }
 
-                if (Math.abs(vX) <= force && Math.abs(vY) <= force) anchor = y
+        async function die_mouseMove(xNow, yNow)
+        {
+            if (event.grabbing)
+            {
+                const now = +new Date()
+
+                clearTimeout(timeout)
+        
+                now > last + delay ? move(xNow, yNow, now) : timeout = setTimeout(() => move(xNow, yNow, now), delay)
             }
         }
-    }
 
-    async function die_mouseUp()
-    {
-        cursor = 'grab'
-        event.grabbing = false
-        document.body.style.userSelect = 'auto'
+        // --UTIL
+        function move(xNow, yNow, now)
+        {
+            // console.clear()
+            // console.log(yNow + ' - ' + initY)
+           
+            xNow = xNow - initX
+            yNow = yNow + scrollTop - initY
 
-        if (!launchedInterval && y !== anchor && (Math.abs(vX) > gravity || Math.abs(vY) > gravity)) launched()
-    }
+            console.log(yNow)
 
-    function getCoords(x, y)
-    {
-        let
-        xNow = Math.floor(x),
-        yNow =  _main.scrollTop + Math.floor(y)
+            updatePosition(xNow, yNow)
+            updateTranslate()
+            // updateRotate()
 
-        return (xNow < 0 || xNow > _maxX || yNow < 0 || yNow > _maxY) ? null : [xNow, yNow]
-    }
+            last = now
+        }
 
-    function updateTranslate(xNow, yNow)
-    {
-        translateX = (xNow ?? x) - _initX
-        translateY = (yNow ?? y) - _initY
-    }
 
-    function updateRotate()
-    {
-        rotateX = Math.floor((y - _initY) * 360 / _initY)
-        rotateY = Math.floor((x - _initX) * 360 / _initX)
-    }
 
-    function grab()
-    {
-        clear()
+        function launched()
+        {
+            const smaller = y < anchor
 
-        cursor = 'grabbing'
-        event.grabbing = true
-        document.body.style.userSelect = 'none'
-    }
+            let
+            t = 0,
+            xNow = x,
+            yNow = y,
+            g = gravity * (smaller ? -1 : 1)
+
+            launchedInterval = setInterval(() =>
+            {
+                xNow += vX
+                yNow = Math.floor(y + vY * t - 0.5 * g * t * t)
+        
+                if (xNow < 0 || xNow > _maxX)
+                {
+                    xNow = (xNow < 0 ? 0 : _maxX)
+                    vX = -vX / 2
+                }
+                if (smaller ? yNow >= anchor : yNow <= anchor)
+                {
+                    if (yNow < 0) yNow = 0
+                    else if (yNow > _maxY) yNow = _maxY
+        
+                    clear()
+                    reset(xNow, yNow)
+                    getNumber()
+                }
+
+                updateTranslate(xNow, yNow)
+
+                t++
+            }, delay)
+
+            rotateRandom()
+        }
 
     function clear()
     {
         clearInterval(rotateInterval)
         clearInterval(launchedInterval)
         launchedInterval = null
-    }
-
-    function launched()
-    {
-        const smaller = y < anchor
-
-        let
-        t = 0,
-        xNow = x,
-        yNow = y,
-        g = gravity * (smaller ? -1 : 1)
-
-        launchedInterval = setInterval(() =>
-        {
-            xNow += vX
-            yNow = Math.floor(y + vY * t - 0.5 * g * t * t)
-    
-            if (xNow < 0 || xNow > _maxX)
-            {
-                xNow = (xNow < 0 ? 0 : _maxX)
-                vX = -vX / 2
-            }
-            if (smaller ? yNow >= anchor : yNow <= anchor)
-            {
-                if (yNow < 0) yNow = 0
-                else if (yNow > _maxY) yNow = _maxY
-    
-                clear()
-                setVar(xNow, yNow)
-                getNumber()
-            }
-
-            updateTranslate(xNow, yNow)
-
-            t++
-        }, delay)
-
-        rotateRandom()
     }
 
     function rotateRandom()
@@ -305,7 +365,8 @@ class="die"
 style:transform="translateX({translateX}px) translateY({translateY}px)"
 style:transition="transform {delay}ms"
 style:cursor={cursor}
-on:mousedown={grab}
+bind:this={die}
+on:mousedown={die_mouseDown}
 on:mouseenter={spring.spring_mouseEnter.bind(spring)}
 on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 >
@@ -320,6 +381,7 @@ on:mouseleave={spring.spring_mouseLeave.bind(spring)}
             >
                 {#each side as circle}
                     <Icon
+                    _spring={false}
                     {_color}
                     >
                         {#if circle}
@@ -339,13 +401,12 @@ on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #USE */
 
-    @import
-    '../../assets/scss/styles/grid.scss',
-    '../../assets/scss/styles/flex.scss',
-    '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/cursor.scss';
+    @use '../../assets/scss/styles/grid.scss' as *;
+    @use '../../assets/scss/styles/flex.scss' as *;
+    @use '../../assets/scss/styles/size.scss' as *;
+    @use '../../assets/scss/styles/cursor.scss' as *;
 
     /* #GROUPS */
     .die
@@ -357,6 +418,8 @@ lang="scss"
 
         width: 90px;
         height: 90px;
+
+        padding: 15px;
 
         .die-3d
         {

@@ -20,11 +20,10 @@
         width,
         height
 
-        // --SIZES-20-PERCENT
+        // --SIZES-10-PERCENT
         let
-        w_20,
-        h_20
-        
+        w_10,
+        h_10
 
     // #FUNCTIONS
 
@@ -38,54 +37,54 @@
             canvas.height = height
 
             context = canvas.getContext('2d')
+            context.lineWidth = 2
+            context.strokeStyle = _colors.sDark
+            context.fillStyle = _colors.sLight
 
-            w_20 = width * .2
-            h_20 = height * .2
+            w_10 = width * .1
+            h_10 = height * .1
 
             draw()
-            // console.log()
         }
 
         // --DRAW
         function draw()
         {
-            const [r, g, b] = _colors.sLight.match(/\w\w/g).map(x => parseInt(x, 16))
-    
-            let
-            a = 0.7,
-            h = h_20 * 5 + Math.random() * h_20
+            let y = height - Math.random() * h_10 * .5 - h_10 / 3
 
             for (let i = 0; i < 8; i++)
             {
-                drawMontain(i < 4, h, r, g, b, a)
-
-                if (a >= 1)
-                {
-                    a = 0.7
-                    h = h_20 * 5 + Math.random() * h_20
-                }
-                else
-                {
-                    a += 0.1
-                    h += Math.random() * h_20 / 4
-                }
+                i === 4
+                ? y = height - Math.random() * h_10 * .5 - h_10 / 3
+                : y += Math.random() * h_10 / 4
+    
+                drawMontain(i < 4, y)
             }
+
+            y = height + 3
+
+            for (let i = 0; i < 4; i++) drawMontain(i < 2, y, true)
         }
 
-        function drawMontain(left, h, r, g, b, a)
+        function drawMontain(left, y, small)
         {
             const
-            x = Math.random() * w_20 + (left ? -w_20 / 2 : w_20 * 3),
-            y = Math.random() * h_20 * 2 + h_20,
-            w = Math.random() * w_20 + w_20,
-            s = x + (w + Math.random() * w_20 / 2 * (left ? -1 : 1)) / 2
+            x = Math.random() * w_10 * 4 + (left ? -w_10 : w_10 * 7),
+            w = (Math.random() * w_10 * 3 + w_10 * 2) / (small ? 3 : 1),
+            h = (Math.random() * h_10 * 4 + h_10 * 3) / (small ? 3 : 1),
+            s = x + Math.random() * w_10 / 2 * (left ? -1 : 1)
     
-            context.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`
+            drawTriangle(x, y, w, h, s)
+        }
+
+        function drawTriangle(x, y, w, h, s)
+        {
             context.beginPath()
-            context.moveTo(s, y)
-            context.lineTo(x, h)
-            context.lineTo(x + w, h)
+            context.moveTo(x - w / 2, y)
+            context.lineTo(s, y - h)
+            context.lineTo(x + w / 2, y)
             context.fill()
+            context.stroke()
             context.closePath()
         }
 

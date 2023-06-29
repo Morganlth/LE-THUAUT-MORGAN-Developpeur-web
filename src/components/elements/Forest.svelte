@@ -41,7 +41,7 @@
             canvas.height = height
 
             context = canvas.getContext('2d')
-            context.lineWidth = .5
+            context.lineWidth = 2
             context.strokeStyle = _colors.sDark
 
             w_10 = width * .1
@@ -53,7 +53,7 @@
         // --DRAW
         function draw()
         {
-            const max = Math.floor(Math.random() * 7) + 10
+            const max = Math.floor(Math.random() * 7) + 7
         
             let
             y = height - Math.random() * h_10 - h_10 * 2,
@@ -63,14 +63,15 @@
             {
                 if (!mid && i === max)
                 {
-                    console.log('reset')
                     y = height - Math.random() * h_10 - h_10 * 2
                     mid = true
                 }
 
                 drawTree(i < max, y)
 
-                y < h_10 * 9.5 ? y += Math.random() * h_10 / 3 : y = h_10 * 9.5
+                y < h_10 * 9.5
+                ? y += Math.random() * h_10 / 3
+                : y = h_10 * 9.5
             }
         }
 
@@ -78,7 +79,7 @@
         {
             const
             x = Math.random() * w_10 * 4 + (left ? -w_10 * .3 : w_10 * 6.3),
-            w = Math.random() * w_10 * .2 + w_10 * .3,
+            w = Math.random() * w_10 * .1 + w_10 * .4,
             h = Math.random() * h_10 * 3 + h_10 * 4.5
 
             drawFoliage(x, y, w, h)
