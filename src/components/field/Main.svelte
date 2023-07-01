@@ -174,6 +174,7 @@ context="module"
 
 <!-- #HTML -->
 
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main
 bind:this={main}
 on:scroll={event.scroll.bind(event)}

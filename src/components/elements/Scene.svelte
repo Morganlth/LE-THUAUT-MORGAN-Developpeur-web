@@ -1,17 +1,22 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORT
+    // #EXPORTS
 
-        // --PROP
-        export let _colors
+        // --PROPS
+        export let
+        _scale,
+        _colors
 
     // #IMPORTS
 
-        // --SVELTE
-        import { onMount } from 'svelte'
+        // --CONTEXT
+        import { event } from '../field/Main.svelte'
 
-        // --COMPONENT-ELEMENT
+        // --SVELTE
+        import { onMount, onDestroy } from 'svelte'
+
+        // --COMPONENT-ELEMENTS
         import Decor from './Decor.svelte'
         import Die from './Die.svelte'
 
@@ -20,17 +25,40 @@
         // --ELEMENT-SCENE
         let
         scene,
-        scale
+        offsetTop
+
+    // #FUNCTIONS
+
+        // --SET
+        function set()
+        {
+            offsetTop = scene.offsetTop
+
+            setEvent()
+        }
+
+        function setEvent() { event.add('scroll', scene_scroll) }
+
+        // --DESTROY
+        function destroy() { event.remove('scroll', scene_scroll) }
+
+        // --EVENT
+        function scene_scroll() { offsetTop = scene.offsetTop }
+
+    // #CYCLES
+
+    onMount(set)
+    onDestroy(destroy)
 </script>
 
 <!-- #HTML -->
 
 <div
 class="scene"
-style:transform="scale({scale})"
 bind:this={scene}
 >
     <Decor
+    {_scale}
     {_colors}
     />
 
@@ -38,7 +66,7 @@ bind:this={scene}
     class="content"
     >
         <Die
-        _offsetTop={0}
+        _offsetTop={offsetTop}
         _color={_colors.light}
         />
 
@@ -66,8 +94,6 @@ lang="scss"
         @include any-w;
 
         height: 100vh;
-
-        transition: transform 1s;
 
         .content
         {

@@ -1,10 +1,12 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORT
+    // #EXPORTS
 
-        // --PROP
-        export let _colors
+        // --PROPS
+        export let
+        _scale,
+        _colors
 
     // #IMPORT
 
@@ -37,7 +39,7 @@
             canvas.height = height
 
             context = canvas.getContext('2d')
-            context.lineWidth = 4
+            context.lineWidth = 3
             context.strokeStyle = _colors.sDark
             context.fillStyle = _colors.sLight
 
@@ -155,6 +157,7 @@
 
 <div
 class="decor"
+style:transform="scale({_scale})"
 >
     <div
     class="background"
@@ -187,6 +190,8 @@ lang="scss"
     .decor
     {
         @include any;
+
+        transition: transform 1s;
 
         .background
         {

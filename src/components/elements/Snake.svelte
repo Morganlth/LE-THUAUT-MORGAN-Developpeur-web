@@ -455,6 +455,7 @@
 
 <!-- #HTML -->
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
 class="snake-game"
 style:height="{height}px"

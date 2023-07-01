@@ -79,6 +79,9 @@
         start,
         end
 
+        // --ELEMENT-SCENE
+        let scaleScene = 0
+
         // --ELEMENT-SKY
         let translate = 0
 
@@ -89,7 +92,7 @@
 
     // #REACTIVE
 
-    $: scale = number / 6 * ratio // modifier cette partie pour que le dé retourne directement le calcul dans une variable scale sans réactivité
+    $: scaleSpace = number / 6 * ratio // modifier cette partie pour que le dé retourne directement le calcul dans une variable scale sans réactivité
 
     // #FUNCTIONS
 
@@ -153,7 +156,7 @@
         {
             const gap = main.scrollTop - offsetTop
             
-            ;[ratio, translateY, zoom] = gap >= start ? [.3, -100, 1] : [1, 0, 1.5]
+            ;[ratio, translateY, scaleScene] = gap >= start ? [.3, -100, 1] : [1, 0, 1.5]
             y = (gap > 0 ? gap < height ? gap / height : 1 : 0) * 5
             translate = gap > end ? gap - end : 0
         }
@@ -200,7 +203,7 @@ bind:this={competence}
     class="space"
     >
         <div
-        style:transform="scale({scale}) translateY({translateY}%)"
+        style:transform="scale({scaleSpace}) translateY({translateY}%)"
         >
             <Moon
             {_colors}
@@ -221,6 +224,7 @@ bind:this={competence}
     bind:this={land}
     >
         <Scene
+        _scale={scaleScene}
         {_colors}
         />
 

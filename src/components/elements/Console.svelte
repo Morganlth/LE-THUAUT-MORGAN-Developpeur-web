@@ -144,6 +144,7 @@
 
 <!-- #HTML -->
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
 class="console"
 on:mouseenter={spring.spring_mouseEnter.bind(spring)}

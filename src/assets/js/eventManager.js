@@ -3,6 +3,8 @@
 class EventManager
 {
     // --VARIABLES
+    scrollTop = 0
+
     manager =
     {
         scroll: [],
@@ -18,12 +20,14 @@ class EventManager
     grabbing = false
 
     // --EVENTS
-    scroll()
+    scroll(e)
     {
         if (this.scrollFrame) return
 
         this.scrollFrame = requestAnimationFrame(() =>
         {
+            this.scrollTop = e.target.scrollTop
+
             this.run.call(this.manager.scroll)
 
             this.scrollFrame = false

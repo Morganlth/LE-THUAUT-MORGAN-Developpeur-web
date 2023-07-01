@@ -178,8 +178,6 @@ lang="scss"
         @include xy-start(true);
         @include any;
 
-        pointer-events: auto;
-
         transition: transform .3s;
     }
 </style>

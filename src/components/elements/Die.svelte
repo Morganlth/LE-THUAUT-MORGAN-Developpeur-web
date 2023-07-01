@@ -8,32 +8,28 @@
         _offsetTop,
         _color
 
-        // --BINDS
-        export let
-        main,
-        number = 0
+        // --BIND
+        export let number = 0
 
     // #IMPORTS
 
         // --CONTEXT
-        import { spring } from '../field/Main.svelte'
-    
-        // #MODULE
         import { event } from '../field/Main.svelte'
+        import { spring } from '../field/Main.svelte'
 
-        // #SVELTE
+        // --SVELTE
         import { onMount, onDestroy } from 'svelte'    
     
-        // #COVER
+        // --COMPONENT-COVER
         import Icon from '../covers/Icon.svelte'
 
-        // #ICON
+        // --COMPONENT-ICON
         import Circle from '../icons/Circle.svelte'
 
     // #CONSTANTES
 
     const
-    gravity = 9,
+    gravity = 7,
     modelX = [1, 4, 6, 2],
     modelY = [1, 3, 6, 5],
     modelZ = [2, 3, 4, 5],
@@ -71,7 +67,6 @@
         ]
     ]
 
-    $: console.log(_offsetTop)
     // #VARIABLES
 
         // --GLOBALS
@@ -84,15 +79,19 @@
         launchedInterval = null,
         rotateInterval = null
     
-        // --ELEMENT-MAIN
-        let scrollTop
+        // --MEMORIES
+        let
+        lastScrollTop = 0,
+        lastOffsetTop = 0
+        // let main
+        // scrollTop
 
         // --ELEMENT-DIE
         let
         die,
         x = 0,
         y = 0,
-        r,
+        r = 0,
         vX = 0,
         vY = 0,
         maxX,
@@ -113,34 +112,29 @@
         // --SET
         function set()
         {
-            setMain()
+            // setMain()
             setVar()
             setEvent()
         }
 
-        function setMain()
-        {
-            main = document.querySelector('main')
-
-            scrollTop = main.scrollTop
-        }
+        // function setMain()
+        // {
+        //     main = document.querySelector('main')
+        // }
 
         function setVar()
         {
+            const
+            main = document.querySelector('main'),
+            boundingClientRect = die.getBoundingClientRect()
+    
             r = die.offsetWidth / 2
     
             maxX = window.innerWidth
             maxY = main.scrollHeight
 
-            setInitialPosition()
-        }
-
-        function setInitialPosition()
-        {
-            const boundingClientRect = die.getBoundingClientRect()
-
             initX = boundingClientRect.left + r
-            initY = scrollTop + boundingClientRect.top + r
+            initY = boundingClientRect.top + r + main.scrollTop
         }
 
         function setEvent()
@@ -151,14 +145,14 @@
         }
 
         // --GET
-        function getCoords(x, y)
-        {
-            let
-            xNow = Math.floor(x),
-            yNow = _main.scrollTop + Math.floor(y)
+        // function getCoords(x, y)
+        // {
+        //     let
+        //     xNow = Math.floor(x),
+        //     yNow = _main.scrollTop + Math.floor(y)
 
-            return (xNow < 0 || xNow > _maxX || yNow < 0 || yNow > _maxY) ? null : [xNow, yNow]
-        }
+        //     return (xNow < 0 || xNow > _maxX || yNow < 0 || yNow > _maxY) ? null : [xNow, yNow]
+        // }
 
         // --RESET
         function reset(xNow, yNow)
@@ -183,8 +177,8 @@
 
         function updatePosition(xNow, yNow)
         {
-            vX = Math.floor(xNow - x) / delay
-            vY = Math.floor(yNow - y) / delay
+            vX = Math.floor(xNow - x) / gravity
+            vY = Math.floor(yNow - y) / gravity
             x = xNow
             y = yNow
         }
@@ -195,10 +189,10 @@
             translateY = yNow ?? y
         }
 
-        function updateRotate()
+        function updateRotate(s)
         {
-            rotateX = Math.floor(y * 360 / initY)
-            rotateY = Math.floor(x * 360 / initX)
+            rotateX = Math.floor(s * 360 / initX) % 360
+            rotateY = Math.floor(x * 360 / initX) % 360
         }
 
         // --DESTROY
@@ -221,30 +215,25 @@
         {
             update('grab', false, 'auto')
 
-            // if (!launchedInterval && (Math.abs(vX) > gravity || Math.abs(vY) > gravity)) launched()
+            if (!launchedInterval && (Math.abs(vX) > gravity || Math.abs(vY) > gravity)) launched()
         }
 
         async function die_scroll()
         {
-            const scrollTopNow = main.scrollTop
-
-            initY = scrollTopNow + die.getBoundingClientRect().top + r
-
-            // setInitialPosition()
+            const scrollTop = event.scrollTop
 
             if (event.grabbing)
             {
+                if (lastOffsetTop === _offsetTop) y += scrollTop - lastScrollTop
+
                 delay = 0
-    
-                // y += scrollTopNow - scrollTop
         
                 updateTranslate()
-                updateRotate()
-
-                delay = 50
+                updateRotate(scrollTop)
             }
         
-            scrollTop = scrollTopNow
+            lastScrollTop = scrollTop
+            lastOffsetTop = _offsetTop
         }
 
         async function die_mouseMove(xNow, yNow)
@@ -262,26 +251,23 @@
         // --UTIL
         function move(xNow, yNow, now)
         {
-            // console.clear()
-            // console.log(yNow + ' - ' + initY)
-           
-            xNow = xNow - initX
-            yNow = yNow + scrollTop - initY
+            const scrollTop = event.scrollTop
+    
+            delay = 50
 
-            console.log(yNow)
-
+            xNow -= initX
+            yNow += scrollTop - (initY + _offsetTop)
+            
             updatePosition(xNow, yNow)
             updateTranslate()
-            // updateRotate()
+            updateRotate(scrollTop)
 
             last = now
         }
 
-
-
         function launched()
         {
-            const smaller = y < anchor
+            const smaller = y < 0
 
             let
             t = 0,
@@ -294,15 +280,15 @@
                 xNow += vX
                 yNow = Math.floor(y + vY * t - 0.5 * g * t * t)
         
-                if (xNow < 0 || xNow > _maxX)
+                if (xNow < -initX || xNow > initX)
                 {
-                    xNow = (xNow < 0 ? 0 : _maxX)
+                    xNow = (xNow < 0 ? -initX : initX)
                     vX = -vX / 2
                 }
-                if (smaller ? yNow >= anchor : yNow <= anchor)
+                if (smaller ? yNow >= 0 : yNow <= 0)
                 {
                     if (yNow < 0) yNow = 0
-                    else if (yNow > _maxY) yNow = _maxY
+                    else if (yNow > maxY) yNow = maxY
         
                     clear()
                     reset(xNow, yNow)
@@ -317,40 +303,40 @@
             rotateRandom()
         }
 
-    function clear()
-    {
-        clearInterval(rotateInterval)
-        clearInterval(launchedInterval)
-        launchedInterval = null
-    }
+        function clear()
+        {
+            clearInterval(rotateInterval)
+            clearInterval(launchedInterval)
+            launchedInterval = null
+        }
 
-    function rotateRandom()
-    {
-        rotateDelay = 90
-        rotateX = Math.floor(Math.random() * 4) * 90
-        rotateY = Math.floor(Math.random() * 4) * 90
-        rotateZ = Math.floor(Math.random() * 4) * 90
+        function rotateRandom()
+        {
+            rotateDelay = 180 - vX - vY
+            rotateX = Math.floor(Math.random() * 4) * 90
+            rotateY = Math.floor(Math.random() * 4) * 90
+            rotateZ = Math.floor(Math.random() * 4) * 90
 
-        rotateInterval = setInterval(() =>
-        Math.round(Math.random()) ? rotateX += 90 : Math.round(Math.random()) ? rotateY += 90 : rotateZ += 90,
-        rotateDelay)
-    }
+            rotateInterval = setInterval(() =>
+            Math.round(Math.random()) ? rotateX += 90 : Math.round(Math.random()) ? rotateY += 90 : rotateZ += 90,
+            rotateDelay)
+        }
 
-    function getNumber()
-    {
-        const // position du dé en x, y, z
-        posX = rotateX / 90,
-        posY = rotateY / 90,
-        posZ = rotateZ / 90
+        function getNumber()
+        {
+            const // position du dé en x, y, z
+            posX = rotateX / 90,
+            posY = rotateY / 90,
+            posZ = rotateZ / 90
 
-        let n = modelX[posX] // recupère le premier nombre parmis les possibilité en x
+            let n = modelX[posX] // recupère le premier nombre parmis les possibilité en x
 
-        // verifie si le nombre existe sur les models y et z, puis effectue les rotations suivante en modifiant le nombre
-        if (posY && modelY.includes(n)) n = modelY[(modelY.indexOf(n) + posY) % 4]
-        if (posZ && modelZ.includes(n)) n = modelZ[(modelZ.indexOf(n) + posZ) % 4]
+            // verifie si le nombre existe sur les models y et z, puis effectue les rotations suivante en modifiant le nombre
+            if (posY && modelY.includes(n)) n = modelY[(modelY.indexOf(n) + posY) % 4]
+            if (posZ && modelZ.includes(n)) n = modelZ[(modelZ.indexOf(n) + posZ) % 4]
 
-        number = n
-    }
+            number = n
+        }
 
     // #CYCLES
 
@@ -360,6 +346,7 @@
 
 <!-- #HTML -->
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
 class="die"
 style:transform="translateX({translateX}px) translateY({translateY}px)"
