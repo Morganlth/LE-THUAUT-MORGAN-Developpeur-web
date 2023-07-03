@@ -5,10 +5,23 @@
 
         // --PROPS
         export let
+        _id,
         _rotate = 0,
         _offset = 0,
         _r = 0,
         _y = 0
+
+        // --BIND
+        export let on = false
+
+    // #IMPORT
+
+        // --SVELTE
+        import { createEventDispatcher } from 'svelte'
+
+    // #CONSTANTE
+
+    const dispatch = createEventDispatcher()
 
     // #VARIABLES
 
@@ -16,13 +29,14 @@
         let
         translateX = 0,
         translateZ = 0,
-        rotateY = 0
+        rotateY = 0,
+        cursor = 'auto'
 
     // #REACTIVE
 
     $: update(_y)
 
-    // #FUNCTION 
+    // #FUNCTIONS
 
         // --UPDATE
         function update(y)
@@ -30,9 +44,28 @@
             const angle = y * Math.PI + _offset
 
             translateX = _r * Math.cos(angle)
-            translateZ = _r * Math.sin(angle)
+            translateZ = _r * Math.sin(angle)            
 
             rotateY = angle
+
+            if (!on) check()
+        }
+
+        // --CHECK
+        function check() { [cursor, on] = translateX > -200 && translateX < 200 ? ['pointer', on] : ['auto', false] }
+
+        // --EVENT
+        function satellite_click(e)
+        {
+            if (cursor === 'pointer')
+            {
+                let r = 90 * Math.PI / 180
+    
+                rotateY += on ? r : -r
+                on = !on
+
+                dispatch('click', { id: _id, on: on })
+            }
         }
 </script>
 
@@ -43,9 +76,12 @@ class="orbit"
 style:perspective="{_r * 2}px"
 style:transform="rotate({_rotate}deg)"
 >
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
     <div
     class="satellite"
     style:transform="translateX({translateX}px) translateZ({translateZ}px) rotateY({rotateY}rad)"
+    style:cursor={cursor}
+    on:click={satellite_click}
     >
         {#each [0, 1, 2, 3, 4, 5] as side}
             <div
@@ -98,8 +134,6 @@ lang="scss"
 
         .satellite
         {
-            @include pointer;
-        
             width: $size;
             height: $size;
 
@@ -130,7 +164,7 @@ lang="scss"
                     width: 30%;
                     height: 30%;
         
-                    stroke: rgba($light, 1);
+                    stroke: $light;
                 }
             }
             .side:nth-child(1)

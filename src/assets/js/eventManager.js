@@ -34,7 +34,7 @@ class EventManager
         })
     }
 
-    wheel(e) { this.run.call(this.manager.wheel, e.currentTarget, e.deltaY) }
+    wheel(e) { this.run.call(this.manager.wheel, e.deltaY, e.currentTarget) }
 
     mouseMove(e)
     {
@@ -52,11 +52,8 @@ class EventManager
 
     mouseUp() { this.run.call(this.manager.mouseUp) }
 
-    // --CODE
-    add(category, func)
-    {
-        this.manager[category].push(func)
-    }
+    // --UTILS
+    add(category, func) { this.manager[category].push(func) }
 
     remove(category, func)
     {

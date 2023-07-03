@@ -177,7 +177,7 @@
         }
 
         // --EVENT
-        async function project_wheel(target, deltaY)
+        async function project_wheel(deltaY, target)
         {
             const scrollTop = target.scrollTop
 
@@ -191,7 +191,7 @@
         }
 
         // --ROUTER-CALL
-        function project_call() { project_wheel(router.main, true) }
+        function project_call() { project_wheel(true, router.main) }
 
         // --DRAW
         function draw()

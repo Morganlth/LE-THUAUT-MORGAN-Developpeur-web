@@ -13,9 +13,6 @@
         // --CONTEXT
         import { router } from '../field/Main.svelte'
 
-        // --SVELTE
-        import { onMount } from 'svelte'
-
         // --COMPONENT-ELEMENTS
         import TicTacToe from '../elements/TicTacToe.svelte'
         import Console from '../elements/Console.svelte'

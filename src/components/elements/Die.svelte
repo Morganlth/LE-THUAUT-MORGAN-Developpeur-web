@@ -9,7 +9,7 @@
         _color
 
         // --BIND
-        export let number = 0
+        export let number = 6
 
     // #IMPORTS
 
@@ -83,8 +83,6 @@
         let
         lastScrollTop = 0,
         lastOffsetTop = 0
-        // let main
-        // scrollTop
 
         // --ELEMENT-DIE
         let
@@ -145,14 +143,21 @@
         }
 
         // --GET
-        // function getCoords(x, y)
-        // {
-        //     let
-        //     xNow = Math.floor(x),
-        //     yNow = _main.scrollTop + Math.floor(y)
+        function getNumber()
+        {
+            const // position du dé en x, y, z
+            posX = Math.abs(rotateX / 90),
+            posY = Math.abs(rotateY / 90),
+            posZ = Math.abs(rotateZ / 90)
 
-        //     return (xNow < 0 || xNow > _maxX || yNow < 0 || yNow > _maxY) ? null : [xNow, yNow]
-        // }
+            let n = modelX[posX] // recupère le premier nombre parmis les possibilité en x
+
+            // verifie si le nombre existe sur les models y et z, puis effectue les rotations suivante en modifiant le nombre
+            if (posY && modelY.includes(n)) n = modelY[(modelY.indexOf(n) + posY) % 4]
+            if (posZ && modelZ.includes(n)) n = modelZ[(modelZ.indexOf(n) + posZ) % 4]
+
+            number = n
+        }
 
         // --RESET
         function reset(xNow, yNow)
@@ -189,10 +194,10 @@
             translateY = yNow ?? y
         }
 
-        function updateRotate(s)
+        function updateRotate()
         {
-            rotateX = Math.floor(s * 360 / initX) % 360
-            rotateY = Math.floor(x * 360 / initX) % 360
+            rotateX = Math.floor(y * 360 / initY)
+            rotateY = Math.floor(x * 360 / initX)
         }
 
         // --DESTROY
@@ -204,7 +209,7 @@
         }
 
         // --EVENTS
-        function die_mouseDown()
+        async function die_mouseDown()
         {
             // clear()
 
@@ -213,6 +218,8 @@
 
         async function die_mouseUp()
         {
+            clearTimeout(timeout)
+    
             update('grab', false, 'auto')
 
             if (!launchedInterval && (Math.abs(vX) > gravity || Math.abs(vY) > gravity)) launched()
@@ -229,7 +236,7 @@
                 delay = 0
         
                 updateTranslate()
-                updateRotate(scrollTop)
+                updateRotate()
             }
         
             lastScrollTop = scrollTop
@@ -251,16 +258,14 @@
         // --UTIL
         function move(xNow, yNow, now)
         {
-            const scrollTop = event.scrollTop
-    
             delay = 50
 
             xNow -= initX
-            yNow += scrollTop - (initY + _offsetTop)
+            yNow += event.scrollTop - (initY + _offsetTop)
             
             updatePosition(xNow, yNow)
             updateTranslate()
-            updateRotate(scrollTop)
+            updateRotate()
 
             last = now
         }
@@ -320,22 +325,6 @@
             rotateInterval = setInterval(() =>
             Math.round(Math.random()) ? rotateX += 90 : Math.round(Math.random()) ? rotateY += 90 : rotateZ += 90,
             rotateDelay)
-        }
-
-        function getNumber()
-        {
-            const // position du dé en x, y, z
-            posX = rotateX / 90,
-            posY = rotateY / 90,
-            posZ = rotateZ / 90
-
-            let n = modelX[posX] // recupère le premier nombre parmis les possibilité en x
-
-            // verifie si le nombre existe sur les models y et z, puis effectue les rotations suivante en modifiant le nombre
-            if (posY && modelY.includes(n)) n = modelY[(modelY.indexOf(n) + posY) % 4]
-            if (posZ && modelZ.includes(n)) n = modelZ[(modelZ.indexOf(n) + posZ) % 4]
-
-            number = n
         }
 
     // #CYCLES

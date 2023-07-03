@@ -28,19 +28,19 @@
 
 @mixin title-2($color: $light)
 {
-    @include title($color, 80px, 70px);
+    @include title($color, 48px, 48px);
 
     text-align: center;
 }
 
 @mixin title-3($color: $light)
 {
-    @include title($color, 40px, 40px);
+    @include title($color, 36px, 36px);
 }
 
 @mixin title-4($color: $light)
 {
-    @include title($color, 28px, 28px);
+    @include title($color, 24px, 24px);
 }
 
 @mixin text-info($color: $s-light)

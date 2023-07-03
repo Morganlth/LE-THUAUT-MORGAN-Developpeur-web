@@ -8,6 +8,9 @@
         _scale,
         _colors
 
+        // --BIND
+        export let number
+
     // #IMPORTS
 
         // --CONTEXT
@@ -68,6 +71,7 @@ bind:this={scene}
         <Die
         _offsetTop={offsetTop}
         _color={_colors.light}
+        bind:number={number}
         />
 
         <p>CE DÉ NE SERT ABSOLUMENT A RIEN.</p>
