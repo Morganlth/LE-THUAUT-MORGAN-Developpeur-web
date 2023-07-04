@@ -15,7 +15,7 @@
         import { event } from '../field/Main.svelte'
 
         // --SVELTE
-        import { onMount, onDestroy } from 'svelte'
+        import { onMount, onDestroy, tick } from 'svelte'
 
         // --COMPONENT-ELEMENTS
         import Moon from '../elements/Moon.svelte'
@@ -23,14 +23,14 @@
         import Scene from '../elements/Scene.svelte'
         import Sky from '../elements/Sky.svelte'
 
-    // #CONSTANTE
+    // #CONSTANTES
 
         // --TO-ITERATE
         const orbits =
         [
             {
                 props: { _id: 0, _rotate: -50, _offset: 0 },
-                title: 'FORME & STYLE',
+                title: ['FORME', 'STYLE'],
                 type: 'FRONT',
                 content:
                 [
@@ -43,7 +43,7 @@
         ,
             {
                 props: { _id: 1, _rotate: 80, _offset: 4.71 },
-                title: 'LOGIQUE JAVASCRIPT',
+                title: ['LOGIQUE', 'JAVASCRIPT'],
                 type: 'FRONT',
                 content:
                 [
@@ -60,7 +60,7 @@
         ,
             {
                 props: { _id: 2, _rotate: 40, _offset: 3.14 },
-                title: 'LE LANGAGE SERVER',
+                title: ['CÔTÉ', 'SERVER'],
                 type: 'BACK',
                 content:
                 [
@@ -74,7 +74,7 @@
         ,
             {
                 props: { _id: 3, _rotate: 10, _offset: 1.57 },
-                title: 'ADAPTABILITÉ & RÉFÉRENCEMENT',
+                title: ['ADAPTABILITÉ', 'RÉFÉRENCEMENT'],
                 type: 'FRONT',
                 content:
                 [
@@ -104,11 +104,23 @@
         ratio = 1,
         translateY = 0
 
+        // --ELEMENT-CONTENT
+        let
+        list,
+        listTarget,
+        listTargetId,
+        listTargetTranslateX,
+        listTargetTranslateY,
+        listTargetMin
+
         // --ELEMENT-ORBIT
         let
         target = 0,
         r,
-        y
+        y,
+        [red, green, blue] = _colors.light.match(/\w\w/g).map(x => parseInt(x, 16)),
+        onColor = _colors.light,
+        offColor = `rgba(${red}, ${green}, ${blue}, .1)`
 
         // --ELEMENT-LAND
         let
@@ -191,6 +203,15 @@
             translate = gap > resolution ? gap - resolution : 0
         }
 
+        function updateList(i)
+        {
+            listTarget = i ? [...list.children][i] : list.firstChild
+            listTargetId = i ?? 0
+            listTargetTranslateX = 600
+            listTargetTranslateY = Math.random() * (window.innerHeight - 240 - listTarget.offsetHeight) + 120
+            listTargetMin = - window.innerWidth - listTarget.offsetWidth
+        }
+
         // --DESTROY
         function destroy()
         {
@@ -220,29 +241,40 @@
             else timeout = setTimeout(update, 50)
         }
 
-        async function competence_wheel(deltaY) { y += deltaY > 0 ? .05 : -.05 }
+        async function competence_wheel(deltaY)
+        {
+            y += deltaY > 0 ? .05 : -.05
 
-        async function orbit_click({detail})
+            listTarget.style.transform = `translate(${listTargetTranslateX -= deltaY * 2}px, ${listTargetTranslateY}px)`
+
+            if (listTargetTranslateX < listTargetMin)
+            {
+                ++listTargetId >= orbits[target].content.length
+                ? orbit_click({ detail: { id: null } })
+                : updateList(listTargetId)
+            }
+        }
+
+        function orbit_click({detail})
         {
             event.remove('wheel', competence_wheel)
     
-            if (target !== detail.id) orbits[target].on = false
-            if (detail.on)
-            {
-                main.style.overflowY = 'hidden'
-                ratio = .3
+            if (target !== detail.id) orbits[target ?? 0].on = false
 
-                event.add('wheel', competence_wheel)
-            }
-            else
-            {
-                main.style.overflowY = 'scroll'
-                ratio = 1
-
-                update()
-            }
+            tipping(detail.on)
 
             target = detail.id
+        }
+
+        // --UTIL
+        function tipping(on)
+        {
+            [main.style.overflowY, ratio] = on ? ['hidden', .3] : ['scroll', 1]
+
+            tick().then(() => on
+            ?   (updateList(),
+                event.add('wheel', competence_wheel))
+            : update())
         }
 
     // #CYCLES
@@ -276,6 +308,7 @@ bind:this={competence}
                     {...orbit.props}
                     _r={r}
                     _y={y}
+                    _color={orbit.on ? onColor: offColor}
                     bind:on={orbit.on}
                     on:click={orbit_click}
                     />
@@ -288,12 +321,26 @@ bind:this={competence}
                 {#each orbits as orbit}
                     {#if orbit.on}
                         <section>
-                            <h3>{orbit.title}</h3>
+                            <h3>
+                                <div>
+                                    {#each orbit.title[0] as letter}
+                                        <span>{letter}</span>
+                                    {/each}
+                                </div>
 
-                            <span>{orbit.type} . {orbit.title}</span>
+                                <div>
+                                    {#each orbit.title[1] as letter}
+                                        <span>{letter}</span>
+                                    {/each}
+                                </div>
+                            </h3>
+
+                            <span>{orbit.type} . {orbit.title[0] + ' ' + orbit.title[1]}</span>
                         </section>
 
-                        <ul>
+                        <ul
+                        bind:this={list}
+                        >
                             {#each orbit.content as content}
                                 <li>
                                     <p>{content}</p>
@@ -347,11 +394,11 @@ lang="scss"
 
         width: 100vw;
 
-        .track { @include any; }
-
         .track
         {
-            padding-top: 100vh;
+            @include any;
+
+            overflow-y: clip;
 
             box-sizing: border-box;
 
@@ -362,6 +409,18 @@ lang="scss"
                 @include any-w;
 
                 height: 100vh;
+            }
+
+            &::after
+            {
+                @include xy-start(true);
+                @include any-w;
+
+                content: '';
+
+                height: 100vh;
+
+                background: linear-gradient(0deg, transparent 0%, $dark 70%);
             }
         }
 
@@ -397,23 +456,55 @@ lang="scss"
 
                 h3
                 {
-                    @include title(rgba($light, .1), 222px, 222px);
+                    @include title(rgba($light, .1), 190px, 190px);
 
-                    letter-spacing: 20px;
+                    letter-spacing: 10px;
+
+                    div
+                    {
+                        @include flex;
+                    }
+
+                    span
+                    {
+                        @include relative;
+
+                        display: inline-block;
+
+                        &::after
+                        {
+                            @include xy-start(true);
+                            @include any;
+
+                            content: '';
+
+                            background-color: $dark;
+
+                            border-radius: 50%;
+
+                            animation: text .9s forwards;
+                        }
+
+                        @keyframes text
+                        {
+                            100% { transform: translateX(100%) }
+                        }
+                    }
                 }
 
-                span
+                &
+                >span
                 {
                     @include font-command;
 
                     color: $primary;
                     font-size: 18px;
+                    user-select: none;
                 }
             }
 
             ul
             {
-                            display: none !important;
                 @include flex;
                 @include f-column;
                 @include xy-start(true);
@@ -421,21 +512,30 @@ lang="scss"
 
                 justify-content: space-between;
 
+                transform: translateX(100%);
+
                 padding: 120px;
 
                 box-sizing: border-box;
-            }
 
-            p
-            {
-                @include text-command;
+                li
+                {
+                    @include xy-start(true);
 
-                color: $s-light;
+                    transition: transform .3s;
+                }
 
-                cursor: default;
-                pointer-events: auto;
+                p
+                {
+                    @include text-command;
 
-                &:hover { color: $primary; }
+                    color: $s-light;
+
+                    cursor: default;
+                    pointer-events: auto;
+
+                    &:hover { color: $primary; }
+                }
             }
         }
 
