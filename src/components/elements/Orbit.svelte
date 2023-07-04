@@ -6,10 +6,11 @@
         // --PROPS
         export let
         _id,
-        _rotate = 0,
-        _offset = 0,
-        _r = 0,
-        _y = 0
+        _rotate,
+        _offset,
+        _r,
+        _y,
+        _color
 
         // --BIND
         export let on = false
@@ -27,6 +28,7 @@
 
         // --ELEMENT-SATELLITE
         let
+        satellite,
         translateX = 0,
         translateZ = 0,
         rotateY = 0,
@@ -52,10 +54,10 @@
         }
 
         // --CHECK
-        function check() { [cursor, on] = translateX > -200 && translateX < 200 ? ['pointer', on] : ['auto', false] }
+        function check() { [cursor, on] = translateX > -_r / 2 && translateX < _r / 2 ? ['pointer', on] : ['auto', false] }
 
         // --EVENT
-        function satellite_click(e)
+        function satellite_click()
         {
             if (cursor === 'pointer')
             {
@@ -81,11 +83,13 @@ style:transform="rotate({_rotate}deg)"
     class="satellite"
     style:transform="translateX({translateX}px) translateZ({translateZ}px) rotateY({rotateY}rad)"
     style:cursor={cursor}
+    bind:this={satellite}
     on:click={satellite_click}
     >
         {#each [0, 1, 2, 3, 4, 5] as side}
             <div
             class="side"
+            style:border="solid 8px {_color}"
             >
                 <svg
                 viewBox="0 0 80 80"
@@ -140,24 +144,16 @@ lang="scss"
             transform-style: preserve-3d;
             transform-origin: center;
 
-            transition: transform .3s;
+            transition: transform .6s;
 
             .side
             {
                 @include f-center(true);
                 @include any;
-                @include font-command;
 
                 background-color: $dark;
 
-                border: solid 8px rgba($light, .1);
-
                 box-sizing: border-box;
-
-                color: $light;
-                font-size: 36px;
-                text-align: center;
-                user-select: none;
 
                 svg
                 {
