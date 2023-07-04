@@ -25,6 +25,8 @@
 
     // #CONSTANTES
 
+    const duration = 900
+
         // --TO-ITERATE
         const orbits =
         [
@@ -106,16 +108,15 @@
 
         // --ELEMENT-CONTENT
         let
+        title,
+        letters = [],
         list,
-        listTarget,
-        listTargetId,
-        listTargetTranslateX,
-        listTargetTranslateY,
-        listTargetMin
+        listTranslateX = 0,
+        listMax = 0
 
         // --ELEMENT-ORBIT
         let
-        target = 0,
+        target = null,
         r,
         y,
         [red, green, blue] = _colors.light.match(/\w\w/g).map(x => parseInt(x, 16)),
@@ -182,6 +183,22 @@
             resolution = land.scrollHeight + show - window.innerHeight
         }
 
+        function setLetter()
+        {
+            const children = [...title.querySelectorAll('span')]
+
+            for (let i = 0; i < children.length; i++)
+            {
+                letters[i] =
+                {
+                    letter: children[i],
+                    translateX: window.innerWidth / 3 * (Math.round(Math.random()) ? 1 : -1),
+                    translateY: window.innerHeight / 3 * (Math.round(Math.random()) ? 1 : -1),
+                    translateZ: window.innerHeight * (Math.round(Math.random()) ? 1 : -1)
+                }
+            }
+        }
+
         function setCommand() { app.add('spaceDimension', spaceDimension, true) }
 
         function setEvent() { event.add('scroll', competence_scroll) }
@@ -191,6 +208,13 @@
             const start = competence.parentNode.offsetTop
     
             router.add(2, 'competence', start)
+        }
+
+        // --RESET
+        function resetList()
+        {
+            listTranslateX = 0
+            listMax = 0
         }
 
         // --UPDATE
@@ -203,13 +227,26 @@
             translate = gap > resolution ? gap - resolution : 0
         }
 
-        function updateList(i)
+        function updateLetter(letter, x, y, z) { letter.style.transform = `translate3d(${x ?? 0}px, ${y ?? 0}px, ${z ?? 0}px)` }
+    
+        function updateList()
         {
-            listTarget = i ? [...list.children][i] : list.firstChild
-            listTargetId = i ?? 0
-            listTargetTranslateX = 600
-            listTargetTranslateY = Math.random() * (window.innerHeight - 240 - listTarget.offsetHeight) + 120
-            listTargetMin = - window.innerWidth - listTarget.offsetWidth
+            const
+            children = [...list.children],
+            ratioY = (window.innerHeight - 240) / children.length
+
+            for (let i = 0; i < children.length; i++)
+            {
+                let
+                translateX = Math.random() * window.innerWidth * 2 + window.innerWidth,
+                translateY = Math.random() * ratioY + ratioY * i + 120
+
+                listMax = Math.max(listMax, translateX + children[i].offsetWidth)
+        
+                children[i].style.transform = `translate(${translateX}px, ${translateY}px)`
+            }
+
+            listMax += window.innerWidth + 200
         }
 
         // --DESTROY
@@ -245,26 +282,44 @@
         {
             y += deltaY > 0 ? .05 : -.05
 
-            listTarget.style.transform = `translate(${listTargetTranslateX -= deltaY * 2}px, ${listTargetTranslateY}px)`
+            listTranslateX -= deltaY * 2
 
-            if (listTargetTranslateX < listTargetMin)
-            {
-                ++listTargetId >= orbits[target].content.length
-                ? orbit_click({ detail: { id: null } })
-                : updateList(listTargetId)
-            }
+            if (listTranslateX < -listMax || listTranslateX > 0) resetList(), orbit_click({ detail: { id: null } })
         }
 
         function orbit_click({detail})
         {
             event.remove('wheel', competence_wheel)
     
-            if (target !== detail.id) orbits[target ?? 0].on = false
-
+            if (target !== null && target !== detail.id) orbits[target].on = false
+    
             tipping(detail.on)
 
             target = detail.id
         }
+
+        // --TRANSITION
+        function fade()
+        {
+            return {
+                duration: duration,
+                css: (t) => `opacity: ${t}`
+            }
+        }
+
+        // --ANIMATIONS
+        function gather()
+        {
+            setLetter()
+
+            for (const l of letters)
+            {
+                updateLetter(l.letter, l.translateX, l.translateY, l.translateZ)
+                requestAnimationFrame(() => updateLetter(l.letter))
+            }
+        }
+
+        function shatter() { for (const l of letters) updateLetter(l.letter, l.translateX, l.translateY, l.translateZ) }
 
         // --UTIL
         function tipping(on)
@@ -293,7 +348,9 @@ bind:this={competence}
     <div
     class="track"
     >
-        <div>
+        <div
+        style:--duration="{duration}ms"
+        >
             <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
             <div
             class="space"
@@ -308,6 +365,7 @@ bind:this={competence}
                     {...orbit.props}
                     _r={r}
                     _y={y}
+                    _duration={duration}
                     _color={orbit.on ? onColor: offColor}
                     bind:on={orbit.on}
                     on:click={orbit_click}
@@ -320,33 +378,42 @@ bind:this={competence}
             >
                 {#each orbits as orbit}
                     {#if orbit.on}
-                        <section>
-                            <h3>
-                                <div>
-                                    {#each orbit.title[0] as letter}
-                                        <span>{letter}</span>
-                                    {/each}
-                                </div>
-
-                                <div>
-                                    {#each orbit.title[1] as letter}
-                                        <span>{letter}</span>
-                                    {/each}
-                                </div>
+                        <section
+                        transition:fade
+                        on:introstart={gather}
+                        on:outrostart={shatter}
+                        >
+                            <h3
+                            bind:this={title}
+                            >
+                                {#each orbit.title as title}
+                                    <div>
+                                        {#each title as letter}
+                                            <span
+                                            style:transition="transform {Math.random() * duration / 2 + duration / 2}ms"
+                                            >
+                                                {letter}
+                                            </span>
+                                        {/each}
+                                    </div>
+                                {/each}
                             </h3>
 
-                            <span>{orbit.type} . {orbit.title[0] + ' ' + orbit.title[1]}</span>
+                            <span>{orbit.type} . {orbit.title.toString().replaceAll(',', ' ')}</span>
                         </section>
 
-                        <ul
-                        bind:this={list}
-                        >
-                            {#each orbit.content as content}
-                                <li>
-                                    <p>{content}</p>
-                                </li>
-                            {/each}
-                        </ul>
+                        <div>
+                            <ul
+                            style:transform="translateX({listTranslateX}px)"
+                            bind:this={list}
+                            >
+                                {#each orbit.content as content}
+                                    <li>
+                                        <p>{content}</p>
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
                     {/if}
                 {/each}
             </div>
@@ -431,7 +498,7 @@ lang="scss"
     
             transform-style: preserve-3d;
 
-            transition: transform .9s;
+            transition: transform var(--duration);
         }
 
         .content
@@ -458,37 +525,15 @@ lang="scss"
                 {
                     @include title(rgba($light, .1), 190px, 190px);
 
+                    perspective: 100vh;
+
                     letter-spacing: 10px;
 
                     div
                     {
                         @include flex;
-                    }
 
-                    span
-                    {
-                        @include relative;
-
-                        display: inline-block;
-
-                        &::after
-                        {
-                            @include xy-start(true);
-                            @include any;
-
-                            content: '';
-
-                            background-color: $dark;
-
-                            border-radius: 50%;
-
-                            animation: text .9s forwards;
-                        }
-
-                        @keyframes text
-                        {
-                            100% { transform: translateX(100%) }
-                        }
+                        transform-style: preserve-3d;
                     }
                 }
 
@@ -503,38 +548,43 @@ lang="scss"
                 }
             }
 
-            ul
+            &
+            >div
             {
-                @include flex;
-                @include f-column;
                 @include xy-start(true);
                 @include any;
 
-                justify-content: space-between;
-
                 transform: translateX(100%);
 
-                padding: 120px;
-
-                box-sizing: border-box;
-
-                li
+                ul
                 {
+                    @include flex;
+                    @include f-column;
                     @include xy-start(true);
+                    @include any;
+
+                    justify-content: space-between;
+
+                    padding: 120px;
+
+                    box-sizing: border-box;
 
                     transition: transform .3s;
-                }
 
-                p
-                {
-                    @include text-command;
+                    li { @include xy-start(true); }
 
-                    color: $s-light;
+                    p
+                    {
+                        @include text-command;
 
-                    cursor: default;
-                    pointer-events: auto;
+                        color: $s-light;
 
-                    &:hover { color: $primary; }
+                        cursor: default;
+                        pointer-events: auto;
+                        user-select: none;
+
+                        &:hover { color: $primary; }
+                    }
                 }
             }
         }

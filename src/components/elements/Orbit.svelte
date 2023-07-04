@@ -10,6 +10,7 @@
         _offset,
         _r,
         _y,
+        _duration,
         _color
 
         // --BIND
@@ -32,6 +33,7 @@
         translateX = 0,
         translateZ = 0,
         rotateY = 0,
+        lock = false,
         cursor = 'auto'
 
     // #REACTIVE
@@ -59,8 +61,10 @@
         // --EVENT
         function satellite_click()
         {
-            if (cursor === 'pointer')
+            if (!lock && cursor === 'pointer')
             {
+                if (on) lock = true, setTimeout(() => lock = false, _duration)
+        
                 let r = 90 * Math.PI / 180
     
                 rotateY += on ? r : -r
