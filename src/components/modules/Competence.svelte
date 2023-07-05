@@ -108,11 +108,8 @@
 
         // --ELEMENT-CONTENT
         let
-        title,
-        letters = [],
-        list,
-        listTranslateX = 0,
-        listMax = 0
+        max = 0,
+        translateX = 0
 
         // --ELEMENT-ORBIT
         let
@@ -183,13 +180,15 @@
             resolution = land.scrollHeight + show - window.innerHeight
         }
 
-        function setLetter()
+        function setLetters()
         {
-            const children = [...title.querySelectorAll('span')]
+            const children = [...this.elementTitle.querySelectorAll('span')]
+
+            this.letters = []
 
             for (let i = 0; i < children.length; i++)
             {
-                letters[i] =
+                this.letters[i] =
                 {
                     letter: children[i],
                     translateX: window.innerWidth / 3 * (Math.round(Math.random()) ? 1 : -1),
@@ -197,6 +196,22 @@
                     translateZ: window.innerHeight * (Math.round(Math.random()) ? 1 : -1)
                 }
             }
+        }
+
+        function setList()
+        {
+            const children = [...this.elementList.children]
+
+            for (let i = 0; i < children.length; i++)
+            {
+                const translateX = Math.random() * window.innerWidth * 2 + window.innerWidth
+
+                max = Math.max(max, translateX + children[i].offsetWidth)
+        
+                children[i].style.transform = `translateX(${translateX}px)`
+            }
+
+            max += window.innerWidth
         }
 
         function setCommand() { app.add('spaceDimension', spaceDimension, true) }
@@ -211,10 +226,12 @@
         }
 
         // --RESET
-        function resetList()
+        function reset()
         {
-            listTranslateX = 0
-            listMax = 0
+            event.remove('wheel', competence_wheel)
+    
+            translateX = 0
+            max = 0
         }
 
         // --UPDATE
@@ -228,26 +245,6 @@
         }
 
         function updateLetter(letter, x, y, z) { letter.style.transform = `translate3d(${x ?? 0}px, ${y ?? 0}px, ${z ?? 0}px)` }
-    
-        function updateList()
-        {
-            const
-            children = [...list.children],
-            ratioY = (window.innerHeight - 240) / children.length
-
-            for (let i = 0; i < children.length; i++)
-            {
-                let
-                translateX = Math.random() * window.innerWidth * 2 + window.innerWidth,
-                translateY = Math.random() * ratioY + ratioY * i + 120
-
-                listMax = Math.max(listMax, translateX + children[i].offsetWidth)
-        
-                children[i].style.transform = `translate(${translateX}px, ${translateY}px)`
-            }
-
-            listMax += window.innerWidth + 200
-        }
 
         // --DESTROY
         function destroy()
@@ -282,20 +279,20 @@
         {
             y += deltaY > 0 ? .05 : -.05
 
-            listTranslateX -= deltaY * 2
+            translateX -= deltaY * 2
 
-            if (listTranslateX < -listMax || listTranslateX > 0) resetList(), orbit_click({ detail: { id: null } })
+            if (translateX < -max || translateX > 0) reset(), orbit_click({ detail: { id: null } })
         }
 
         function orbit_click({detail})
         {
-            event.remove('wheel', competence_wheel)
-    
+            reset()
+
             if (target !== null && target !== detail.id) orbits[target].on = false
-    
-            tipping(detail.on)
 
             target = detail.id
+    
+            tipping.call(orbits[target], detail.on)
         }
 
         // --TRANSITION
@@ -308,28 +305,79 @@
         }
 
         // --ANIMATIONS
-        function gather()
+        async function gather()
         {
-            setLetter()
+            setLetters.call(this)
 
-            for (const l of letters)
+            for (const l of this.letters)
             {
                 updateLetter(l.letter, l.translateX, l.translateY, l.translateZ)
                 requestAnimationFrame(() => updateLetter(l.letter))
             }
         }
 
-        function shatter() { for (const l of letters) updateLetter(l.letter, l.translateX, l.translateY, l.translateZ) }
+        async function textAnimation(start, end, i, j, unwind)
+        {
+            this.frameId = requestAnimationFrame(() =>
+            {
+                for (let u = start; unwind ? u < end : u > end; unwind ? u++ : u--)
+                    this.subtitleLetters[u].textContent = ['#', '*'][Math.floor(Math.random() * 2)]
 
-        // --UTIL
+                if (++i === 10)
+                {
+                    i = 0
+
+                    if (unwind) { if (++end >= this.subtitleLetters.length) end = this.subtitleLetters.length-1 }
+                    else { if (--end < 0) end = 0 }
+                }
+                if (++j === 16)
+                {
+                    const letter = this.subtitleLetters[start]
+            
+                    unwind ? letter.textContent = letter.dataset.char : letter.innerHTML = '&nbsp;'
+
+                    if ((unwind ? start++ : start--) === end) return
+        
+                    j = 0
+                }
+
+                textAnimation.call(this, start, end, i, j, unwind)
+            })
+        }
+
+        async function shatter() { for (const l of this.letters) updateLetter(l.letter, l.translateX, l.translateY, l.translateZ) }
+
+        // --UTILS
         function tipping(on)
         {
             [main.style.overflowY, ratio] = on ? ['hidden', .3] : ['scroll', 1]
 
             tick().then(() => on
-            ?   (updateList(),
+            ?   (setList.call(this),
                 event.add('wheel', competence_wheel))
             : update())
+        }
+
+        function introstart()
+        {
+            gather.call(this)
+
+            cancelAnimationFrame(this.frameId)
+
+            this.subtitleLetters = [...this.elementSubtitle.querySelectorAll('.char')]
+
+            textAnimation.call(this, 0, 1, 0, 0, true)
+        }
+
+        function outrostart()
+        {
+            shatter.call(this)
+
+            cancelAnimationFrame(this.frameId)
+
+            const length = this.subtitleLetters.length
+    
+            textAnimation.call(this, length - 1, length - 2, 0, 0, false)
         }
 
     // #CYCLES
@@ -351,6 +399,61 @@ bind:this={competence}
         <div
         style:--duration="{duration}ms"
         >
+            {#each orbits as orbit}
+                {#if orbit.on}
+                    <div
+                    class="content"
+                    transition:fade
+                    on:introstart={introstart.bind(orbit)}
+                    on:outrostart={outrostart.bind(orbit)}
+                    >
+                        <section>
+                            <h3
+                            bind:this={orbit.elementTitle}
+                            >
+                                {#each orbit.title as title}
+                                    <div>
+                                        {#each title as char}
+                                            <span
+                                            style:transition="transform {Math.random() * duration / 2 + duration / 2}ms"
+                                            >
+                                                {char}
+                                            </span>
+                                        {/each}
+                                    </div>
+                                {/each}
+                            </h3>
+
+                            <p
+                            bind:this={orbit.elementSubtitle}
+                            >
+                                {#each (orbit.type + ' . ' + orbit.title.toString().replaceAll(',', ' ')) as char}
+                                    <span
+                                    class:char={char !== ' '}
+                                    data-char={char}
+                                    >
+                                        &nbsp;
+                                    </span>
+                                {/each}
+                            </p>
+                        </section>
+
+                        <div>
+                            <ul
+                            style:transform="translateX({translateX}px)"
+                            bind:this={orbit.elementList}
+                            >
+                                {#each orbit.content as content}
+                                    <li>
+                                        <p>{content}</p>
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
+                    </div>
+                {/if}
+            {/each}
+
             <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
             <div
             class="space"
@@ -365,56 +468,10 @@ bind:this={competence}
                     {...orbit.props}
                     _r={r}
                     _y={y}
-                    _duration={duration}
-                    _color={orbit.on ? onColor: offColor}
+                    _color={orbit.on ? onColor : offColor}
                     bind:on={orbit.on}
                     on:click={orbit_click}
                     />
-                {/each}
-            </div>
-
-            <div
-            class="content"
-            >
-                {#each orbits as orbit}
-                    {#if orbit.on}
-                        <section
-                        transition:fade
-                        on:introstart={gather}
-                        on:outrostart={shatter}
-                        >
-                            <h3
-                            bind:this={title}
-                            >
-                                {#each orbit.title as title}
-                                    <div>
-                                        {#each title as letter}
-                                            <span
-                                            style:transition="transform {Math.random() * duration / 2 + duration / 2}ms"
-                                            >
-                                                {letter}
-                                            </span>
-                                        {/each}
-                                    </div>
-                                {/each}
-                            </h3>
-
-                            <span>{orbit.type} . {orbit.title.toString().replaceAll(',', ' ')}</span>
-                        </section>
-
-                        <div>
-                            <ul
-                            style:transform="translateX({listTranslateX}px)"
-                            bind:this={list}
-                            >
-                                {#each orbit.content as content}
-                                    <li>
-                                        <p>{content}</p>
-                                    </li>
-                                {/each}
-                            </ul>
-                        </div>
-                    {/if}
                 {/each}
             </div>
         </div>
@@ -503,23 +560,19 @@ lang="scss"
 
         .content
         {
-            @include xy-start(true);
-            @include any;
             @include no-event;
-
-            padding: 0px 40px;
-
-            box-sizing: border-box;
 
             section
             {
                 @include flex;
                 @include f-column;
                 @include f-j-center;
-                @include relative;
+                @include xy-start(true);
                 @include any;
 
-                z-index: -1;
+                padding: 0px 40px;
+
+                box-sizing: border-box;
 
                 h3
                 {
@@ -537,9 +590,9 @@ lang="scss"
                     }
                 }
 
-                &
-                >span
+                p
                 {
+                    @include flex;
                     @include font-command;
 
                     color: $primary;
@@ -554,13 +607,14 @@ lang="scss"
                 @include xy-start(true);
                 @include any;
 
+                z-index: 1;
+
                 transform: translateX(100%);
 
                 ul
                 {
                     @include flex;
                     @include f-column;
-                    @include xy-start(true);
                     @include any;
 
                     justify-content: space-between;
@@ -571,11 +625,11 @@ lang="scss"
 
                     transition: transform .3s;
 
-                    li { @include xy-start(true); }
-
                     p
                     {
                         @include text-command;
+
+                        display: inline;
 
                         color: $s-light;
 

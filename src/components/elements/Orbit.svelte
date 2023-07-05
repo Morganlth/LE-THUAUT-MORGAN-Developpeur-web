@@ -10,7 +10,6 @@
         _offset,
         _r,
         _y,
-        _duration,
         _color
 
         // --BIND
@@ -21,9 +20,13 @@
         // --SVELTE
         import { createEventDispatcher } from 'svelte'
 
-    // #CONSTANTE
+    // #CONSTANTES
 
-    const dispatch = createEventDispatcher()
+        // --SVELTE
+        const dispatch = createEventDispatcher()
+
+        // --DEFAULT
+        const rad90 = 90 * Math.PI / 180
 
     // #VARIABLES
 
@@ -32,13 +35,13 @@
         satellite,
         translateX = 0,
         translateZ = 0,
-        rotateY = 0,
-        lock = false,
-        cursor = 'auto'
+        rotateY = 0
 
     // #REACTIVE
 
     $: update(_y)
+
+    $: rotateY += on ? -rad90 : rad90
 
     // #FUNCTIONS
 
@@ -51,27 +54,14 @@
             translateZ = _r * Math.sin(angle)            
 
             rotateY = angle
-
-            if (!on) check()
         }
-
-        // --CHECK
-        function check() { [cursor, on] = translateX > -_r / 2 && translateX < _r / 2 ? ['pointer', on] : ['auto', false] }
 
         // --EVENT
         function satellite_click()
         {
-            if (!lock && cursor === 'pointer')
-            {
-                if (on) lock = true, setTimeout(() => lock = false, _duration)
-        
-                let r = 90 * Math.PI / 180
-    
-                rotateY += on ? r : -r
-                on = !on
+            on = !on
 
-                dispatch('click', { id: _id, on: on })
-            }
+            dispatch('click', { id: _id, on: on })
         }
 </script>
 
@@ -86,7 +76,6 @@ style:transform="rotate({_rotate}deg)"
     <div
     class="satellite"
     style:transform="translateX({translateX}px) translateZ({translateZ}px) rotateY({rotateY}rad)"
-    style:cursor={cursor}
     bind:this={satellite}
     on:click={satellite_click}
     >
@@ -142,6 +131,8 @@ lang="scss"
 
         .satellite
         {
+            @include pointer;
+    
             width: $size;
             height: $size;
 
