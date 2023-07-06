@@ -354,7 +354,7 @@
         // --UTILS
         function tipping(on)
         {
-            [main.style.overflowY, ratio] = on ? ['hidden', .3] : ['scroll', 1]
+            on ? (app.freeze.set(true), ratio = .3) : (app.freeze.set(false), ratio = 1)
 
             tick().then(() => on
             ?   (setList.call(this),

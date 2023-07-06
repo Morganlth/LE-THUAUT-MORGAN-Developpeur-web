@@ -39,7 +39,7 @@
             canvas.height = height
 
             context = canvas.getContext('2d')
-            context.lineWidth = 3
+            context.lineWidth = 2
             context.strokeStyle = _colors.sDark
             context.fillStyle = _colors.sLight
 

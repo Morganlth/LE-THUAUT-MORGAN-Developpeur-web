@@ -8,7 +8,11 @@
         _id,
         _translateX,
         _translateZ,
-        _rotateY
+        _rotateY,
+        _radius
+
+        // --BIND
+        export function update() { [translateZ, scale] = on ? [_radius, 2] : [0, 1] }
 
     // #IMPORT
 
@@ -20,10 +24,15 @@
         // --SVELTE
         const dispatch = createEventDispatcher()
 
-    // #VARIABLE
+    // #VARIABLES
 
         // --ELEMENT-CARD
         let on = false
+
+        // --ELEMENT-BUTTON
+        let
+        translateZ = 0,
+        scale = 1
 
     // #FUNCTION
 
@@ -31,7 +40,7 @@
         function card_click()
         {
             on = !on
-        
+
             dispatch('click', { id: _id, on: on })
         }
 </script>
@@ -44,12 +53,9 @@ style:transform="translateX({_translateX ?? 0}px) translateZ({_translateZ ?? 0}p
 >
     <button
     type="button"
+    style:transform="translateZ({translateZ}px) scale({scale})"
     on:click={card_click}
     >
-        <!-- <div
-        class="content"
-        >
-        </div> -->
     </button>
 </div>
 
@@ -60,8 +66,8 @@ lang="scss"
 >
     /* #USE */
 
-    /* @use '../../assets/scss/styles/position.scss' as *; */
     @use '../../assets/scss/styles/size.scss' as *;
+    @use '../../assets/scss/styles/background.scss' as *;
 
     /* #GROUP */
 
@@ -71,32 +77,24 @@ lang="scss"
 
         flex-shrink: 0;
 
+        transform-style: preserve-3d;
         transform-origin: left;
 
-        padding: 0 25px;
+        padding: 0 1vw; /* in project cardWidth = 100vw * .52 */
 
         box-sizing: border-box;
 
         button
         {
             @include any;
+            @include black-glass(hue-rotate(180deg));
 
-            background-color: $dark;
-
-            border: solid $light 4px;
+            border: solid rgba($light, .1) 4px;
             outline: none;
 
             box-sizing: border-box;
 
-            /* .content
-            {
-                @include xy-start(true);
-
-                transform: translate(-25%, -25%);
-
-                width: 100vw;
-                height: 100vh;
-            } */
+            transition: transform .4s, width .4s, height .4s;
         }
     }
 </style>

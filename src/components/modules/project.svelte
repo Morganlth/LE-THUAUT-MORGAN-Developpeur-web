@@ -11,6 +11,7 @@
     // #IMPORTS
 
         // --CONTEXTS
+        import { app } from '../field/Main.svelte'
         import { event } from '../field/Main.svelte'
         import { router } from '../field/Main.svelte'
 
@@ -62,7 +63,9 @@
         cardHeight,
         radius,
         translateZ,
-        rotateY = 0
+        rotateY = 0,
+        target = 0,
+        cardTimeout
 
     // #FUNCTIONS
 
@@ -88,7 +91,7 @@
             size = Math.sqrt(width * width + height * height)
             sizeBy2 = size / 2
 
-            offsetTop = project.offsetTop + project.parentNode.offsetTop + height - 5 // 5 pour une marge d'erreur dans les calculs (utile pour project_wheel avec scrollTop et offsetTop)
+            offsetTop = project.offsetTop + project.parentNode.offsetTop + height
         }
 
         function setCanvas()
@@ -127,8 +130,8 @@
 
         function setCardContainer()
         {
-            cardWidth = window.innerWidth / 2
-            cardHeight = window.innerHeight / 2
+            cardWidth = window.innerWidth * .52
+            cardHeight = window.innerHeight * .5
 
             radius = cardWidth / 2 / Math.tan(18 * Math.PI / 180)
             translateZ = radius
@@ -149,7 +152,7 @@
                     rY -= 36
                 }
         
-                cards[i] = { translateX: tX, translateZ: tZ, rotateY: rY }
+                cards[i] = { ...cards[i], translateX: tX, translateZ: tZ, rotateY: rY }
             }
         }
 
@@ -160,10 +163,11 @@
         // --DESTROY
         function destroy()
         {
-            event.remove('wheel', project_wheel)
-            
+            destroyEvent()
             destroyFrame()
         }
+
+        function destroyEvent() { event.remove('wheel', project_wheel) }
 
         function destroyFrame()
         {
@@ -192,31 +196,13 @@
 
         function card_click({detail})
         {
-            // console.log(cards[detail.id])
-            // rotate = 0
-
-            if (detail.on)
+            if (detail.id === target)
             {
-                rotate = 0
-                translateX = 0
-                translateY = 0
+                clearTimeout(cardTimeout)
+    
+                app.freeze.set(detail.on)
 
-                setTimeout(() =>
-                {
-                    cardWidth = window.innerWidth
-                    cardHeight = window.innerHeight
-
-                    radius = cardWidth / 2 / Math.tan(18 * Math.PI / 180)
-                    translateZ = radius
-
-                    setDecagon()
-                }, 400)
-            }
-            else
-            {
-                // setTrack()
-                setCardContainer()
-                setTimeout(setTrack, 400)
+                ;(detail.on ? show : hidden)(cards[detail.id])
             }
         }
 
@@ -255,7 +241,7 @@
             context.closePath()
         }
 
-        // --UTILS
+        // --ANIMATION
         function animate()
         {
             frameId = requestAnimationFrame(animate)
@@ -274,6 +260,7 @@
             }
         }
 
+        // --ACTIONS
         function move()
         {
             const now = +new Date()
@@ -282,9 +269,28 @@
             {
                 last = now
                 rotateY += 36
+                target = rotateY / 36 % 10
 
                 clearTimeout(timeout), timeout = setTimeout(() => timeout = null, 400)
             }
+        }
+
+        function show(card)
+        {
+            destroyEvent()
+
+            ;[rotate, translateX, translateY] = [0]
+
+            cardTimeout = setTimeout(() => { translateZ = 1, card.update() }, 400)
+        }
+
+        function hidden(card)
+        {
+            translateZ = radius
+
+            card.update()
+    
+            cardTimeout = setTimeout(() => { setTrack(), setEvent() }, 400)
         }
 
     // #CYCLES
@@ -326,6 +332,8 @@ bind:this={project}
                 _translateX={card.translateX}
                 _translateZ={card.translateZ}
                 _rotateY={card.rotateY}
+                _radius={radius}
+                bind:update={card.update}
                 on:click={card_click}
                 />
             {/each}

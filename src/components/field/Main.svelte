@@ -65,7 +65,9 @@ context="module"
     // #VARIABLES
 
         // --ELEMENT-MAIN
-        let main
+        let
+        main,
+        freeze = app.freeze
 
         // --ELEMENT-WRAPPER-1
         let
@@ -183,6 +185,7 @@ on:mousemove={event.mouseMove.bind(event)}
 on:mousedown={event.mouseDown.bind(event)}
 on:mouseup={event.mouseUp.bind(event)}
 on:mouseleave={event.mouseUp.bind(event)}
+class:freeze={$freeze}
 >
     <div
     style:height="calc(140vh + {structures[0].e1 + structures[0].e2 - 100 + structures[0].unit})"
@@ -238,6 +241,8 @@ lang="scss"
 
         overflow-x: clip;
         overflow-y: scroll;
+
+        &.freeze { overflow-y: hidden; }
 
         scrollbar-width: none !important;
         &::-webkit-scrollbar

@@ -8,23 +8,10 @@ class AppManager
 
     cmd = null
 
-    // --TEST
-    testDefault(value) { return value === 'd' || value === 'default' }
+    freeze
 
-    testNumber(value, min, max)
-    {
-        if (!/^\d*?\.?\d+$/.test(value)) this.error('la valeur doit être un nombre', 'TypeError')
-        if (value < min || value > max) this.error(`la valeur doit être comprise entre [${min} et ${max}]`, 'RangeError')
-
-        return parseInt(value, 10)
-    }
-
-    testBoolean(value)
-    {
-        if (value === false || value === 'f' || value === 'false') return false
-        else if (value === true || value === 't' || value === 'true') return true
-        else this.error('"t" | "true" pour vrai - "f" | "false" pour faux', 'TypeError')
-    }
+    // --CONSTRUCTOR
+    constructor() { this.freeze = writable(false) }
 
     // --RESET
     reset(view)
@@ -55,6 +42,24 @@ class AppManager
     success(msg) { this.log(new AppSuccess(msg)) }
     
     error(msg, type) { throw new AppError(type ?? 'Error', msg) }
+
+    // --TEST
+    testDefault(value) { return value === 'd' || value === 'default' }
+
+    testNumber(value, min, max)
+    {
+        if (!/^\d*?\.?\d+$/.test(value)) this.error('la valeur doit être un nombre', 'TypeError')
+        if (value < min || value > max) this.error(`la valeur doit être comprise entre [${min} et ${max}]`, 'RangeError')
+
+        return parseInt(value, 10)
+    }
+
+    testBoolean(value)
+    {
+        if (value === false || value === 'f' || value === 'false') return false
+        else if (value === true || value === 't' || value === 'true') return true
+        else this.error('"t" | "true" pour vrai - "f" | "false" pour faux', 'TypeError')
+    }
 
     // --DEFAULT-COMMAND
     clear()
@@ -100,7 +105,7 @@ class AppManager
         localStorage.setItem('mode', value ? 'eco' : 'personnalisé')
     }
 
-    // --CODE
+    // --UTIL
     add(name, command, storage) // ajouter function remove lié aux destroy des elements
     {
         if (!this.keyWords.includes(name)) this.keyWords.push(name)
@@ -111,6 +116,8 @@ class AppManager
 }
 
 // #IMPORTS
+
+import { writable } from 'svelte/store'
 
 import AppSuccess from './success'
 import AppError from './error'
