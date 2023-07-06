@@ -46,7 +46,7 @@
         function destroy() { event.remove('scroll', scene_scroll) }
 
         // --EVENT
-        function scene_scroll() { offsetTop = scene.offsetTop }
+        async function scene_scroll() { offsetTop = scene.offsetTop }
 
     // #CYCLES
 

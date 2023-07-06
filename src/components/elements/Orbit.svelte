@@ -10,7 +10,9 @@
         _offset,
         _r,
         _y,
-        _color
+        _title,
+        _onColor,
+        _offColor
 
         // --BIND
         export let on = false
@@ -20,22 +22,36 @@
         // --SVELTE
         import { createEventDispatcher } from 'svelte'
 
+        // --COMPONENT-COVER
+        import Icon from '../covers/Icon.svelte'
+
+        // --COMPONENT-ICON
+        import Logo from '../icons/Logo.svelte'
+
     // #CONSTANTES
 
         // --SVELTE
         const dispatch = createEventDispatcher()
 
         // --DEFAULT
-        const rad90 = 90 * Math.PI / 180
+        const
+        rad90 = 90 * Math.PI / 180,
+        rad45 = 45 * Math.PI / 180
 
     // #VARIABLES
+
+        // --ELEMENT-GRAVITY-AREA
+        let gravityArea
 
         // --ELEMENT-SATELLITE
         let
         satellite,
         translateX = 0,
         translateZ = 0,
-        rotateY = 0
+        rotateY = 0,
+        forceX = 0,
+        forceY = 0,
+        last = +new Date()
 
     // #REACTIVE
 
@@ -56,7 +72,34 @@
             rotateY = angle
         }
 
-        // --EVENT
+        // --EVENTS
+        function gravity_mouseMove({clientX, clientY})
+        {
+            const now = +new Date()
+
+            if (now > last + 100)
+            {
+                const
+                boundingClientRect = gravityArea.getBoundingClientRect(),
+                size = boundingClientRect.width / 2,
+                difX = clientX - (boundingClientRect.left + size),
+                difY = clientY - (boundingClientRect.top + size),
+                a = Math.atan(difY / difX),
+                r = Math.cos(rad45) * (size / Math.cos((rad90 - Math.abs(_rotate) - rad45)))
+
+                forceX = difX * (1 - Math.abs(difX) / (Math.cos(a) * r)) * .5
+                forceY = difY * (1 - Math.abs(difY) / Math.abs(Math.sin(a) * r)) * .5
+
+                last = now
+            }
+        }
+
+        function gravity_mouseLeave()
+        {
+            forceX = 0
+            forceY = 0
+        }
+
         function satellite_click()
         {
             on = !on
@@ -69,33 +112,46 @@
 
 <div
 class="orbit"
-style:perspective="{_r * 2}px"
-style:transform="rotate({_rotate}deg)"
+style:perspective="{_r * 2.5}px"
+style:transform="rotate({_rotate}rad)"
 >
-    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-    <div
-    class="satellite"
-    style:transform="translateX({translateX}px) translateZ({translateZ}px) rotateY({rotateY}rad)"
-    bind:this={satellite}
+    <!--deplacement de l'objet-->
+    <button
+    class="gravity-area"
+    style:transform="translateX({translateX}px) translateZ({translateZ}px)"
+    bind:this={gravityArea}
+    on:mousemove={gravity_mouseMove}
+    on:mouseleave={gravity_mouseLeave}
     on:click={satellite_click}
     >
-        {#each [0, 1, 2, 3, 4, 5] as side}
+        <!--application des forces | -_rotate pour retrouver l'axe x-y horizontal-vertical-->
+        <div
+        style:transform="rotate({-_rotate}rad) translate({forceX}px, {forceY}px)"
+        >
+            <!--rotation de l'objet | _rotate pour se replacer face a la trajectoire-->
             <div
-            class="side"
-            style:border="solid 8px {_color}"
+            class="satellite"
+            title={_title}
+            style:transform="rotate({_rotate}rad) rotateY({rotateY}rad)"
+            bind:this={satellite}
             >
-                <svg
-                viewBox="0 0 80 80"
-                fill="none"
-                stroke-width="10"
-                xmlns="http://www.w3.org/2000/svg"
-                >
-                    <rect x="5" y="5" width="70" height="70"/>
-                    <rect x="5" y="5" width="38" height="38"/>
-                </svg>
+                {#each [0, 1, 2, 3, 4, 5] as side}
+                    <div
+                    class="side"
+                    style:border="solid 8px {on ? _onColor : _offColor}"
+                    >
+                        <Icon
+                        _size="30%"
+                        _spring={false}
+                        _color={_onColor}
+                        >
+                            <Logo />
+                        </Icon>
+                    </div>
+                {/each}
             </div>
-        {/each}
-    </div>
+        </div>
+    </button>
 </div>
 
 <!-- #STYLE -->
@@ -121,23 +177,43 @@ lang="scss"
 
     .orbit
     {
-        @include f-center(true);
         @include absolute;
-        @include any;
 
         transform-style: preserve-3d;
 
         transition: transform .3s;
 
+        .gravity-area
+        {
+            @include f-center(true);
+            @include pointer;
+
+            transform-style: preserve-3d;
+
+            width: $size * 2;
+            height: $size * 2;
+
+            background-color: transparent;
+
+            border: none;
+            border-radius: 50%;
+            outline: none;
+
+            transition: transform .6s;
+
+            &
+            >div { transition: transform .6s; }
+        }
+
         .satellite
         {
-            @include pointer;
-    
-            width: $size;
-            height: $size;
+            @include no-event;
 
             transform-style: preserve-3d;
             transform-origin: center;
+
+            width: $size;
+            height: $size;
 
             transition: transform .6s;
 
@@ -148,40 +224,15 @@ lang="scss"
 
                 background-color: $dark;
 
+                /* box-shadow: 0 0 10px rgba($light, .1); */
                 box-sizing: border-box;
-
-                svg
-                {
-                    width: 30%;
-                    height: 30%;
-        
-                    stroke: $light;
-                }
             }
-            .side:nth-child(1)
-            {
-                transform: translateZ(math.div($size, 2));
-            }
-            .side:nth-child(2)
-            {
-                transform: translateY(-150%) rotateX(-90deg);
-            }
-            .side:nth-child(3)
-            {
-                transform: translate(-50%, -200%) rotateY(90deg) scaleX(-1);
-            }
-            .side:nth-child(4)
-            {
-                transform: translateY(-250%) rotateX(90deg);
-            }
-            .side:nth-child(5)
-            {
-                transform: translate(50%, -400%) rotateY(-90deg);
-            }
-            .side:nth-child(6)
-            {
-                transform: translateY(-500%) translateZ(math.div(-$size, 2));
-            }
+            .side:nth-child(1) { transform: translateZ(math.div($size, 2)); }
+            .side:nth-child(2) { transform: translateY(-150%) rotateX(-90deg); }
+            .side:nth-child(3) { transform: translate(-50%, -200%) rotateY(90deg) scaleX(-1); }
+            .side:nth-child(4) { transform: translateY(-250%) rotateX(90deg); }
+            .side:nth-child(5) { transform: translate(50%, -400%) rotateY(-90deg); }
+            .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$size, 2)); }
         }
     }
 </style>

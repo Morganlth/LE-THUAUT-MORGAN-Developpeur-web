@@ -31,7 +31,7 @@
         const orbits =
         [
             {
-                props: { _id: 0, _rotate: -50, _offset: 0 },
+                props: { _id: 0, _rotate: -50 * Math.PI / 180, _offset: 0 },
                 title: ['FORME', 'STYLE'],
                 type: 'FRONT',
                 content:
@@ -44,7 +44,7 @@
             }
         ,
             {
-                props: { _id: 1, _rotate: 80, _offset: 4.71 },
+                props: { _id: 1, _rotate: 80 * Math.PI / 180, _offset: 4.71 },
                 title: ['LOGIQUE', 'JAVASCRIPT'],
                 type: 'FRONT',
                 content:
@@ -61,7 +61,7 @@
             }
         ,
             {
-                props: { _id: 2, _rotate: 40, _offset: 3.14 },
+                props: { _id: 2, _rotate: 40 * Math.PI / 180, _offset: 3.14 },
                 title: ['CÔTÉ', 'SERVER'],
                 type: 'BACK',
                 content:
@@ -75,7 +75,7 @@
             }
         ,
             {
-                props: { _id: 3, _rotate: 10, _offset: 1.57 },
+                props: { _id: 3, _rotate: 10 * Math.PI / 180, _offset: 1.57 },
                 title: ['ADAPTABILITÉ', 'RÉFÉRENCEMENT'],
                 type: 'FRONT',
                 content:
@@ -200,18 +200,22 @@
 
         function setList()
         {
-            const children = [...this.elementList.children]
+            const
+            lis = [...this.list.children],
+            width = window.innerWidth
 
-            for (let i = 0; i < children.length; i++)
+            this.listDatas = []
+
+            for (let i = 0; i < this.content.length; i++)
             {
-                const translateX = Math.random() * window.innerWidth * 2 + window.innerWidth
+                const
+                translateX = Math.random() * width + width,
+                speed = Math.random() + .8
 
-                max = Math.max(max, translateX + children[i].offsetWidth)
-        
-                children[i].style.transform = `translateX(${translateX}px)`
+                this.listDatas[i] = { translateX: translateX, speed: speed }
+
+                max = Math.max(max, (translateX + width + lis[i].offsetWidth + 50) / speed)
             }
-
-            max += window.innerWidth
         }
 
         function setCommand() { app.add('spaceDimension', spaceDimension, true) }
@@ -279,9 +283,9 @@
         {
             y += deltaY > 0 ? .05 : -.05
 
-            translateX -= deltaY * 2
+            translateX += deltaY
 
-            if (translateX < -max || translateX > 0) reset(), orbit_click({ detail: { id: null } })
+            if (translateX > max || translateX < 0) reset(), orbit_click({ detail: { id: null } })
         }
 
         function orbit_click({detail})
@@ -316,12 +320,12 @@
             }
         }
 
-        async function textAnimation(start, end, i, j, unwind)
+        async function writingAnimation(start, end, i, j, unwind)
         {
             this.frameId = requestAnimationFrame(() =>
             {
                 for (let u = start; unwind ? u < end : u > end; unwind ? u++ : u--)
-                    this.subtitleLetters[u].textContent = ['#', '*'][Math.floor(Math.random() * 2)]
+                    this.subtitleLetters[u].textContent = [' ', unwind ? '>' : '<'][Math.floor(Math.random() * 2)]
 
                 if (++i === 10)
                 {
@@ -341,7 +345,7 @@
                     j = 0
                 }
 
-                textAnimation.call(this, start, end, i, j, unwind)
+                writingAnimation.call(this, start, end, i, j, unwind)
             })
         }
 
@@ -366,7 +370,7 @@
 
             this.subtitleLetters = [...this.elementSubtitle.querySelectorAll('.char')]
 
-            textAnimation.call(this, 0, 1, 0, 0, true)
+            writingAnimation.call(this, 0, 1, 0, 0, true)
         }
 
         function outrostart()
@@ -377,7 +381,7 @@
 
             const length = this.subtitleLetters.length
     
-            textAnimation.call(this, length - 1, length - 2, 0, 0, false)
+            writingAnimation.call(this, length - 1, length - 2, 0, 0, false)
         }
 
     // #CYCLES
@@ -440,11 +444,14 @@ bind:this={competence}
 
                         <div>
                             <ul
-                            style:transform="translateX({translateX}px)"
-                            bind:this={orbit.elementList}
+                            bind:this={orbit.list}
                             >
-                                {#each orbit.content as content}
-                                    <li>
+                                {#each orbit.content as content, i}
+                                    <li
+                                    style:transform="translateX({orbit.listDatas
+                                    ? orbit.listDatas[i].translateX - translateX * orbit.listDatas[i].speed
+                                    : -translateX}px)"
+                                    >
                                         <p>{content}</p>
                                     </li>
                                 {/each}
@@ -468,7 +475,9 @@ bind:this={competence}
                     {...orbit.props}
                     _r={r}
                     _y={y}
-                    _color={orbit.on ? onColor : offColor}
+                    _title={orbit.title.toString().replaceAll(',', ' ')}
+                    _onColor={onColor}
+                    _offColor={offColor}
                     bind:on={orbit.on}
                     on:click={orbit_click}
                     />
@@ -619,11 +628,16 @@ lang="scss"
 
                     justify-content: space-between;
 
-                    padding: 120px;
+                    padding: 120px 0;
 
                     box-sizing: border-box;
 
-                    transition: transform .3s;
+                    li
+                    {
+                        width: fit-content;
+    
+                        transition: transform .3s;
+                    }
 
                     p
                     {

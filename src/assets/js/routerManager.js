@@ -31,7 +31,7 @@ class RouterManager
     }
 
     // --EVENT
-    router_scroll()
+    async router_scroll()
     {
         const now = +new Date()
 
