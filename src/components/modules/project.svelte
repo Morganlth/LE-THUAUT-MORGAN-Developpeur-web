@@ -17,21 +17,19 @@
         // --SVELTE
         import { onMount, onDestroy } from 'svelte'
 
-    // #CONSTANTES
+        // --COMPONENT-ELEMENT
+        import Card from '../elements/Card.svelte'
 
-        // --ELEMENNT-CARD-CONTAINER
-        const gap = 100
+    // #CONSTANTE
     
         // --TO-ITERATE
-        const cards = ['', '', '', '', '', '', '', '', '', '']
+        const cards = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
     // #VARIABLES
 
         // --GLOBAL
         let
         frameId = null,
-        width,
-        height,
         size,
         sizeBy2,
         offsetTop,
@@ -54,15 +52,17 @@
         // --ELEMENT-TRACK
         let
         track,
-        rotate = 0,
-        translateX = 0
+        rotate,
+        translateX,
+        translateY
 
         // --ELEMENT-CARD-CONTAINER
         let
-        translateZ = 0,
-        rotateY = 0,
-        cardWidth = 0,
-        cardHeight = 0
+        cardWidth,
+        cardHeight,
+        radius,
+        translateZ,
+        rotateY = 0
 
     // #FUNCTIONS
 
@@ -74,14 +74,17 @@
             setVar()
             setCanvas()
             setTrack()
+            setCardContainer()
             setEvent()
             setRouter()
         }
 
         function setVar()
         {
-            width = window.innerWidth
+            const
+            width = window.innerWidth,
             height = window.innerHeight
+    
             size = Math.sqrt(width * width + height * height)
             sizeBy2 = size / 2
 
@@ -117,39 +120,36 @@
 
         function setTrack()
         {
-            setCardContainer()
-
-            const widthAndGap = cardWidth + gap
-
-            rotate = Math.atan(height / width) / Math.PI * 180
-            translateX = (size - width + gap) / 2
-            translateZ = widthAndGap / 2 / Math.tan(18 * Math.PI / 180)
-
-            setDecagon(widthAndGap)
+            rotate = Math.atan(window.innerHeight / window.innerWidth) / Math.PI * 180
+            translateX = (size - window.innerWidth) / 2
+            translateY = -50
         }
 
         function setCardContainer()
         {
-            cardWidth = width / 2
-            cardHeight = height / 2
+            cardWidth = window.innerWidth / 2
+            cardHeight = window.innerHeight / 2
+
+            radius = cardWidth / 2 / Math.tan(18 * Math.PI / 180)
+            translateZ = radius
+
+            setDecagon()
         }
 
-        function setDecagon(widthAndGap)
+        function setDecagon()
         {
-            const children = [...track.firstChild.children]
-    
-            let [tZ, tX, rY] = [-translateZ, 0, 0]
+            let [tZ, tX, rY] = [-radius, 0, 0]
 
-            for (let i = 0; i < children.length; i++)
+            for (let i = 0; i < cards.length; i++)
             {
                 if (i)
                 {
-                    tX -= widthAndGap - Math.cos(rY * Math.PI / 180) * widthAndGap
-                    tZ -= Math.sin(rY * Math.PI / 180) * widthAndGap
+                    tX -= cardWidth - Math.cos(rY * Math.PI / 180) * cardWidth
+                    tZ -= Math.sin(rY * Math.PI / 180) * cardWidth
                     rY -= 36
                 }
         
-                children[i].style.transform = `translateX(${tX}px) translateZ(${tZ}px) rotateY(${rY}deg)`
+                cards[i] = { translateX: tX, translateZ: tZ, rotateY: rY }
             }
         }
 
@@ -176,7 +176,7 @@
             }
         }
 
-        // --EVENT
+        // --EVENTS
         async function project_wheel(deltaY, target)
         {
             const scrollTop = target.scrollTop
@@ -188,6 +188,36 @@
                 if (deltaY > 0 && scrollTop >= offsetTop) move()
             }
             else destroyFrame()
+        }
+
+        function card_click({detail})
+        {
+            // console.log(cards[detail.id])
+            // rotate = 0
+
+            if (detail.on)
+            {
+                rotate = 0
+                translateX = 0
+                translateY = 0
+
+                setTimeout(() =>
+                {
+                    cardWidth = window.innerWidth
+                    cardHeight = window.innerHeight
+
+                    radius = cardWidth / 2 / Math.tan(18 * Math.PI / 180)
+                    translateZ = radius
+
+                    setDecagon()
+                }, 400)
+            }
+            else
+            {
+                // setTrack()
+                setCardContainer()
+                setTimeout(setTrack, 400)
+            }
         }
 
         // --ROUTER-CALL
@@ -279,23 +309,25 @@ bind:this={project}
 
     <div
     class="track"
-    style:transform="rotate({rotate}deg) translate({translateX}px, -50%)"
+    style:perspective="{radius ?? 0}px"
+    style:transform="rotate({rotate ?? 0}deg) translate({translateX ?? 0}px, {translateY ?? 0}%)"
     bind:this={track}
     >
         <!-- le décalage avec le 'padding-right' est important pour etre centré par rapport aux cotés, ne pas utiliser 'border-box' sur cet element -->
         <div
         class="card-container"
-        style:gap="{gap}px"
-        style:transform="translateZ({translateZ}px) rotateY({rotateY}deg)"
-        style:width="{cardWidth}px"
-        style:height="{cardHeight}px"
-        style:padding-right="{gap}px"
+        style:transform="translateZ({translateZ ?? 0}px) rotateY({rotateY ?? 0}deg)"
+        style:width="{cardWidth ?? 0}px"
+        style:height="{cardHeight ?? 0}px"
         >
-            {#each cards as card}
-                <div
-                class="card"
-                >
-                </div>
+            {#each cards as card, i}
+                <Card
+                _id={i}
+                _translateX={card.translateX}
+                _translateZ={card.translateZ}
+                _rotateY={card.rotateY}
+                on:click={card_click}
+                />
             {/each}
         </div>
     </div>
@@ -345,36 +377,20 @@ lang="scss"
             @include f-center(true);
             @include any-w;
 
-            perspective: 2000px;
-
             transform-origin: top left;
 
             height: 50%;
 
-            & 
-            >div
+            transition: transform .4s;
+
+            .card-container
             {
                 @include flex;
 
                 transform-style: preserve-3d;
 
-                transition: transform 0.3s;
+                transition: transform .4s;
             }
-        }
-
-        .card
-        {
-            @include any;
-
-            flex-shrink: 0;
-
-            transform-origin: left;
-
-            background-color: $dark;
-
-            border: solid $light 4px;
-
-            box-sizing: border-box;
         }
 
         p

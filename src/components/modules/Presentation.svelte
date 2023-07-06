@@ -23,7 +23,7 @@
 
         // --COMPONENT-ELEMENT
         import Snake from '../elements/Snake.svelte'
-        import Card from '../elements/Card.svelte'
+        import Tag from '../elements/Tag.svelte'
         import Toggle from '../elements/Toggle.svelte'
 
         // --COMPONENT-COVERS
@@ -39,7 +39,7 @@
         const size = 40
 
         // --TO-ITERATE
-        const cards =
+        const tags =
         [
             { title: 'NOM - PRÉNOM', content: ['LE THUAUT Morgan'] },
             { title: 'AGE', content: ['21 ans'] },
@@ -54,13 +54,13 @@
         // --ELEMENT-PRESENTATION
         let presentation
 
-        // --ELEMENT-CARD
+        // --ELEMENT-TAG
         let
         charged = false,
         i = 0,
         j = -1
 
-        // --ELEMENT-CARD-GAME-OVER
+        // --ELEMENT-TAG-GAME-OVER
         let gameOver = { on: false, update: updateGameOver }
 
         // --ELEMENT-SNAKE
@@ -92,7 +92,7 @@
     // #REACTIVE
 
         // --UPDATE
-        $: updateCard(snakeTail)
+        $: updateTag(snakeTail)
 
         // --TO-ITERATE
         $: params =
@@ -115,18 +115,18 @@
         function set()
         {
             restore()
-            setCard()
+            setTag()
             setCommand()
             setRouter()
         }
 
-        function setCard()
+        function setTag()
         {
             document.fonts.ready.then(() =>
             {
                 charged = true
 
-                if (!snakeParam && textParam) tick().then(viewCards)
+                if (!snakeParam && textParam) tick().then(viewTags)
             })
         }
 
@@ -188,28 +188,28 @@
             else if (!textParam) normalMode = false
         }
 
-        function restoreCard()
+        function restoreTag()
         {
             if (j > -1)
             {
                 i = j
 
-                updateCard(snakeTail)
+                updateTag(snakeTail)
             }
         }
 
         // --UPDATE
-        function updateCard([cardX, cardY])
+        function updateTag([tagX, tagY])
         {
             if (!textParam || !charged) return
     
-            if (i === cards.length) i = 0
+            if (i === tags.length) i = 0
 
-            cards[j < 0 ? cards.length - 1 : j].hidden()
+            tags[j < 0 ? tags.length - 1 : j].hidden()
 
             j = i
 
-            cards[i++].view(cardX, cardY, 100)
+            tags[i++].view(tagX, tagY, 100)
         }
     
         async function updateGameOver(on)
@@ -265,13 +265,14 @@
 
             if (on)
             {
-                if (charged) snakeParam ? restoreCard() : viewCards()
+                if (charged) snakeParam ? restoreTag() : viewTags()
+                if (gameOver.on) gameOver.update(false)
                 
                 challengeMode = false
             }
             else
             {
-                if (charged) hiddenCards()
+                if (charged) hiddenTags()
     
                 noneMode = false
                 normalMode = false
@@ -286,7 +287,7 @@
         
             if (on)
             {
-                if (textParam && charged) hiddenCards(), restoreCard()
+                if (textParam && charged) hiddenTags(), restoreTag()
             
                 noneMode = false
 
@@ -294,7 +295,8 @@
             }
             else
             {
-                if (textParam && charged) viewCards()
+                if (textParam && charged) viewTags()
+                if (gameOver.on) gameOver.update(false)
     
                 normalMode = false
                 challengeMode = false
@@ -412,21 +414,21 @@
         function presentation_call() { setTimeout(() => event.manager.scroll.find(f => f.name === 'snake_scroll')(), 50) }
 
         // --UTILS
-        function viewCards()
+        function viewTags()
         {
             let y = size + 30
 
-            for (const card of cards)
+            for (const tag of tags)
             {
-                const x = Math.random() * (window.innerWidth - card.width - size * 2) + size
+                const x = Math.random() * (window.innerWidth - tag.width - size * 2) + size
         
-                card.view(x, y)
+                tag.view(x, y)
 
-                y += card.height
+                y += tag.height
             }
         }
 
-        function hiddenCards() { for (let i = 0; i < cards.length; i++) cards[i].hidden() }
+        function hiddenTags() { for (let i = 0; i < tags.length; i++) tags[i].hidden() }
 
     // #CYCLE
 
@@ -441,34 +443,34 @@ style:width={_width}
 bind:this={presentation}
 >
     <div
-    class="card-container"
+    class="tag-container"
     >
         {#if charged}
-            {#each cards as card}
-                <Card
+            {#each tags as tag}
+                <Tag
                 _blockSize={size}
                 _dark={_colors.dark}
-                bind:width={card.width}
-                bind:height={card.height}
-                bind:view={card.view}
-                bind:hidden={card.hidden}
+                bind:width={tag.width}
+                bind:height={tag.height}
+                bind:view={tag.view}
+                bind:hidden={tag.hidden}
                 >
-                    <h3>{card.title}</h3>
+                    <h3>{tag.title}</h3>
 
                     <div
                     class="content"
                     >
-                        {#each card.content as text}
+                        {#each tag.content as text}
                             <p>{text}</p>
                         {/each}
                     </div>
-                </Card>
+                </Tag>
             {/each}
 
             <div
             class="game-over"
             >
-                <Card
+                <Tag
                 _blockSize={size}
                 _start={false}
                 _dark={_colors.dark}
@@ -482,7 +484,7 @@ bind:this={presentation}
                     </h6>
 
                     <p>CLICK POUR REJOUER</p>
-                </Card>
+                </Tag>
             </div>
         {/if}
     </div>
@@ -598,7 +600,7 @@ lang="scss"
 
         height: 100vh;
 
-        .card-container
+        .tag-container
         {
             h3
             {

@@ -1,185 +1,102 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORTS
+    // #EXPORT
 
         // --PROPS
         export let
-        _blockSize = 0,
-        _start = true,
-        _dark
-
-        // --BINDS
-
-        export let
-        width = 0,
-        height = 0
-
-        export async function view(x, y, delay)
-        {
-            [translateX, translateY] = getPosition(x, y)
-            z = 0
-        
-            timeout = setTimeout(() =>
-            {
-                timeout = null
-    
-                animation('clearRect')
-            }, delay ?? 0)
-        }
-
-        export async function hidden()
-        {
-            context.fillStyle = _dark
-            z = -1
-
-            if (timeout) clearTimeout(timeout), timeout = null
-    
-            animation('fillRect')
-        }
+        _id,
+        _translateX,
+        _translateZ,
+        _rotateY
 
     // #IMPORT
 
         // --SVELTE
-        import { onMount } from 'svelte'
+        import { createEventDispatcher } from 'svelte'
 
-    // #VARIABLES
+    // #CONSTANTE
+
+        // --SVELTE
+        const dispatch = createEventDispatcher()
+
+    // #VARIABLE
 
         // --ELEMENT-CARD
-        let
-        card,
-        translateX = 0,
-        translateY = 0,
-        z = -1,
-        timeout = null
+        let on = false
 
-        // --ELEMENT-CANVAS
-        let
-        canvas,
-        columns,
-        rows,
-        context,
-        even
+    // #FUNCTION
 
-    // #FUNCTIONS
-
-        // --SET
-        function set()
+        // --EVENT
+        function card_click()
         {
-            width = card.offsetWidth + _blockSize - card.offsetWidth % _blockSize,
-            height = card.offsetHeight + _blockSize - card.offsetHeight % _blockSize
-
-            setCanvas()
-        }
-
-        function setCanvas()
-        {
-            canvas.width = width
-            canvas.height = height
-
-            columns = width / _blockSize
-            rows = height / _blockSize
-
-            context = canvas.getContext('2d')
-
-            even = columns % 2 ? false : true
-
-            context.fillStyle = _dark
-            context.fillRect(0, 0, columns * _blockSize, rows * _blockSize)
-        }
-
-        // --GET
-        function getPosition(x, y)
-        {
-            const
-            w = window.innerWidth,
-            h = window.innerHeight
-
-            if (x < _blockSize) x = _blockSize
-            else
-            {
-                const xAndWidth = x + width + _blockSize
-
-                if (xAndWidth > w) x -= xAndWidth - w
-            }
-            
-            if (y < _blockSize) y = _blockSize
-            else
-            {
-                const yAndHeight = y + height + _blockSize
-
-                if (yAndHeight > h) y -= yAndHeight - h
-            }
-
-            return [x, y]
-        }
-
-        // --ANIMATION
-        function animation(action)
-        {
-            let delay = 0
+            on = !on
         
-            for (let y = 0; y < rows; y++)
-            {
-                for (let x = 0; x < columns; x += 2)
-                {
-                    setTimeout(() =>
-                    {
-                        requestAnimationFrame(() =>
-                        {
-                            context[action](x * _blockSize, y * _blockSize, _blockSize, _blockSize)
-                            context[action](((even ? columns - 1 : columns) - x) * _blockSize, (rows - y - 1) * _blockSize, _blockSize, _blockSize)
-                        })
-                    }, delay += 16)
-                }
-            }
+            dispatch('click', { id: _id, on: on })
         }
-
-    // #CYCLE
-
-     onMount(set)
 </script>
 
 <!-- #HTML -->
 
-<section
+<div
 class="card"
-style:z-index={z}
-style:transform="translate({_start ? `${translateX}px, ${translateY}px` : '-50%, -50%'})"
-style={_start ? 'top: 0; left: 0' : 'top: 50%; left: 50%'}
-bind:this={card}
+style:transform="translateX({_translateX ?? 0}px) translateZ({_translateZ ?? 0}px) rotateY({_rotateY ?? 0}deg)"
 >
-    <slot />
-
-    <canvas
-    style:width="{width}px"
-    style:height="{height}px"
-    bind:this={canvas}
+    <button
+    type="button"
+    on:click={card_click}
     >
-    </canvas>
-</section>
+        <!-- <div
+        class="content"
+        >
+        </div> -->
+    </button>
+</div>
 
 <!-- #STYLE -->
 
 <style
 lang="scss"
 >
-    /* #IMPORT */
+    /* #USE */
 
-    @import '../../assets/scss/styles/position.scss';
+    /* @use '../../assets/scss/styles/position.scss' as *; */
+    @use '../../assets/scss/styles/size.scss' as *;
 
     /* #GROUP */
 
     .card
     {
-        @include absolute;
+        @include any;
 
-        display: inline-block;
+        flex-shrink: 0;
 
-        padding: 10px 20px;
+        transform-origin: left;
 
-        transition: transform .1s;
+        padding: 0 25px;
 
-        canvas { @include xy-start(true); }
+        box-sizing: border-box;
+
+        button
+        {
+            @include any;
+
+            background-color: $dark;
+
+            border: solid $light 4px;
+            outline: none;
+
+            box-sizing: border-box;
+
+            /* .content
+            {
+                @include xy-start(true);
+
+                transform: translate(-25%, -25%);
+
+                width: 100vw;
+                height: 100vh;
+            } */
+        }
     }
 </style>
