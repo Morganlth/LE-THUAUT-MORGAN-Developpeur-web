@@ -9,7 +9,9 @@
         _translateX,
         _translateZ,
         _rotateY,
-        _radius
+        _radius,
+        _title,
+        _img
 
         // --BIND
         export function update() { [translateZ, scale] = on ? [_radius, 2] : [0, 1] }
@@ -51,12 +53,22 @@
 class="card"
 style:transform="translateX({_translateX ?? 0}px) translateZ({_translateZ ?? 0}px) rotateY({_rotateY ?? 0}deg)"
 >
-    <button
-    type="button"
-    style:transform="translateZ({translateZ}px) scale({scale})"
-    on:click={card_click}
+    <section
+    class="content"
     >
-    </button>
+        {#if _img}
+            <img src={_img.src} alt={_img.alt}>
+        {/if}
+
+        <p>{_title ?? ''}</p>
+
+        <button
+        type="button"
+        style:transform="translateZ({translateZ}px) scale({scale})"
+        on:click={card_click}
+        >
+        </button>
+    </section>
 </div>
 
 <!-- #STYLE -->
@@ -64,12 +76,15 @@ style:transform="translateX({_translateX ?? 0}px) translateZ({_translateZ ?? 0}p
 <style
 lang="scss"
 >
-    /* #USE */
+    /* #USES */
 
+    @use '../../assets/scss/styles/flex.scss' as *;
+    @use '../../assets/scss/styles/position.scss' as *;
     @use '../../assets/scss/styles/size.scss' as *;
     @use '../../assets/scss/styles/background.scss' as *;
+    @use '../../assets/scss/styles/font.scss' as *;
 
-    /* #GROUP */
+    /* #GROUPS */
 
     .card
     {
@@ -84,17 +99,41 @@ lang="scss"
 
         box-sizing: border-box;
 
-        button
+        .content
         {
+            @include f-center(true);
+            @include f-column;
+            @include relative;
             @include any;
-            @include black-glass(hue-rotate(180deg));
 
-            border: solid rgba($light, .1) 4px;
-            outline: none;
+            gap: 20px;
 
-            box-sizing: border-box;
+            transform-style: preserve-3d;
 
-            transition: transform .4s, width .4s, height .4s;
+            p
+            {
+                @include text-command;
+
+                color: $s-light;
+            }
+
+            button
+            {
+                @include xy-start(true);
+                @include any;
+                @include black-glass(hue-rotate(180deg));
+
+                z-index: -1;
+
+                border: solid rgba($light, .1) 4px;
+                outline: none;
+
+                box-sizing: border-box;
+
+                pointer-events: auto;
+
+                transition: transform .4s, width .4s, height .4s;
+            }
         }
     }
 </style>

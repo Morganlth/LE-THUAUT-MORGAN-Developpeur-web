@@ -239,8 +239,7 @@ lang="scss"
     {
         @include any;
 
-        overflow-x: clip;
-        overflow-y: scroll;
+        overflow: clip scroll;
 
         &.freeze { overflow-y: hidden; }
 

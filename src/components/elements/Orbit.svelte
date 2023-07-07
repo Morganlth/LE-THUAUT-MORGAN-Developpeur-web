@@ -14,8 +14,11 @@
         _onColor,
         _offColor
 
-        // --BIND
+        // --BINDS
         export let on = false
+
+        export function animate() { floating(Math.random()) }
+        export function clear() { clearInterval(interval), interval = null }
 
     // #IMPORT
 
@@ -51,7 +54,9 @@
         rotateY = 0,
         forceX = 0,
         forceY = 0,
-        last = +new Date()
+        last = +new Date(),
+        interval,
+        timeout
 
     // #REACTIVE
 
@@ -77,27 +82,26 @@
         {
             const now = +new Date()
 
+            clearTimeout(timeout)
+
             if (now > last + 100)
             {
-                const
-                boundingClientRect = gravityArea.getBoundingClientRect(),
-                size = boundingClientRect.width / 2,
-                difX = clientX - (boundingClientRect.left + size),
-                difY = clientY - (boundingClientRect.top + size),
-                a = Math.atan(difY / difX),
-                r = Math.cos(rad45) * (size / Math.cos((rad90 - Math.abs(_rotate) - rad45)))
+                clear()
 
-                forceX = difX * (1 - Math.abs(difX) / (Math.cos(a) * r)) * .5
-                forceY = difY * (1 - Math.abs(difY) / Math.abs(Math.sin(a) * r)) * .5
+                gravityEffect(clientX, clientY)
 
                 last = now
             }
+            else timeout = setTimeout(() => { gravityEffect(clientX, clientY), animate() }, 300)
         }
 
         function gravity_mouseLeave()
         {
-            forceX = 0
-            forceY = 0
+            clearTimeout(timeout)
+
+            ;[forceX, forceY] = [0, 0]
+
+            animate()
         }
 
         function satellite_click()
@@ -105,6 +109,38 @@
             on = !on
 
             dispatch('click', { id: _id, on: on })
+        }
+
+        // --ANIMATION
+        function floating(t)
+        {
+            if (interval) return
+
+            let up = false
+    
+            interval = setInterval(() =>
+            {
+                forceY = 10 * (Math.sin((t - 0.5) * Math.PI) + 1) - 10
+
+                t += up ? -.05 : .05
+
+                if (t > 1) t = 1, up = true
+                else if (t < 0) t = 0, up = false
+            }, 100)
+        }
+
+        function gravityEffect(clientX, clientY)
+        {
+            const
+            boundingClientRect = gravityArea.getBoundingClientRect(),
+            size = boundingClientRect.width / 2,
+            difX = clientX - (boundingClientRect.left + size),
+            difY = clientY - (boundingClientRect.top + size),
+            a = Math.atan(difY / difX),
+            r = Math.cos(rad45) * (size / Math.cos((rad90 - Math.abs(_rotate) - rad45)))
+
+            forceX = difX * (1 - Math.abs(difX) / (Math.cos(a) * r)) * .3
+            forceY = difY * (1 - Math.abs(difY) / Math.abs(Math.sin(a) * r)) * .3
         }
 </script>
 
@@ -199,7 +235,7 @@ lang="scss"
             border-radius: 50%;
             outline: none;
 
-            transition: transform .6s;
+            transition: transform .4s;
 
             &
             >div { transition: transform .6s; }

@@ -20,13 +20,13 @@ class EventManager
     grabbing = false
 
     // --EVENTS
-    scroll(e)
+    scroll({target})
     {
         if (this.scrollFrame) return
 
         this.scrollFrame = requestAnimationFrame(() =>
         {
-            this.scrollTop = e.target.scrollTop
+            this.scrollTop = target.scrollTop
 
             this.run.call(this.manager.scroll)
 
@@ -34,15 +34,15 @@ class EventManager
         })
     }
 
-    wheel(e) { this.run.call(this.manager.wheel, e.deltaY, e.currentTarget) }
+    wheel({deltaY, currentTarget}) { this.run.call(this.manager.wheel, deltaY, currentTarget) }
 
-    mouseMove(e)
+    mouseMove({clientX, clientY})
     {
         if (this.mouseFrame) return
 
         this.mouseFrame = requestAnimationFrame(() =>
         {
-            this.run.call(this.manager.mouseMove, e.clientX, e.clientY)
+            this.run.call(this.manager.mouseMove, clientX, clientY)
 
             this.mouseFrame = false
         })

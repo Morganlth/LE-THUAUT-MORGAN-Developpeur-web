@@ -114,6 +114,7 @@
         // --ELEMENT-ORBIT
         let
         target = null,
+        animate = false,
         r,
         y,
         [red, green, blue] = _colors.light.match(/\w\w/g).map(x => parseInt(x, 16)),
@@ -142,7 +143,9 @@
 
     // #REACTIVE
 
-    $: scaleSpace = number / 6 * ratio // modifier cette partie pour que le dé retourne directement le calcul dans une variable scale sans réactivité
+    $: scaleSpace = number / 6 * ratio
+
+    $: updateOrbits(animate)
 
     // #FUNCTIONS
 
@@ -210,7 +213,7 @@
             {
                 const
                 translateX = Math.random() * width + width,
-                speed = Math.random() + .8
+                speed = Math.random() * 1.5 + .8
 
                 this.listDatas[i] = { translateX: translateX, speed: speed }
 
@@ -244,9 +247,17 @@
             const gap = main.scrollTop - offsetTop
             
             ;[ratio, translateY, scaleScene] = gap >= show ? [.3, -100, 1] : [1, 0, 1.5]
-            y = (gap > 0 ? gap < height ? gap / height : 1 : 0) * 5
+    
+            ;[y, animate] = gap > 0 ?
+                gap < height
+                ? [gap / height * 5, true]
+                : [5, false]
+            : [0, false]
+    
             translate = gap > resolution ? gap - resolution : 0
         }
+
+        function updateOrbits(animate) { if (competence) for (const orbit of orbits) orbit[animate ? 'animate' : 'clear']() }
 
         function updateLetter(letter, x, y, z) { letter.style.transform = `translate3d(${x ?? 0}px, ${y ?? 0}px, ${z ?? 0}px)` }
 
@@ -479,6 +490,8 @@ bind:this={competence}
                     _onColor={onColor}
                     _offColor={offColor}
                     bind:on={orbit.on}
+                    bind:animate={orbit.animate}
+                    bind:clear={orbit.clear}
                     on:click={orbit_click}
                     />
                 {/each}

@@ -18,13 +18,27 @@
         // --SVELTE
         import { onMount, onDestroy } from 'svelte'
 
+        // --COMPONENT-PAGES
+        import Booki from '../pages/Booki.svelte'
+
         // --COMPONENT-ELEMENT
         import Card from '../elements/Card.svelte'
 
     // #CONSTANTE
     
         // --TO-ITERATE
-        const cards = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
+        const cards =
+        [
+            {
+                title: 'Créez la page d\'accueil d\'une agence de voyage avec HTML & CSS',
+                img:
+                {
+                    src: './src/assets/images/project/booki/logo/booki.png',
+                    alt: 'projet Booki OpenClassrooms'
+                },
+                component: Booki
+            },
+            {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
     // #VARIABLES
 
@@ -55,7 +69,9 @@
         track,
         rotate,
         translateX,
-        translateY
+        translateY,
+        overflowX,
+        overflowY
 
         // --ELEMENT-CARD-CONTAINER
         let
@@ -199,10 +215,12 @@
             if (detail.id === target)
             {
                 clearTimeout(cardTimeout)
+
+                if (router.main.scrollTop !== offsetTop) router.main.scrollTo({ top: offsetTop, behavior: 'smooth' })
     
                 app.freeze.set(detail.on)
 
-                ;(detail.on ? show : hidden)(cards[detail.id])
+                ;(detail.on ? show : hidden)()
             }
         }
 
@@ -275,20 +293,27 @@
             }
         }
 
-        function show(card)
+        function show()
         {
             destroyEvent()
 
-            ;[rotate, translateX, translateY] = [0]
+            ;[rotate, translateX, translateY] = [0, 0, 0]
 
-            cardTimeout = setTimeout(() => { translateZ = 1, card.update() }, 400)
+            cardTimeout = setTimeout(() =>
+            {
+                [translateZ, overflowX, overflowY] = [1, 'hidden', 'scroll']
+    
+                cards[target].on = true
+                cards[target].update()
+            }, 400)
         }
 
-        function hidden(card)
+        function hidden()
         {
-            translateZ = radius
+            [translateZ, overflowX, overflowY] = [radius, 'visible', 'visible']
 
-            card.update()
+            cards[target].on = false
+            cards[target].update()
     
             cardTimeout = setTimeout(() => { setTrack(), setEvent() }, 400)
         }
@@ -314,28 +339,47 @@ bind:this={project}
     </canvas>
 
     <div
-    class="track"
-    style:perspective="{radius ?? 0}px"
-    style:transform="rotate({rotate ?? 0}deg) translate({translateX ?? 0}px, {translateY ?? 0}%)"
-    bind:this={track}
+    style:overflow="{overflowX ?? 'visible'} {overflowY ?? 'visible'}"
     >
-        <!-- le décalage avec le 'padding-right' est important pour etre centré par rapport aux cotés, ne pas utiliser 'border-box' sur cet element -->
         <div
-        class="card-container"
-        style:transform="translateZ({translateZ ?? 0}px) rotateY({rotateY ?? 0}deg)"
-        style:width="{cardWidth ?? 0}px"
-        style:height="{cardHeight ?? 0}px"
+        class="track"
+        style:perspective="{radius ?? 0}px"
+        style:transform="rotate({rotate ?? 0}deg) translate({translateX ?? 0}px, {translateY ?? 0}%)"
+        bind:this={track}
         >
-            {#each cards as card, i}
-                <Card
-                _id={i}
-                _translateX={card.translateX}
-                _translateZ={card.translateZ}
-                _rotateY={card.rotateY}
-                _radius={radius}
-                bind:update={card.update}
-                on:click={card_click}
-                />
+            <!-- le décalage avec le 'padding-right' est important pour etre centré par rapport aux cotés, ne pas utiliser 'border-box' sur cet element -->
+            <div
+            class="card-container"
+            style:transform="translateZ({translateZ ?? 0}px) rotateY({rotateY ?? 0}deg)"
+            style:width="{cardWidth ?? 0}px"
+            style:height="{cardHeight ?? 0}px"
+            >
+                {#each cards as card, i}
+                    <Card
+                    _id={i}
+                    _translateX={card.translateX}
+                    _translateZ={card.translateZ}
+                    _rotateY={card.rotateY}
+                    _radius={radius}
+                    _title={card.title}
+                    _img={card.img}
+                    bind:update={card.update}
+                    on:click={card_click}
+                    />
+                {/each}
+            </div>
+        </div>
+
+        <div
+        class="content"
+        >
+            {#each cards as card}
+                {#if card.on && card.component}
+                    <svelte:component
+                    this={card.component}
+                    >
+                    </svelte:component>
+                {/if}
             {/each}
         </div>
     </div>
@@ -348,12 +392,13 @@ bind:this={project}
 <style
 lang="scss"
 >
-    /* #USE */
+    /* #USES */
 
     @use '../../assets/scss/styles/flex.scss' as *;
     @use '../../assets/scss/styles/position.scss' as *;
     @use '../../assets/scss/styles/size.scss' as *;
     @use '../../assets/scss/styles/font.scss' as *;
+    @use '../../assets/scss/styles/cursor.scss' as *;
 
     /* #GROUPS */
 
@@ -380,25 +425,48 @@ lang="scss"
             transform: translate(-50%, -50%);
         }
 
+        &
+        >div
+        {
+            @include any-w;
+    
+            height: 50%;
+
+            scrollbar-width: none !important;
+            &::-webkit-scrollbar
+            {
+                display: none !important;
+
+                width: 0 !important;
+            }
+        }
+
         .track
         {
             @include f-center(true);
-            @include any-w;
+            @include any;
 
             transform-origin: top left;
-
-            height: 50%;
 
             transition: transform .4s;
 
             .card-container
             {
                 @include flex;
+                @include relative;
+                @include no-event;
 
                 transform-style: preserve-3d;
 
                 transition: transform .4s;
             }
+        }
+
+        .content
+        {
+            @include any-w;
+
+            display: contents;
         }
 
         p
