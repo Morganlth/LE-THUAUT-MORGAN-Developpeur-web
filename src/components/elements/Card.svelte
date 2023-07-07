@@ -67,6 +67,8 @@ style:transform="translateX({_translateX ?? 0}px) translateZ({_translateZ ?? 0}p
                 src={$page.url.origin + _img.src}
                 alt={_img.alt}
                 style:transform="scale({1 / scale})"
+                style:width={_img.width ?? 'auto'}
+                style:height={_img.height ?? 'auto'}
                 >
             {/if}
 

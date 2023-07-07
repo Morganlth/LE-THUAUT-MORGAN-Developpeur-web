@@ -11,7 +11,7 @@
         import { spring } from '../field/Main.svelte'
 
         // --JS
-        import AppError from '../../assets/js/error'
+        import AppError from '../../assets/js/utils/error'
 
         // --SVELTE
         import { onMount } from 'svelte'

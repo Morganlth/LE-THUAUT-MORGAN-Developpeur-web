@@ -15,10 +15,10 @@ context="module"
     // #IMPORTS
 
         // --CONTEXTS
-        import a from '../../assets/js/appManager'
-        import e from '../../assets/js/eventManager'
-        import r from '../../assets/js/routerManager'
-        import s from '../../assets/js/springManager'
+        import a from '../../assets/js/managers/appManager'
+        import e from '../../assets/js/managers/eventManager'
+        import r from '../../assets/js/managers/routerManager'
+        import s from '../../assets/js/managers/springManager'
 </script>
 
 <script>

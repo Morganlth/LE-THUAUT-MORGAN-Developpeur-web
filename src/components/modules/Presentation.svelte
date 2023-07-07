@@ -16,7 +16,7 @@
         import { spring } from '../field/Main.svelte'
 
         // --JS
-        import getFps from '../../assets/js/fps'
+        import getFps from '../../assets/js/utils/fps'
 
         // --SVELTE
         import { onMount, tick } from 'svelte'

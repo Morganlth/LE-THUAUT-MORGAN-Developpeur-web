@@ -29,7 +29,7 @@ id="booki"
     >
         <header class="flex">
             <a id="logo" href="./project/booki">
-                <img src="{$page.url.origin}/src/assets/images/project/booki/logo/booki.png" alt="Logo Booki site de réservation et de vente d'hébergements et d'activités pour les vacances">
+                <img src="{$page.url.origin}/src/assets/images/projects/booki/logo/booki.png" alt="Logo Booki site de réservation et de vente d'hébergements et d'activités pour les vacances">
             </a>
 
             <nav class="any-height">
@@ -97,7 +97,7 @@ id="booki"
                         <article>
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             <a href="#">
-                                <img class="any-width" src="{$page.url.origin}/src/assets/images/project/booki/hebergements/4_small/marcus-loke-WQJvWU_HZFo-unsplash.jpg" alt="Auberge La Canebière">
+                                <img class="any-width" src="{$page.url.origin}/src/assets/images/projects/booki/hebergements/4_small/marcus-loke-WQJvWU_HZFo-unsplash.jpg" alt="Auberge La Canebière">
                             
                                 <div>
                                     <h3>Auberge La Canebière</h3>
@@ -116,7 +116,7 @@ id="booki"
                         <article>
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             <a href="#">
-                                <img class="any-width" src="{$page.url.origin}/src/assets/images/project/booki/hebergements/4_small/fred-kleber-gTbaxaVLvsg-unsplash.jpg" alt="Hôtel du port">
+                                <img class="any-width" src="{$page.url.origin}/src/assets/images/projects/booki/hebergements/4_small/fred-kleber-gTbaxaVLvsg-unsplash.jpg" alt="Hôtel du port">
                             
                                 <div>
                                     <h3>Hôtel du port</h3>
@@ -135,7 +135,7 @@ id="booki"
                         <article>
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             <a href="#">
-                                <img class="any-width" src="{$page.url.origin}/src/assets/images/project/booki/hebergements/4_small/reisetopia-B8WIgxA_PFU-unsplash.jpg" alt="Hôtel Les mouettes">
+                                <img class="any-width" src="{$page.url.origin}/src/assets/images/projects/booki/hebergements/4_small/reisetopia-B8WIgxA_PFU-unsplash.jpg" alt="Hôtel Les mouettes">
                             
                                 <div>
                                     <h3>Hôtel Les mouettes</h3>
@@ -154,7 +154,7 @@ id="booki"
                         <article>
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             <a href="#">
-                                <img class="any-width" src="{$page.url.origin}/src/assets/images/project/booki/hebergements/4_small/annie-spratt-Eg1qcIitAuA-unsplash.jpg" alt="Hôtel de la mer">
+                                <img class="any-width" src="{$page.url.origin}/src/assets/images/projects/booki/hebergements/4_small/annie-spratt-Eg1qcIitAuA-unsplash.jpg" alt="Hôtel de la mer">
                             
                                 <div>
                                     <h3>Hôtel de la mer</h3>
@@ -173,7 +173,7 @@ id="booki"
                         <article>
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             <a href="#">
-                                <img class="any-width" src="{$page.url.origin}/src/assets/images/project/booki/hebergements/4_small/nicate-lee-kT-ZyaiwBe0-unsplash.jpg" alt="Auberge Le Panier">
+                                <img class="any-width" src="{$page.url.origin}/src/assets/images/projects/booki/hebergements/4_small/nicate-lee-kT-ZyaiwBe0-unsplash.jpg" alt="Auberge Le Panier">
                             
                                 <div>
                                     <h3>Auberge Le Panier</h3>
@@ -192,7 +192,7 @@ id="booki"
                         <article>
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             <a href="#">
-                                <img class="any-width" src="{$page.url.origin}/src/assets/images/project/booki/hebergements/4_small/febrian-zakaria-M6S1WvfW68A-unsplash.jpg" alt="Auberge Le Panier">
+                                <img class="any-width" src="{$page.url.origin}/src/assets/images/projects/booki/hebergements/4_small/febrian-zakaria-M6S1WvfW68A-unsplash.jpg" alt="Auberge Le Panier">
                             
                                 <div>
                                     <h3>Hôtel Chez Amina</h3>
@@ -225,7 +225,7 @@ id="booki"
                         <article class="any-width">
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             <a href="#">
-                                <img class="any-height" src="{$page.url.origin}/src/assets/images/project/booki/hebergements/4_small/emile-guillemot-Bj_rcSC5XfE-unsplash.jpg" alt="Hôtel Le soleil du matin">
+                                <img class="any-height" src="{$page.url.origin}/src/assets/images/projects/booki/hebergements/4_small/emile-guillemot-Bj_rcSC5XfE-unsplash.jpg" alt="Hôtel Le soleil du matin">
                             
                                 <div class="any-height">
                                     <h3>Hôtel Le soleil du matin</h3>
@@ -244,7 +244,7 @@ id="booki"
                         <article class="any-width">
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             <a href="#">
-                                <img class="any-height" src="{$page.url.origin}/src/assets/images/project/booki/hebergements/4_small/aw-creative-VGs8z60yT2c-unsplash.jpg" alt="Chambres d’hôtes Au cœur de l’eau">
+                                <img class="any-height" src="{$page.url.origin}/src/assets/images/projects/booki/hebergements/4_small/aw-creative-VGs8z60yT2c-unsplash.jpg" alt="Chambres d’hôtes Au cœur de l’eau">
                             
                                 <div class="any-height">
                                     <h3>Chambres d’hôtes Au cœur de l’eau</h3>
@@ -263,7 +263,7 @@ id="booki"
                         <article class="any-width">
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             <a href="#">
-                                <img class="any-height" src="{$page.url.origin}/src/assets/images/project/booki/hebergements/4_small/febrian-zakaria-sjvU0THccQA-unsplash.jpg" alt="Hôtel Bleu et Blanc">
+                                <img class="any-height" src="{$page.url.origin}/src/assets/images/projects/booki/hebergements/4_small/febrian-zakaria-sjvU0THccQA-unsplash.jpg" alt="Hôtel Bleu et Blanc">
                             
                                 <div class="any-height">
                                     <h3>Hôtel Bleu et Blanc</h3>
@@ -290,7 +290,7 @@ id="booki"
                     <!-- svelte-ignore a11y-invalid-attribute -->
                     <a href="#">
                         <figure class="any-width any-height">
-                            <img class="any-width" src="{$page.url.origin}/src/assets/images/project/booki/activites/3_medium/reno-laithienne-QUgJhdY5Fyk-unsplash.jpg" alt="Vieux-Port">
+                            <img class="any-width" src="{$page.url.origin}/src/assets/images/projects/booki/activites/3_medium/reno-laithienne-QUgJhdY5Fyk-unsplash.jpg" alt="Vieux-Port">
 
                             <figcaption class="flex">
                                 <h3>Vieux-Port</h3>
@@ -300,7 +300,7 @@ id="booki"
                     <!-- svelte-ignore a11y-invalid-attribute -->
                     <a href="#" class="any-height">
                         <figure class="any-width any-height">
-                            <img class="any-width" src="{$page.url.origin}/src/assets/images/project/booki/activites/3_medium/paul-hermann-QFTrLdQIRhI-unsplash.jpg" alt="Fort de Pomègues">
+                            <img class="any-width" src="{$page.url.origin}/src/assets/images/projects/booki/activites/3_medium/paul-hermann-QFTrLdQIRhI-unsplash.jpg" alt="Fort de Pomègues">
                     
                             <figcaption class="flex">
                                 <h3>Fort de Pomègues</h3>
@@ -310,7 +310,7 @@ id="booki"
                     <!-- svelte-ignore a11y-invalid-attribute -->
                     <a href="#" class="any-height">
                         <figure class="any-width any-height">
-                            <img class="any-width" src="{$page.url.origin}/src/assets/images/project/booki/activites/3_medium/kilyan-sockalingum-NR8-cBCN3aI-unsplash.jpg" alt="Parc national des Calanques">
+                            <img class="any-width" src="{$page.url.origin}/src/assets/images/projects/booki/activites/3_medium/kilyan-sockalingum-NR8-cBCN3aI-unsplash.jpg" alt="Parc national des Calanques">
 
                             <figcaption class="flex">
                                 <h3>Parc national des Calanques</h3>
@@ -320,7 +320,7 @@ id="booki"
                     <!-- svelte-ignore a11y-invalid-attribute -->
                     <a href="#">
                         <figure class="any-width any-height">
-                            <img class="any-width" src="{$page.url.origin}/src/assets/images/project/booki/activites/3_medium/florian-wehde-xW9e8gdotxI-unsplash.jpg" alt="Notre-Dame-de-la-Garde">
+                            <img class="any-width" src="{$page.url.origin}/src/assets/images/projects/booki/activites/3_medium/florian-wehde-xW9e8gdotxI-unsplash.jpg" alt="Notre-Dame-de-la-Garde">
 
                             <figcaption class="flex">
                                 <h3>Notre-Dame-de-la-Garde</h3>

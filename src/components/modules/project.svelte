@@ -22,6 +22,7 @@
 
         // --COMPONENT-PAGES
         import Booki from '../pages/Booki.svelte'
+        import SophieBluel from '../pages/SophieBluel.svelte'
 
         // --COMPONENT-ELEMENT
         import Card from '../elements/Card.svelte'
@@ -37,11 +38,25 @@
                 title: 'Créez la page d\'accueil d\'une agence de voyage avec HTML & CSS',
                 img:
                 {
-                    src: '/src/assets/images/project/booki/logo/booki.png',
-                    alt: 'projet Booki OpenClassrooms'
+                    src: '/src/assets/images/projects/booki/logo/booki.png',
+                    alt: 'projet Booki OpenClassrooms',
+                    width: 'auto',
+                    height: 'auto'
                 }
             },
-            {}, {}, {}, {}, {}, {}, {}, {}, {}]
+            {
+                component: SophieBluel,
+                subPath: 'sophiebluel',
+                title: 'Créez une page web dynamique avec JavaScript',
+                img:
+                {
+                    src: '/src/assets/images/projects/sophiebluel/sophie-bluel.png',
+                    alt: 'projet Sophie Bluel / JavaScript OpenClassrooms',
+                    width: '150px',
+                    height: 'auto'
+                }
+            },
+            {}, {}, {}, {}, {}, {}, {}, {}]
 
     // #VARIABLES
 
@@ -183,7 +198,13 @@
 
             if (_subPath)
                 for (let i = 0; i < cards.length; i++)
-                    if (cards[i].subPath === _subPath) return card_click({ detail: { id: i, on: true }})
+                    if (cards[i].subPath === _subPath)
+                    {
+                        target = i
+                        rotateY += 36 * i
+                        
+                        return card_click({ detail: { id: i, on: true }})
+                    }
         }
 
         // --UPDATE
@@ -235,8 +256,6 @@
             if (detail.id === target)
             {
                 clearTimeout(cardTimeout)
-
-                // if (router.main.scrollTop !== offsetTop) router.main.scrollTo({ top: offsetTop, behavior: 'smooth' })
     
                 app.freeze.set(detail.on)
 

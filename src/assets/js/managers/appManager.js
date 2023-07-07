@@ -119,10 +119,9 @@ class AppManager
 
 import { writable } from 'svelte/store'
 
-import AppSuccess from './success'
-import AppError from './error'
-
-import getFps from './fps'
+import AppSuccess from '../utils/success'
+import AppError from '../utils/error'
+import getFps from '../utils/fps'
 
 // #EXPORT
 
