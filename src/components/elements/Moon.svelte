@@ -10,6 +10,7 @@
 
         // --SVELTE
         import { onMount } from 'svelte'
+        import { page } from '$app/stores'
 
     // #CONSTANTE
 
@@ -47,7 +48,7 @@
             {
                 const img = new Image()
 
-                img.src = './src/assets/images/glitch.jpg'
+                img.src = $page.url.origin + '/src/assets/images/glitch.jpg'
 
                 img.addEventListener('load', () => resolve(img))
             })

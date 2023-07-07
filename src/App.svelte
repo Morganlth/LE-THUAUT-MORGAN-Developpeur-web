@@ -4,7 +4,7 @@
     // #EXPORT
 
         // --PROP
-        export let _pageId = 0
+        export let _page = { id: 0 }
 
     // #IMPORTS
 
@@ -92,7 +92,7 @@
 
     <Main
     _colors={colors}
-    {_pageId}
+    {_page}
     />
 
     <svg

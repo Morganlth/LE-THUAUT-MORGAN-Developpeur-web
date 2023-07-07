@@ -6,7 +6,10 @@
         // --PROP
         export let _iconColor = '#FFF'
 
-    // #IMPORT
+    // #IMPORTS
+
+        // --SVELTE
+        import { page } from '$app/stores'
 
         // --COMPONENT-COVER
         import Icon from '../covers/Icon.svelte'
@@ -24,7 +27,7 @@
     >
         <Icon
         _size="30px"
-        _href="./"
+        _href={$page.url.origin}
         _alt="home"
         _color={_iconColor}
         >

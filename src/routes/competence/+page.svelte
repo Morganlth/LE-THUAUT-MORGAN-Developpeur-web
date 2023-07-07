@@ -8,5 +8,5 @@
 </script>
 
 <App
-_pageId={2}
+_page={{ id: 2 }}
 />

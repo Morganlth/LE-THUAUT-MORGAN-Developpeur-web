@@ -27,7 +27,7 @@ context="module"
         // --PROPS
         export let
         _colors,
-        _pageId
+        _page
 
     // #IMPORTS
 
@@ -90,7 +90,7 @@ context="module"
         {
             router.main = main
         
-            router.setPage(_pageId)
+            router.setPage(_page.id)
         }
 
         function setCommand()
@@ -217,6 +217,7 @@ class:freeze={$freeze}
             />
 
             <Project
+            _subPath={_page.subPath}
             _height={structures[1].e2 + structures[1].unit}
             {_colors}
             />

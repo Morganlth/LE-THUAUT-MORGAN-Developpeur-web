@@ -16,22 +16,22 @@
     {
         @if $radial
         {
-            background: url('./src/assets/images/glitch_1920.jpg') left / auto repeat, radial-gradient(circle, $radial);
+            background: left / auto repeat, radial-gradient(circle, $radial);
         }
         @else
         {
-            background: url('./src/assets/images/glitch_1920.jpg') left / auto repeat;
+            background: left / auto repeat;
         }
     }
     @else
     {
         @if $radial
         {
-            background: url('./src/assets/images/glitch_1920.jpg') center / cover no-repeat, radial-gradient(circle, $radial);
+            background: center / cover no-repeat, radial-gradient(circle, $radial);
         }
         @else
         {
-            background: url('./src/assets/images/glitch_1920.jpg') center / cover no-repeat;
+            background: center / cover no-repeat;
         }
     }
 

@@ -13,6 +13,9 @@
         // --CONTEXT
         import { router } from '../field/Main.svelte'
 
+        // --SVELTE
+        import { page } from '$app/stores'
+
         // --COMPONENT-ELEMENTS
         import TicTacToe from '../elements/TicTacToe.svelte'
         import Console from '../elements/Console.svelte'
@@ -40,8 +43,14 @@ style:width={_width}
         <div
         class="bg"
         >
-            <div></div>
-            <div></div>
+            <div
+            style:background-image="url({$page.url.origin}/src/assets/images/glitch_1920.jpg)"
+            >
+            </div>
+            <div
+            style:background-image="url({$page.url.origin}/src/assets/images/glitch_1920.jpg)"
+            >
+            </div>
         </div>
 
         <div
@@ -49,7 +58,7 @@ style:width={_width}
         >
             <img
             class="me"
-            src="./src/assets/images/me.png"
+            src="{$page.url.origin}/src/assets/images/me.png"
             alt="LE THUAUT Morgan"
             >
 
@@ -68,7 +77,7 @@ style:width={_width}
                             {#each ['presentation', 'competences', 'projets'] as section, i}
                                 <li>
                                     <a
-                                    href="./{['presentation', 'competence', 'project'][i]}"
+                                    href="{$page.url.origin}/{['presentation', 'competence', 'project'][i]}"
                                     alt="LE THUAUT Morgan - {section}"
                                     >
                                     &nbsp; #{section}

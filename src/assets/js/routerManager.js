@@ -27,7 +27,7 @@ class RouterManager
         scrollTop = this.main.scrollTop
 
         for (let i = pages.length - 1; i >= 0; i--)
-            if (pages[i].start <= scrollTop) return history.pushState({}, '', pages[i].name)
+            if (pages[i].start <= scrollTop) return history.pushState({}, '', location.origin + '/' + pages[i].name + (pages[i].subPath ?? ''))
     }
 
     // --EVENT
@@ -46,8 +46,10 @@ class RouterManager
         else this.timeout = setTimeout(this.updatePage.bind(this), 1000)
     }
 
-    // --CODE
+    // --UTILS
     add(id, name, start, call) { this.pages[id] = { name: name, start: start, call: call } }
+
+    setSubPath(id, subPath) { this.pages[id].subPath = subPath ? '/' + subPath : undefined }
 }
 
 // #EXPORT

@@ -5,6 +5,7 @@
 
         // --PROPS
         export let
+        _subPath,
         _height,
         _colors
 
@@ -17,6 +18,7 @@
 
         // --SVELTE
         import { onMount, onDestroy } from 'svelte'
+        // import { page } from '$app/stores'
 
         // --COMPONENT-PAGES
         import Booki from '../pages/Booki.svelte'
@@ -30,13 +32,14 @@
         const cards =
         [
             {
+                component: Booki,
+                subPath: 'booki',
                 title: 'Créez la page d\'accueil d\'une agence de voyage avec HTML & CSS',
                 img:
                 {
-                    src: './src/assets/images/project/booki/logo/booki.png',
+                    src: '/src/assets/images/project/booki/logo/booki.png',
                     alt: 'projet Booki OpenClassrooms'
-                },
-                component: Booki
+                }
             },
             {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
@@ -174,7 +177,24 @@
 
         function setEvent() { event.add('wheel', project_wheel) }
 
-        function setRouter() { router.add(3, 'project', offsetTop, project_call) }
+        function setRouter()
+        {
+            router.add(3, 'project', offsetTop, project_call)
+
+            if (_subPath)
+                for (let i = 0; i < cards.length; i++)
+                    if (cards[i].subPath === _subPath) return card_click({ detail: { id: i, on: true }})
+        }
+
+        // --UPDATE
+        function update(on)
+        {
+            cards[target].on = on
+            cards[target].update(on)
+
+           router.setSubPath(3, on ? cards[target].subPath : null)
+           router.updatePage()
+        }
 
         // --DESTROY
         function destroy()
@@ -216,7 +236,7 @@
             {
                 clearTimeout(cardTimeout)
 
-                if (router.main.scrollTop !== offsetTop) router.main.scrollTo({ top: offsetTop, behavior: 'smooth' })
+                // if (router.main.scrollTop !== offsetTop) router.main.scrollTo({ top: offsetTop, behavior: 'smooth' })
     
                 app.freeze.set(detail.on)
 
@@ -303,8 +323,7 @@
             {
                 [translateZ, overflowX, overflowY] = [1, 'hidden', 'scroll']
     
-                cards[target].on = true
-                cards[target].update()
+                update(true)
             }, 400)
         }
 
@@ -312,8 +331,7 @@
         {
             [translateZ, overflowX, overflowY] = [radius, 'visible', 'visible']
 
-            cards[target].on = false
-            cards[target].update()
+            update(false)
     
             cardTimeout = setTimeout(() => { setTrack(), setEvent() }, 400)
         }
