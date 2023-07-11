@@ -23,6 +23,7 @@
         // --COMPONENT-PAGES
         import Booki from '../pages/Booki.svelte'
         import SophieBluel from '../pages/SophieBluel.svelte'
+        import NinaCarducci from '../pages/NinaCarducci.svelte'
 
         // --COMPONENT-ELEMENT
         import Card from '../elements/Card.svelte'
@@ -35,7 +36,7 @@
             {
                 component: Booki,
                 subPath: 'booki',
-                title: 'Créez la page d\'accueil d\'une agence de voyage avec HTML & CSS',
+                desc: 'Créez la page d\'accueil d\'une agence de voyage avec HTML & CSS',
                 img:
                 {
                     src: '/src/assets/images/projects/booki/logo/booki.png',
@@ -47,16 +48,28 @@
             {
                 component: SophieBluel,
                 subPath: 'sophiebluel',
-                title: 'Créez une page web dynamique avec JavaScript',
+                desc: 'Créez une page web dynamique avec JavaScript',
                 img:
                 {
-                    src: '/src/assets/images/projects/sophiebluel/sophie-bluel.png',
+                    src: '/src/assets/images/projects/sophiebluel/logo/sophie-bluel.svg',
                     alt: 'projet Sophie Bluel / JavaScript OpenClassrooms',
-                    width: '150px',
+                    width: '50%',
                     height: 'auto'
                 }
             },
-            {}, {}, {}, {}, {}, {}, {}, {}]
+            {
+                component: NinaCarducci,
+                subPath: 'ninacarducci',
+                desc: 'Débuggez et optimisez un site de photographe',
+                img:
+                {
+                    src: '/src/assets/images/projects/ninacarducci/logo/nina-carducci.svg',
+                    alt: 'projet Nina Carducci / Optimisation OpenClassrooms',
+                    width: '50%',
+                    height: 'auto'
+                }
+            },
+            {}, {}, {}, {}, {}, {}, {}]
 
     // #VARIABLES
 
@@ -398,7 +411,7 @@ bind:this={project}
                     _translateZ={card.translateZ}
                     _rotateY={card.rotateY}
                     _radius={radius}
-                    _title={card.title}
+                    _desc={card.desc}
                     _img={card.img}
                     bind:update={card.update}
                     on:click={card_click}

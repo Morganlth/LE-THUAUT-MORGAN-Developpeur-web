@@ -10,7 +10,7 @@
         _translateZ,
         _rotateY,
         _radius,
-        _title,
+        _desc,
         _img
 
         // --BIND
@@ -72,7 +72,7 @@ style:transform="translateX({_translateX ?? 0}px) translateZ({_translateZ ?? 0}p
                 >
             {/if}
 
-            <p>{_title ?? ''}</p>
+            <p>{_desc ?? ''}</p>
         </section>
     </button>
 </div>
@@ -122,11 +122,18 @@ lang="scss"
 
         .content
         {
-            @include f-center(true);
+            @include flex;
             @include f-column;
+            @include f-a-center;
             @include any;
 
+            justify-content: flex-end;
+
             gap: 20px;
+
+            padding-bottom: 18%;
+
+            box-sizing: border-box;
 
             img { transition: transform .4s; }
 

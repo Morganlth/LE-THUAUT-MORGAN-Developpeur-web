@@ -28,7 +28,7 @@ id="booki"
     class="body"
     >
         <header class="flex">
-            <a id="logo" href="./project/booki">
+            <a id="logo" href="{$page.url.origin}/project/booki" data-sveltekit-reload>
                 <img src="{$page.url.origin}/src/assets/images/projects/booki/logo/booki.png" alt="Logo Booki site de réservation et de vente d'hébergements et d'activités pour les vacances">
             </a>
 
