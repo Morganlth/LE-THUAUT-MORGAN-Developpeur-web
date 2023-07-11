@@ -389,12 +389,14 @@ bind:this={project}
     </canvas>
 
     <div
+    class="container"
     style:overflow="{overflowX ?? 'visible'} {overflowY ?? 'visible'}"
     >
         <div
         class="track"
         style:perspective="{radius ?? 0}px"
         style:transform="rotate({rotate ?? 0}deg) translate({translateX ?? 0}px, {translateY ?? 0}%)"
+        style:overflow={overflowX ?? 'visible'}
         bind:this={track}
         >
             <!-- le décalage avec le 'padding-right' est important pour etre centré par rapport aux cotés, ne pas utiliser 'border-box' sur cet element -->
@@ -475,8 +477,7 @@ lang="scss"
             transform: translate(-50%, -50%);
         }
 
-        &
-        >div
+        .container
         {
             @include any-w;
     
@@ -517,6 +518,8 @@ lang="scss"
             @include any-w;
 
             display: contents;
+
+            height: 200%;
         }
 
         p

@@ -17,7 +17,7 @@
         export function update(value)
         {
             [translateZ, scale, ] = value ? [_radius, 2] : [0, 1]
-
+ 
             on = value
         }
 
