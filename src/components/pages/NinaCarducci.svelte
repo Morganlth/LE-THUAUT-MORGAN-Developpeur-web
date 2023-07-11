@@ -6,23 +6,16 @@
 
         // --SCSS
         import '../../assets/scss/projects/ninacarducci/style.scss'
-
-        // --JS
-        import { map } from '../../assets/js/projects/ninacarducci/land/map'
-        import { windowEvent } from '../../assets/js/projects/ninacarducci/land/window'
-        import { slider } from '../../assets/js/projects/ninacarducci/body/slider'
-        import { gallery } from '../../assets/js/projects/ninacarducci/body/gallery'
         
-
         // --SVELTE
         import { onMount } from 'svelte'
         import { page } from '$app/stores'
+        import { fade } from 'svelte/transition'
 
-    // #CONSTANTE
+    // #CONSTANTES
 
-        // --TO-ITERATE
-        const
-        sliderItems =
+        // --ELEMENT-SLIDER
+        const SLIDER_ITEMS =
         [
             {
                 src: 'ryoji-iwata-wUZjnOv7t0g-unsplash',
@@ -41,60 +34,160 @@
             }
         ]
 
+        // --ELEMENT-GALLERY
+        const
+        GALLERY_ITEMS =
+        [
+            {
+                on: true,
+                tag: 'Concert',
+                src: 'concerts/aaron-paul-wnX-fXzB6Cw-unsplash',
+                alt: 'Aaron Paul'
+            },
+            {
+                on: true,
+                tag: 'Entreprises',
+                src: 'entreprise/ali-morshedlou-WMD64tMfc4k-unsplash',
+                alt: 'Ali Morshedlou'
+            },
+            {
+                on: true,
+                tag: 'Entreprises',
+                src: 'entreprise/jason-goodman-tHO1_OuKbg0-unsplash',
+                alt: 'Jason Goodman'
+            },
+            {
+                on: true,
+                tag: 'Mariages',
+                src: 'mariage/hannah-busing-RvF2R_qMpRk-unsplash',
+                alt: 'Hannah Busing'
+            },
+            {
+                on: true,
+                tag: 'Portrait',
+                src: 'portraits/ade-tunji-rVkhWWZFAtQ-unsplash',
+                alt: 'Ade Tunji'
+            },
+            {
+                on: true,
+                tag: 'Mariages',
+                src: 'mariage/jakob-owens-SiniLJkXhMc-unsplash',
+                alt: 'Jakob Owens'
+            },
+            {
+                on: true,
+                tag: 'Portrait',
+                src: 'portraits/nino-van-prattenburg--443cl1uR_8-unsplash',
+                alt: 'Non Van Prattenburg'
+            },
+            {
+                on: true,
+                tag: 'Concert',
+                src: 'concerts/austin-neill-hgO1wFPXl3I-unsplash',
+                alt: 'Austin Neill'
+            },
+            {
+                on: true,
+                tag: 'Entreprise',
+                src: 'entreprise/mateus-campos-felipe-Fsgzm8N0hIY-unsplash',
+                alt: 'Mateus Campos Felipe'
+            }
+        ],
+        GALLERY_TAGS = ['Tous']
+
+        // --ELEMENT-SERVICE
+        const SERVICES =
+        [
+            {
+                title: 'Shooting photo',
+                desc: 'Pour capturer vos moments les plus précieux et garder un souvenir impérissable. Je me déplace en Île-de-France pour réaliser vos photos',
+                price: '350€/demi journée',
+                info: 'Matériel, déplacement inclus'
+            },
+            {
+                title: 'Retouches',
+                desc: 'Vous souhaitez retoucher vos photos pour un résultat professionnel ? Bénéficier d’un rendu optimal pour vos publications',
+                price: '50€/photo',
+                info: '2 AR par photo'
+            },
+            {
+                title: 'Album photos',
+                desc: 'Partagez avec vos proches et vos clients les photos des moments partagés ensemble à travers un album photo personnalisé',
+                price: '400€ album A4',
+                info: '30 pages recto/verso'
+            }
+        ]
+
     // #VARIABLES
 
         // --ELEMENT-SLIDER
         let
-        target = 0,
-        timeout
+        slider_TARGET = 0,
+        slider_TIMEOUT,
+        slider_INTERVAL
+
+        // --ELEMENT-GALLERY
+        let
+        gallery_CONTAINER,
+        gallery_TAG_TARGET = 0,
+        gallery_ELEMENT_TARGET,
+        gallery_COLUMNS = 3,
+        gallery_COUNT = GALLERY_ITEMS.length
 
     // #FUNCTIONS
 
         // --SET
         function set()
         {
-            map.set()
-            windowEvent.set()
-    
-            slider.set()
-            gallery.set(
-                {
-                    columns: {
-                        xs: 1,
-                        sm: 2,
-                        md: 3,
-                        lg: 3,
-                        xl: 3
-                    },
-                    lightBox: true,
-                    lightboxId: 'myAwesomeLightbox',
-                    showTags: true,
-                    tagsPosition: 'top'
-                }
-            )
+            slider_set()
         }
 
-        // --UPDATE
-        function updateSlider(a)
+        function slider_set()
         {
-            const length = sliderItems.length
+            slider_INTERVAL = setInterval(() =>
+            {
+                slider_lock()
+                slider_update(2)
+            }, 6000)
+        }
+
+        function modal_set(id)
+        {
+            gallery_COUNT = GALLERY_ITEMS.reduce((a, item) => item.on ? ++a : a, 0)
+            gallery_ELEMENT_TARGET = id
+        }
+
+        // --RESET
+        function slider_reset()
+        {
+            clearInterval(slider_INTERVAL)
+
+            slider_lock(slider_set)
+        }
+
+        // --UPDATES
+        function slider_update(a)
+        {
+            const length = SLIDER_ITEMS.length
     
             for (let i = 0; i < length; i++)
             {
-                const
-                item = sliderItems[i],
+                const 
+                item = SLIDER_ITEMS[i],
                 translateX = (item.translateX + 100 * a) % (length * 100),
-                duration = (a === 1 && translateX === 0) || (a === 2 && translateX === (length - 1) * 100) ? 0 : .6
+                duration = (a === 1 && translateX === 0) || (a === 2 && translateX === (length - 1) * 100)
+                            ? 0
+                            : .6
 
-                if (translateX === 100) target = i
+                if (translateX === 100) slider_TARGET = i
 
-                sliderItems[i] = { ...item, translateX: translateX, duration: duration }
+                SLIDER_ITEMS[i] = { ...item, translateX: translateX, duration: duration }
             }
         }
        
-        function updateSliderTo(id)
+        function slider_updateTo(id)
         {
-            let a = id - target
+            let a = id - slider_TARGET
 
             switch (a)
             {
@@ -110,43 +203,134 @@
                     break
             }
     
-            updateSlider(a)
-
-            target = id
+            slider_update(a)
         }
+
+        function gallery_update(id)
+        {
+            const tag = GALLERY_TAGS[id]
+
+            gallery_map(null, false)
+ 
+            setTimeout(() => gallery_map(tag), 200)
+
+            gallery_TAG_TARGET = id
+        }
+
+        function modal_update(a)
+        {
+            const
+            children = [...gallery_CONTAINER.children],
+            length = children.length
+
+            let i = -1
+
+            while (++i < length)
+                if (children[i].dataset.id == gallery_ELEMENT_TARGET) { i += a; break }
+
+            gallery_ELEMENT_TARGET = parseInt(children[i < 0 ? length - 1 : i >= length ? 0 : i].dataset.id, 10)
+        }
+
+        // --DESTROY
+        function modal_destroy() { gallery_ELEMENT_TARGET = null }
     
         // --EVENTS
         function slider_click(id)
         {
-            if (timeout) return
+            if (slider_TIMEOUT) return
 
-            timeout = setTimeout(() => timeout = null, 600)
-
-            referral.call(this, id)
+            slider_reset()
+            slider_referral.call(this, id)
         }
 
-        // --REFERRAL
-        function referral(id)
+        function gallery_click(id) { gallery_referral.call(this, id) }
+
+        function modal_click() { modal_referral.call(this) }
+
+        // --REFERRALS
+        function slider_referral(id)
         {
             switch (this)
             {
                 case 'c':
-                    updateSliderTo(id)
+                    slider_updateTo(id)
                     break
                 case 'p':
-                    updateSlider(1)
+                    slider_update(1)
                     break
                 case 'n':
-                    updateSlider(2)
+                    slider_update(2)
                     break
                 default:
                     break
             }
         }
 
+        function gallery_referral(id)
+        {
+            switch (this)
+            {
+                case 't':
+                    gallery_update(id)
+                    break
+                case 'i':
+                    modal_set(id)
+                    break
+                default:
+                    break
+            }
+        }
+
+        function modal_referral()
+        {
+            switch (this)
+            {
+                case 'c':
+                    modal_destroy()
+                    break
+                case 'p':
+                    modal_update(-1)
+                    break
+                case 'n':
+                    modal_update(+1)
+                    break
+                default:
+                    break
+            }
+        }
+
+        // --TRANSITION
+        function scale() { return { duration: 200, css: (t) => `transform: scale(${t})` } }
+
+        // --AUTO-CALL
+        ;(function gallery_autoCompletionTags()
+        {
+            for (const item of GALLERY_ITEMS)
+                if (!GALLERY_TAGS.find(tag => tag === item.tag)) GALLERY_TAGS.push(item.tag)
+        })()
+
+        // --UTILS
+        function slider_lock(callback)
+        {
+            slider_TIMEOUT = setTimeout(() =>
+            {
+                if (callback) callback()
+        
+                slider_TIMEOUT = null
+            }, 600)
+        }
+
+        function gallery_map(tag, value)
+        {
+            if (tag === 'Tous') value = true
+    
+            for (let i = 0; i < GALLERY_ITEMS.length; i++)
+                GALLERY_ITEMS[i] = { ...GALLERY_ITEMS[i], on: value ?? (GALLERY_ITEMS[i].tag === tag ? true : false) }
+        }
+
     // #CYCLE
 
-    // onMount(set)
+    onMount(set)
 </script>
 
 <!-- #HTML -->
@@ -194,443 +378,482 @@ id="nina-carducci"
     itemscope
     itemtype="https://schema.org/LocalBusiness"
     >
-		<header>
-			<a
+        <header>
+            <a
             href="./project/ninacarducci"
             >
-				<h1
+                <h1
                 itemprop="name"
                 >
                     Nina Carducci
                 </h1>
-			</a>
-		
-			<nav>
-				<ul>
-					<li>
+            </a>
+        
+            <nav>
+                <ul>
+                    <li>
                         <a
                         href="#about"
                         >
                             À propos
                         </a>
                     </li>
-					<li>
+                    <li>
                         <a
                         href="#gallery"
                         >
                             Galerie
                         </a>
                     </li>
-					<li><a
+                    <li><a
                         href="#services"
                         >
                             Service
                         </a>
                     </li>
-					<li><a
+                    <li><a
                         href="#contact"
                         >
                             Contact
                         </a>
                     </li>
-					<li>
-						<a
+                    <li>
+                        <a
                         href="https://www.instagram.com/ninacarducci.photo/?hl=fr"
                         target="_blank"
                         >
-							<img
+                            <img
                             src="{$page.url.origin}/src/assets/images/projects/ninacarducci/instagram.png"
                             alt="Instagram"
                             width="20"
                             height="20"
                             >
-						</a>
-					</li>
-				</ul>
-			</nav>
-		</header>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
 
-		<main>
+        <main>
             <div
-            class="top bloc"
+            class="slider"
             >
-                <div
-                class="slider"
-                >
-                    <nav>
-                        {#each [0, 1, 2] as id}
-                            <button
-                            type="button"
-                            class:active={target === id}
-                            on:click={slider_click.bind('c', id)}
-                            >
-                            </button>
-                        {/each}
-                    </nav>
-
-                    <div
-                    itemscope
-                    itemtype="https://schema.org/ImageGallery"
-                    itemprop="subjectOf"
-                    >
-                        {#each sliderItems as item}
-                            <div
-                            class="slider-item"
-                            style:transition-duration="{item.duration}s"
-                            style:transform="translateX({item.translateX - 100}%)"
-                            >
-                                <img
-                                srcset="
-                                {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1920.jpg 1920w,
-                                {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1440.jpg 1440w,
-                                {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1024.jpg 1024w,
-                                {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-768.jpg 768w,
-                                {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-425.jpg 425w"
-                                sizes="(min-width: 1441px) 1920px, (min-width: 1025px) 1440px, (min-width: 769px) 1024px, (min-width: 426px) 768px, 425px"
-                                src="{$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1920.jpg"
-                                alt={item.alt}
-                                width="1920"
-                                height="888"
-                                itemprop="image"
-                                >
-                            </div>
-                        {/each}
-
+                <nav>
+                    {#each [0, 1, 2] as id}
                         <button
-                        class="prev"
                         type="button"
-                        on:click={slider_click.bind('p')}
+                        class:active={slider_TARGET === id}
+                        on:click={slider_click.bind('c', id)}
                         >
-                            <img
-                            src="{$page.url.origin}/src/assets/images/projects/ninacarducci/icons/carousel-control-prev-icon.svg"
-                            alt="prev button"
-                            width="16"
-                            height="27"
-                            >
                         </button>
-            
-                        <button
-                        class="next"
-                        type="button"
-                        on:click={slider_click.bind('n')}
-                        >
-                            <img
-                            src="{$page.url.origin}/src/assets/images/projects/ninacarducci/icons/carousel-control-next-icon.svg"
-                            alt="next button"
-                            width="16" 
-                            height="27"
-                            >
-                        </button>
-                    </div>
-                </div>
-            
+                    {/each}
+                </nav>
+
                 <div
-                class="about"
-                >
-                    <picture>
-                        <source
-                        media="(min-width: 1180px)"
-                        srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina.png 560w"
-                        sizes="560px"
-                        >
-                        <source
-                        media="(min-width: 650px)"
-                        srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina-420.png 420w"
-                        sizes="420px"
-                        >
-                        <source
-                        media="(max-width: 650px)"
-                        srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina-224.png 224w"
-                        sizes="224px"
-                        >
-                        <img
-                        srcset="
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/nina.png 560w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/nina-420.png 420w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/nina-224.png 224w"
-                        sizes="(min-width: 1180px) 559px, (min-width: 650px) 419px, 223px"
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina.png"
-                        alt="moi - Nina Carducci"
-                        width="560"
-                        height="558"
-                        itemprop="image"
-                        >
-                    </picture>
-            
-                    <article
-                    itemprop="description"
-                    >
-                        <h2>À propos de moi</h2>
-                
-                        <em>
-                            Devenir photographe était pour moi une évidence. Comme si j’y étais prédestiné. Saisir un moment, une émotion, une situation, un endroit, une lumière et les rendre immortels,
-                            voilà ce qui me fait vibrer.
-                        </em>
-
-                        <p>
-                            Nous passons notre vie à chercher le bonheur, et lorsque nous y touchons, nous n’avons qu’une envie : le figer au travers de photographies pour le savourer avec les personnes
-                            qui sont importantes à nos yeux, ou le partager au plus grand nombre.
-                            C’est ce que je vous propose : saisir ces merveilleux moments au travers de mon regard, mon approche, ma technique. Rendre ces moments immortels, afin que vous puissiez y 
-                            puiser de l’amour, du bonheur, de la tendresse et de lumière à chaque fois que vous poserez les yeux sur vos photos.
-                        </p>
-                    </article>
-                </div>
-            </div>
-
-            <div
-            class="mid bloc"
-            >
-                <section
-                class="gallery"
                 itemscope
                 itemtype="https://schema.org/ImageGallery"
                 itemprop="subjectOf"
                 >
-                    <h2
-                    itemprop="name"
+                    {#each SLIDER_ITEMS as item}
+                        <div
+                        class="slider-item"
+                        style:transition-duration="{item.duration}s"
+                        style:transform="translateX({item.translateX - 100}%)"
+                        >
+                            <img
+                            srcset="
+                            {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1920.jpg 1920w,
+                            {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1440.jpg 1440w,
+                            {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1024.jpg 1024w,
+                            {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-768.jpg 768w,
+                            {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-425.jpg 425w"
+                            sizes="(min-width: 1441px) 1920px, (min-width: 1025px) 1440px, (min-width: 769px) 1024px, (min-width: 426px) 768px, 425px"
+                            src="{$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1920.jpg"
+                            alt={item.alt}
+                            width="1920"
+                            height="888"
+                            itemprop="image"
+                            >
+                        </div>
+                    {/each}
+
+                    <button
+                    class="prev"
+                    type="button"
+                    on:click={slider_click.bind('p')}
                     >
-                        Portfolio
-                    </h2>
-                
-                    <div class="container">
-                        <img data-gallery-tag="Concert"
-                        srcset="
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/aaron-paul-wnX-fXzB6Cw-unsplash-424.jpg 424w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/aaron-paul-wnX-fXzB6Cw-unsplash-364.jpg 364w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/aaron-paul-wnX-fXzB6Cw-unsplash-304.jpg 304w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/aaron-paul-wnX-fXzB6Cw-unsplash-224.jpg 224w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/aaron-paul-wnX-fXzB6Cw-unsplash-254.jpg 254w"
-                        sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/aaron-paul-wnX-fXzB6Cw-unsplash.jpg"
-                        alt="Aaron Paul Concert" width="424" height="424" itemprop="image">
-                        <img data-gallery-tag="Entreprises"
-                        srcset="
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/ali-morshedlou-WMD64tMfc4k-unsplash-424.jpg 424w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/ali-morshedlou-WMD64tMfc4k-unsplash-364.jpg 364w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/ali-morshedlou-WMD64tMfc4k-unsplash-304.jpg 304w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/ali-morshedlou-WMD64tMfc4k-unsplash-224.jpg 224w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/ali-morshedlou-WMD64tMfc4k-unsplash-254.jpg 254w"
-                        sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/ali-morshedlou-WMD64tMfc4k-unsplash.jpg"
-                        alt="Ali Morshedlou entreprise" width="424" height="424" itemprop="image">
-                        <img data-gallery-tag="Entreprises"
-                        srcset="
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/jason-goodman-tHO1_OuKbg0-unsplash-424.jpg 424w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/jason-goodman-tHO1_OuKbg0-unsplash-364.jpg 364w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/jason-goodman-tHO1_OuKbg0-unsplash-304.jpg 304w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/jason-goodman-tHO1_OuKbg0-unsplash-224.jpg 224w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/jason-goodman-tHO1_OuKbg0-unsplash-254.jpg 254w"
-                        sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/jason-goodman-tHO1_OuKbg0-unsplash.jpg"
-                        alt="Jason Goodman entreprise" width="424" height="424" itemprop="image">
-                        <img data-gallery-tag="Mariages"
-                        srcset="
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/hannah-busing-RvF2R_qMpRk-unsplash-424.jpg 424w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/hannah-busing-RvF2R_qMpRk-unsplash-364.jpg 364w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/hannah-busing-RvF2R_qMpRk-unsplash-304.jpg 304w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/hannah-busing-RvF2R_qMpRk-unsplash-224.jpg 224w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/hannah-busing-RvF2R_qMpRk-unsplash-254.jpg 254w"
-                        sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/hannah-busing-RvF2R_qMpRk-unsplash.jpg"
-                        alt="Hannah Busing mariage" width="424" height="424" itemprop="image">
-                        <img data-gallery-tag="Portrait"
-                        srcset="
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/ade-tunji-rVkhWWZFAtQ-unsplash-424.jpg 424w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/ade-tunji-rVkhWWZFAtQ-unsplash-364.jpg 364w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/ade-tunji-rVkhWWZFAtQ-unsplash-304.jpg 304w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/ade-tunji-rVkhWWZFAtQ-unsplash-224.jpg 224w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/ade-tunji-rVkhWWZFAtQ-unsplash-254.jpg 254w"
-                        sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/ade-tunji-rVkhWWZFAtQ-unsplash.jpg"
-                        alt="Ade Tunji portrait" width="424" height="424" itemprop="image">
-                        <img data-gallery-tag="Mariages"
-                        srcset="
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/jakob-owens-SiniLJkXhMc-unsplash-424.jpg 424w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/jakob-owens-SiniLJkXhMc-unsplash-364.jpg 364w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/jakob-owens-SiniLJkXhMc-unsplash-304.jpg 304w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/jakob-owens-SiniLJkXhMc-unsplash-224.jpg 224w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/jakob-owens-SiniLJkXhMc-unsplash-254.jpg 254w"
-                        sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/mariage/jakob-owens-SiniLJkXhMc-unsplash.jpg"
-                        alt="Jakob Owens mariage" width="424" height="424" itemprop="image">
-                        <img data-gallery-tag="Portrait"
-                        srcset="
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/nino-van-prattenburg--443cl1uR_8-unsplash-424.jpg 424w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/nino-van-prattenburg--443cl1uR_8-unsplash-364.jpg 364w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/nino-van-prattenburg--443cl1uR_8-unsplash-304.jpg 304w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/nino-van-prattenburg--443cl1uR_8-unsplash-224.jpg 224w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/nino-van-prattenburg--443cl1uR_8-unsplash-254.jpg 254w"
-                        sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/portraits/nino-van-prattenburg--443cl1uR_8-unsplash.jpg"
-                        alt="Nino Van Prattenburg portrait" width="424" height="424" itemprop="image">
-                        <img data-gallery-tag="Concert"
-                        srcset="
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/austin-neill-hgO1wFPXl3I-unsplash-424.jpg 424w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/austin-neill-hgO1wFPXl3I-unsplash-364.jpg 364w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/austin-neill-hgO1wFPXl3I-unsplash-304.jpg 304w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/austin-neill-hgO1wFPXl3I-unsplash-224.jpg 224w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/austin-neill-hgO1wFPXl3I-unsplash-254.jpg 254w"
-                        sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/concerts/austin-neill-hgO1wFPXl3I-unsplash.jpg"
-                        alt="Austin Neill concert" width="424" height="424" itemprop="image">
-                        <img data-gallery-tag="Entreprises"
-                        srcset="
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/mateus-campos-felipe-Fsgzm8N0hIY-unsplash-424.jpg 424w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/mateus-campos-felipe-Fsgzm8N0hIY-unsplash-364.jpg 364w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/mateus-campos-felipe-Fsgzm8N0hIY-unsplash-304.jpg 304w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/mateus-campos-felipe-Fsgzm8N0hIY-unsplash-224.jpg 224w,
-                        {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/mateus-campos-felipe-Fsgzm8N0hIY-unsplash-254.jpg 254w"
-                        sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/entreprise/mateus-campos-felipe-Fsgzm8N0hIY-unsplash.jpg"
-                        alt="Mateus Campos Felipe entreprise" width="424" height="424" itemprop="image">
+                        <img
+                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/icons/carousel-control-prev-icon.svg"
+                        alt="prev button"
+                        width="16"
+                        height="27"
+                        >
+                    </button>
+        
+                    <button
+                    class="next"
+                    type="button"
+                    on:click={slider_click.bind('n')}
+                    >
+                        <img
+                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/icons/carousel-control-next-icon.svg"
+                        alt="next button"
+                        width="16" 
+                        height="27"
+                        >
+                    </button>
+                </div>
+            </div>
+        
+            <div
+            class="about"
+            >
+                <picture>
+                    <source
+                    media="(min-width: 1180px)"
+                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina.png 560w"
+                    sizes="560px"
+                    >
+                    <source
+                    media="(min-width: 650px)"
+                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina-420.png 420w"
+                    sizes="420px"
+                    >
+                    <source
+                    media="(max-width: 650px)"
+                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina-224.png 224w"
+                    sizes="224px"
+                    >
+                    <img
+                    srcset="
+                    {$page.url.origin}/src/assets/images/projects/ninacarducci/nina.png 560w,
+                    {$page.url.origin}/src/assets/images/projects/ninacarducci/nina-420.png 420w,
+                    {$page.url.origin}/src/assets/images/projects/ninacarducci/nina-224.png 224w"
+                    sizes="(min-width: 1180px) 559px, (min-width: 650px) 419px, 223px"
+                    src="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina.png"
+                    alt="moi - Nina Carducci"
+                    width="560"
+                    height="558"
+                    itemprop="image"
+                    >
+                </picture>
+        
+                <article
+                itemprop="description"
+                >
+                    <h2>À propos de moi</h2>
+            
+                    <em>
+                        Devenir photographe était pour moi une évidence. Comme si j’y étais prédestiné. Saisir un moment, une émotion, une situation, un endroit, une lumière et les rendre immortels,
+                        voilà ce qui me fait vibrer.
+                    </em>
+
+                    <p>
+                        Nous passons notre vie à chercher le bonheur, et lorsque nous y touchons, nous n’avons qu’une envie : le figer au travers de photographies pour le savourer avec les personnes
+                        qui sont importantes à nos yeux, ou le partager au plus grand nombre.
+                        C’est ce que je vous propose : saisir ces merveilleux moments au travers de mon regard, mon approche, ma technique. Rendre ces moments immortels, afin que vous puissiez y 
+                        puiser de l’amour, du bonheur, de la tendresse et de lumière à chaque fois que vous poserez les yeux sur vos photos.
+                    </p>
+                </article>
+            </div>
+
+            <section
+            class="gallery"
+            itemscope
+            itemtype="https://schema.org/ImageGallery"
+            itemprop="subjectOf"
+            >
+                <h2
+                itemprop="name"
+                >
+                    Portfolio
+                </h2>
+
+                <nav>
+                    <ul>
+                        {#each GALLERY_TAGS as tag, id}
+                            <li>
+                                <button
+                                class:active={gallery_TAG_TARGET === id}
+                                type="button"
+                                on:click={gallery_click.bind('t', id)}
+                                >
+                                    {tag}
+                                </button>
+                            </li>
+                        {/each}
+                    </ul>
+                </nav>
+            
+                <div
+                class="container"
+                >
+                    <div
+                    style:--columns={gallery_COLUMNS}
+                    bind:this={gallery_CONTAINER}
+                    >
+                        {#each GALLERY_ITEMS as item, id}
+                            {#if item.on}
+                                <button
+                                data-id={id}
+                                type="button"
+                                on:click={gallery_click.bind('i', id)}
+                                transition:scale
+                                >
+                                    <img
+                                    srcset="
+                                    {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}-424.jpg 424w,
+                                    {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}-364.jpg 364w,
+                                    {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}-304.jpg 304w,
+                                    {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}-224.jpg 224w,
+                                    {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}-254.jpg 254w"
+                                    sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
+                                    src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}.jpg"
+                                    alt={item.tag + ' ' + item.alt}
+                                    width="424"
+                                    height="424"
+                                    itemprop="image"
+                                    >
+                                </button>
+                            {/if}
+                        {/each}
                     </div>
-    
-                    <article class="quote after-gallery">
-                        <figure itemscope itemtype="https://schema.org/Quotation" itemprop="subjectOf">
-                            <blockquote>
-                                <h2 class="quote__text h1" itemprop="citation">
-                                    Un portrait n’est pas une ressemblance. Dès lors qu’une émotion ou qu’un fait est traduit en photo, il cesse d’être un fait pour devenir une opinion.
-                                    L’inexactitude n’existe pas en photographie. Toutes les photos sont exactes. Aucune d’elles n’est la vérité.
-                                </h2>
-                            </blockquote>
-                            <figcaption class="quote__author" itemprop="author">- Richard Avedon</figcaption>
-                        </figure>
-                    </article>
+                </div>
+
+                {#if gallery_ELEMENT_TARGET !== null && gallery_ELEMENT_TARGET !== undefined}
+                    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+                    <div
+                    class="modal"
+                    transition:fade={{ duration: 200 }}
+                    on:click={modal_click.bind('c')}
+                    >
+                        <div
+                        transition:scale
+                        >
+                            <img
+                            src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{GALLERY_ITEMS[gallery_ELEMENT_TARGET].src}.jpg"
+                            alt={GALLERY_ITEMS[gallery_ELEMENT_TARGET].alt}
+                            width="498"
+                            />
+
+                            {#if gallery_COUNT > 1}
+                                <button
+                                class="prev"
+                                type="button"
+                                on:click|stopPropagation={modal_click.bind('p')}
+                                >
+                                    &#x3C;
+                                </button>
+
+                                <button
+                                class="next"
+                                type="button"
+                                on:click|stopPropagation={modal_click.bind('n')}
+                                >
+                                    &#x3E;
+                                </button>
+                            {/if}
+                        </div>
+                    </div>
+                {/if}
+            </section>
+
+            <article
+            class="quote"
+            >
+                <figure
+                itemscope
+                itemtype="https://schema.org/Quotation"
+                itemprop="subjectOf"
+                >
+                    <blockquote>
+                        <h2
+                        itemprop="citation"
+                        >
+                            Un portrait n’est pas une ressemblance. Dès lors qu’une émotion ou qu’un fait est traduit en photo, il cesse d’être un fait pour devenir une opinion.
+                            L’inexactitude n’existe pas en photographie. Toutes les photos sont exactes. Aucune d’elles n’est la vérité.
+                        </h2>
+                    </blockquote>
+        
+                    <figcaption
+                    itemprop="author"
+                    >
+                        - Richard Avedon
+                    </figcaption>
+                </figure>
+            </article>
+
+            <section
+            class="service"
+            >
+                <h2>Mes services</h2>
+
+                <div>
+                    {#each SERVICES as service}
+                        <article
+                        itemscope
+                        itemtype="https://schema.org/Offer"
+                        itemprop="makesOffer"
+                        >
+                            <div>
+                                <h3
+                                itemprop="itemOffered"
+                                >
+                                    {service.title}
+                                </h3>
+            
+                                <p
+                                itemprop="description"
+                                >
+                                    {service.desc}
+                                </p>
+                            </div>
+
+                            <div
+                            itemscope
+                            itemtype="https://schema.org/PriceSpecification"
+                            itemprop="priceSpecification"
+                            >
+                                <h4
+                                itemprop="price"
+                                >
+                                    {service.price}
+                                </h4>
+        
+                                <span
+                                itemprop="description"
+                                >
+                                    {service.info}
+                                </span>
+                            </div>
+                        </article>
+                    {/each}
+                </div>
+            </section>
+
+            <article
+            class="quote"
+            >
+                <figure
+                itemscope
+                itemtype="https://schema.org/Quotation"
+                itemprop="subjectOf"
+                >
+                    <blockquote>
+                        <h2
+                        itemprop="citation"
+                        >
+                            De manière inconsciente, je crois, je guette un regard, une expression, des traits ou une nostalgie capable de résumer ou plus exactement de révéler une vie
+                        </h2>
+                    </blockquote>
+        
+                    <figcaption 
+                    itemprop="author"
+                    >
+                        - Richard Avedon
+                    </figcaption>
+                </figure>
+            </article>
+        </main>
+
+        <footer>
+            <div>
+                <section>
+                    <h2>Une question ? Une demande de devis ?</h2>
+        
+                    <p> N’hésitez pas à m’écrire ! Je vous répondrais en moins de 24 heures</p>
+                    
+                    <form
+                    action="#"
+                    method="post"
+                    >
+                        <label>
+                            Nom
+        
+                            <input
+                            type="text"
+                            name="nom"
+                            >
+                        </label>
+
+                        <label>
+                            Email
+                        
+                            <input
+                            type="email"
+                            name="email"
+                            >
+                        </label>
+
+                        <label>
+                            Message
+                        
+                            <textarea
+                            name="message"
+                            cols="30"
+                            rows="10"
+                            ></textarea>
+                        </label>
+
+                        <input
+                        type="submit"
+                        value="Envoyer"
+                        >
+                    </form>
+                </section>
+
+                <picture class="picture right">
+                    <source media="(min-width: 1180px)" srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png 419w" sizes="419px">
+                    <source media="(min-width: 650px)" srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-279.png 279w" sizes="279px">
+                    <source media="(max-width: 650px)" srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-159.png 159w" sizes="159px">
+                    <img srcset="
+                    {$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png 419w,
+                    {$page.url.origin}/src/assets/images/projects/ninacarducci/camera-279.png 279w,
+                    {$page.url.origin}/src/assets/images/projects/ninacarducci/camera-159.png 159w"
+                    sizes="(min-width: 1180px) 418px, (min-width: 650px) 279px, 158px"
+                    src="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png" alt="Caméra" width="419" height="418">
+                </picture>
+            </div>
+
+            <div class="infos">
+                <section>
+                    <h2>Adresse</h2>
+
+                    <p itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                        <span itemprop="streetAddress">68 avenue Alsace-Lorraine</span> <br>
+                        <span itemprop="postalCode">33200</span>
+                        <span itemprop="addressLocality">Bordeaux</span>
+                    </p>
+                </section>
+
+                <section>
+                    <h2>Contact</h2>
+
+                    <p>
+                        téléphone <br>
+                        <span itemprop="telephone">05 56 67 78 89</span>
+                    </p>
+                </section>
+
+                <section>
+                    <h2>Horaires</h2>
+
+                    <p itemprop="openingHours" content = "Mo, Tu, We, Th, Fr 10:00-19:00">
+                        Du lundi au vendredi <br>
+                        de 10h à 19h.
+                    </p>
+                </section>
+
+                <section>
+                    <h2>Tarifs</h2>
+
+                    <p>
+                        <span itemprop="priceRange">50€ à 400€</span> <br>
+                        <a href="#services">voir mes services</a>
+                    </p>
                 </section>
             </div>
-
-            <div
-            class="bottom bloc"
-            >
-
-            </div>
-
-			<section id="services" class="after-slider after-gallery">
-				<h2 class="title">Mes services</h2>
-
-				<div class="container">
-					<article class="service" itemscope itemtype="https://schema.org/Offer" itemprop="makesOffer">
-						<div class="service__description">
-							<h3 itemprop="itemOffered">Shooting photo</h3>
-							<p itemprop="description">Pour capturer vos moments les plus précieux et garder un souvenir impérissable. Je me déplace en Île-de-France pour réaliser vos photos</p>
-						</div>
-
-						<div class="service__price" itemscope itemtype="https://schema.org/PriceSpecification" itemprop="priceSpecification">
-							<h4 itemprop="price">350€/demi journée</h4>
-							<span itemprop="description">Matériel, déplacement inclus</span>
-						</div>
-					</article>
-
-					<article class="service" itemscope itemtype="https://schema.org/Offer" itemprop="makesOffer">
-						<div class="service__description">
-							<h3 itemprop="itemOffered">Retouches</h3>
-							<p itemprop="description">Vous souhaitez retoucher vos photos pour un résultat professionnel ? Bénéficier d’un rendu optimal pour vos publications</p>
-						</div>
-
-						<div class="service__price" itemscope itemtype="https://schema.org/PriceSpecification" itemprop="priceSpecification">
-							<h4 itemprop="price">50€/photo</h4>
-							<span itemprop="description">2 AR par photo</span>
-						</div>
-					</article>
-
-					<article class="service" itemscope itemtype="https://schema.org/Offer" itemprop="makesOffer">
-						<div class="service__description">
-							<h3 itemprop="itemOffered">Album photos</h3>
-							<p itemprop="description">Partagez avec vos proches et vos clients les photos des moments partagés ensemble à travers un album photo personnalisé</p>
-						</div>
-
-						<div class="service__price" itemscope itemtype="https://schema.org/PriceSpecification" itemprop="priceSpecification">
-							<h4 itemprop="price">400€ album A4</h4>
-							<span itemprop="description">30 pages recto/verso</span>
-						</div>
-					</article>
-				</div>
-			</section>
-
-			<article class="quote after-slider after-gallery">
-				<figure itemscope itemtype="https://schema.org/Quotation" itemprop="subjectOf">
-					<blockquote>
-						<h2 class="quote__text h1" itemprop="citation">
-							De manière inconsciente, je crois, je guette un regard, une expression, des traits ou une nostalgie capable de résumer ou plus exactement de révéler une vie
-						</h2>
-					</blockquote>
-					<figcaption class="quote__author" itemprop="author">- Richard Avedon</figcaption>
-				</figure>
-			</article>
-		</main>
-
-		<footer id="contact" class="after-slider after-gallery">
-			<div class="container">
-				<section class="form-container">
-					<h2>Une question ? Une demande de devis ?</h2>
-					<p> N’hésitez pas à m’écrire ! Je vous répondrais en moins de 24 heures</p>
-					
-					<form action="#" method="post">
-						<label for="nom">Nom</label>
-						<input type="text" name="nom" id="nom">
-
-						<label for="email">Email</label>
-						<input type="email" name="email" id="email">
-
-						<label for="message">Message</label>
-						<textarea name="message" id="message" cols="30" rows="10"></textarea>
-
-						<input type="submit" value="Envoyer">
-					</form>
-				</section>
-
-				<picture class="picture right">
-					<source media="(min-width: 1180px)" srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png 419w" sizes="419px">
-					<source media="(min-width: 650px)" srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-279.png 279w" sizes="279px">
-					<source media="(max-width: 650px)" srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-159.png 159w" sizes="159px">
-					<img srcset="
-					{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png 419w,
-					{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-279.png 279w,
-					{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-159.png 159w"
-					sizes="(min-width: 1180px) 418px, (min-width: 650px) 279px, 158px"
-					src="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png" alt="Caméra" width="419" height="418">
-				</picture>
-			</div>
-
-			<div class="infos container">
-				<section>
-					<h2>Adresse</h2>
-
-					<p itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
-						<span itemprop="streetAddress">68 avenue Alsace-Lorraine</span> <br>
-						<span itemprop="postalCode">33200</span>
-						<span itemprop="addressLocality">Bordeaux</span>
-					</p>
-				</section>
-
-				<section>
-					<h2>Contact</h2>
-
-					<p>
-						téléphone <br>
-						<span itemprop="telephone">05 56 67 78 89</span>
-					</p>
-				</section>
-
-				<section>
-					<h2>Horaires</h2>
-
-					<p itemprop="openingHours" content = "Mo, Tu, We, Th, Fr 10:00-19:00">
-						Du lundi au vendredi <br>
-						de 10h à 19h.
-					</p>
-				</section>
-
-				<section>
-					<h2>Tarifs</h2>
-
-					<p>
-						<span itemprop="priceRange">50€ à 400€</span> <br>
-						<a href="#services">voir mes services</a>
-					</p>
-				</section>
-			</div>
-		</footer>
+        </footer>
 	</div>
 </div>
 
@@ -641,26 +864,52 @@ lang="scss"
 >
     #nina-carducci
     {
-        width: 100%;
+        transform: scale(1); /* position fixed */
 
-        background-color: white;
+        width: 100vw;
+        height: 100vh;
     }
+
     .body
     {
+        overflow: hidden scroll;
+    
         max-width: 1920px;
+        height: 100%;
 
         margin: auto;
 
+        background-color: white;
+
         font-family: 'Inter', sans-serif;
+
+        scrollbar-width: none !important;
+        &::-webkit-scrollbar
+        {
+            display: none !important;
+
+            width: 0 !important;
+        }
     }
 
-    h1, h2 { font-weight: 500; }
-    h2 { font-size: 2rem; }
+    h1, h2, h3, h4
+    {
+        font-weight: 500;
+        line-height: 1.2;
+    }
 
     a
     {
         color: #330808;
         text-decoration: none;
+    }
+
+    button
+    {
+        border: none;
+        outline: none;
+
+        cursor: pointer;
     }
 
     header
@@ -673,32 +922,30 @@ lang="scss"
         top: 0;
         left: 0;
 
-        z-index: 5;
+        z-index: 2;
+
+        width: 100%;
 
         padding: 30px 100px;
 
-        background-color: white;
+        background-color: #fff;
 
         box-sizing: border-box;
 
-        h1
-        {
-            font-size: 1.6em;
-            line-height: 1.2;
-        }
+        h1 { font-size: 1.6em; }
 
         nav ul
         {
             display: flex;
             align-items: center;
 
+            width: 100%;
+
             font-size: 14px;
 
             li { padding-inline: 10px; }
         }
     }
-
-    .bloc { width: 100%; }
 
     .slider
     {
@@ -710,11 +957,10 @@ lang="scss"
         nav
         {
             position: absolute;
-            
             bottom: 16px;
             left: 50%;
 
-            z-index: 4;
+            z-index: 1;
 
             transform: translateX(-50%);
 
@@ -731,13 +977,9 @@ lang="scss"
                 background-clip: padding-box;
 
                 border-top: solid transparent 10px;
-                border-right: 0;
                 border-bottom: solid transparent 10px;
-                border-left: 0;
 
                 box-sizing: content-box;
-
-                cursor: pointer;
 
                 transition: opacity .6s ease;
             }
@@ -755,7 +997,6 @@ lang="scss"
             .slider-item
             {
                 position: absolute;
-    
                 top: 0;
                 left: 0;
         
@@ -772,10 +1013,9 @@ lang="scss"
                 align-items: center;
     
                 position: absolute;
-
                 top: 0;
 
-                z-index: 4;
+                z-index: 1;
 
                 opacity: .5;
 
@@ -783,11 +1023,6 @@ lang="scss"
                 height: 100%;
 
                 background-color: transparent;
-
-                border: none;
-                outline: none;
-
-                cursor: pointer;
 
                 &:hover { opacity: 1; }
         
@@ -884,9 +1119,372 @@ lang="scss"
             text-align: center;
         }
 
+        button { background-color: transparent; }
+
+        ul
+        {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            margin-block: 1.5em;
+
+            button
+            {
+                padding: 0.5rem 1rem;
+
+                color: #000;
+                font-size: 1em;
+                line-height: 1.5;
+
+                transition: color .15s ease-in-out, background-color .15s ease-in-out;
+            }
+            button.active { background-color: #beb45a; }
+        }
+
         .container
         {
-            position: absolute;
+            &>div
+            {
+                display: grid;
+                grid-template-columns: repeat(var(--columns), auto);
+
+                gap: 1em;
+
+                transform: translateX(50%);
+
+                img { user-select: none; }
+            }
         }
+
+        .modal
+        {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            z-index: 3;
+
+            width: 100vw;
+            height: 100vh;
+
+            background-color: rgba(0,0,0,.5);
+
+            &
+            >div
+            {
+                position: relative;
+
+                transition: transform .3s ease-out;
+
+                img
+                {
+                    max-width: 498px;
+            
+                    border: solid #fff 1rem;
+                    border-radius: 5px;
+
+                    box-sizing: border-box;
+                }
+
+                button
+                {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+            
+                    position: absolute;
+                    top: 50%;
+            
+                    &.prev
+                    {
+                        left: 0;
+
+                        transform: translate(-50%, -50%);
+                    }
+                    &.next
+                    {
+                        right: 0;
+
+                        transform: translate(50%, -50%);
+                    }
+
+                    width: 30px;
+                    height: 30px;
+
+                    background-color: #fff;
+
+                    font-size: 24px;
+                }
+            }
+        }
+    }
+
+    .quote
+    {
+        width: 70%;
+
+        margin: auto;
+        padding-block: 3em;
+
+        font-family: Spectral;
+
+        blockquote { margin-bottom: 1rem; }
+
+        figure { margin-bottom: 1rem; }
+
+        h2
+        {
+            font-size: 2.5rem !important;
+            font-style: italic;
+            font-weight: 300;
+        }
+
+        figcaption
+        {
+            font-size: 22px;
+            font-weight: 800;
+        }
+    }
+
+    .service
+    {
+        position: relative;
+    
+        width: 100%;
+
+        background-color: #a8d5d8;
+
+        h2
+        {
+            padding-block: 2em;
+
+            text-align: center;
+        }
+
+        &
+        >div
+        {
+            display: flex;
+            justify-content: space-between;
+
+            margin: auto;
+            padding: 2em 0;
+
+            box-sizing: border-box;
+
+            &::before
+            {
+                content: '';
+
+                position: absolute;
+                bottom: 0;
+                left: 0;
+    
+                background-color: #1c6474;
+    
+                width: 100%;
+                height: 30%;
+            }
+        }
+
+        article
+        {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            z-index: 1;
+
+            max-width: 390px;
+            width: 30%;
+            height: 337px;
+    
+            padding: 1em;
+
+            background-color: #fff;
+
+            box-sizing: border-box;
+
+            h3, h4 { margin-bottom: 0.5rem; }
+            h3 { font-size: 1.75rem; }
+            h4 { font-size: 1.5rem; }
+            p { margin-bottom: 1rem; }
+        }
+    }
+
+    @media (min-width: 576px)
+    {
+        .service>div,
+        footer>div
+        { max-width: 540px; }
+    }
+
+    @media all and (max-width: 650px)
+    {
+        header
+        {
+            flex-direction: column;
+    
+            padding-inline: 0;
+
+            nav
+            {
+                width: 100%;
+
+                li
+                {
+                    flex: 1;
+
+                    padding-block: 1em;
+
+                    text-align: center;
+                }
+            }
+        }
+    
+        /* .picture.left::before, .picture.right::before { height: 150px; } */
+
+        .service>div,
+        footer>div
+        {
+            align-items: center;
+
+            article { max-width: 90%; }
+        }
+    
+        /* #about, #contact
+        {
+            padding-inline: 2em;
+            padding-block: 2em;
+        }
+
+        form { width: 100%; }
+
+        .picture.left
+        {
+            width: 224px;
+            height: 223px;
+        } */
+    }
+
+    @media (min-width: 768px)
+    {
+        .service>div,
+        footer>div
+        { max-width: 720px; }
+    }
+
+    @media (min-width: 992px)
+    {
+        .service>div,
+        footer>div
+        { max-width: 960px; }
+    }
+
+    @media all and (max-width: 1000px)
+    {
+        /* #about { flex-direction: column; }
+        #about-me { width: 100%; }
+
+        .picture.left::before
+        {
+            position: absolute;
+
+            top: 0;
+            bottom: auto;
+            left: 0;
+    
+            z-index: -1;
+        
+            width: 100%;
+            height: 30%;
+        }
+        .about-me__title
+        {
+            margin-top: 1em;
+
+            text-align: center;
+        } */
+        .service
+        {
+            &
+            >div
+            {
+                flex-direction: column;
+
+                &::before
+                {
+                    right: 0;
+                    left: auto;
+
+                    width: 30%;
+                    height: 100%;
+                }
+            }
+    
+            article
+            {
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+
+                margin: 2em 0;
+
+                &
+                >div:nth-child(1) { margin-bottom: 1em; }
+            }
+        }
+
+        /* #contact .container { flex-direction: column; }
+        #contact .picture.right { margin-top: 1em; }
+        .picture.right::before
+        {
+            position: absolute;
+    
+            right: 0;
+            bottom: 0;
+
+            z-index: -1;
+            width: 100%;
+            height: 40%;
+        } */
+    }
+
+     /* @media all and (max-width: 1180px)
+    {
+        .picture.left
+        {
+            width: 420px;
+            height: 419px;
+        }
+        #about, #contact .container { align-items: center; }
+        .about-me__title
+        {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+    } */
+
+    @media (min-width: 1200px)
+    {
+        h2 { font-size: 2rem; }
+
+        .service>div,
+        footer>div
+        { max-width: 1140px; }
+    }
+
+    @media (min-width: 1400px)
+    {
+        .service>div,
+        footer>div
+        { max-width: 1320px; }
     }
 </style>
