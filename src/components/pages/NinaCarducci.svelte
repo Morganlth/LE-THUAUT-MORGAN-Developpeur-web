@@ -886,7 +886,7 @@ lang="scss"
 
         .container
         {
-            position; absolute
+            position: absolute;
         }
     }
 </style>
