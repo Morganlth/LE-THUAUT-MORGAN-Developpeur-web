@@ -37,7 +37,7 @@
         <p>
             <strong>EE</strong>
 
-            &nbsp;. LE THUAUT MORGAN
+            . LE THUAUT MORGAN
         </p>
     </div>
 
@@ -56,14 +56,14 @@
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #USES */
 
-    @import
-    '../../assets/scss/styles/flex.scss',
-    '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/font.scss',
-    '../../assets/scss/styles/cursor.scss';
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/font' as *;
+    @use '../../assets/scss/styles/cursor' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #GROUPS */
 
@@ -81,7 +81,7 @@ lang="scss"
 
         height: 70px;
 
-        padding: 0 60px;
+        padding-inline: 20px;
 
         box-sizing: border-box;
 
@@ -89,12 +89,19 @@ lang="scss"
         {
             @include flex;
 
-            align-items: flex-end;
+            align-items: center;
         }
 
         p
         {
+            @include flex;
             @include p-interact($light);
+
+            align-items: flex-end;
+            flex-wrap: wrap;
+            align-self: flex-end;
+
+            gap: 10px;
     
             margin-left: 30px;
         }
@@ -104,5 +111,7 @@ lang="scss"
             font-size: 12px;
             font-weight: 900;
         }
+
+        @include media-min(768px) { padding-inline: 60px; }
     }
 </style>

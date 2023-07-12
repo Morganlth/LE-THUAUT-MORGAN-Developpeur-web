@@ -1,6 +1,6 @@
 // #USES
 
-@use 'sass:list';
+@use 'sass:map';
 
 @use '../styles/media' as *;
 @use '../styles/font';
@@ -13,16 +13,17 @@
     {
         svg
         {
+            width: 36px * .7;
             height: 100%;
 
-            $list-width: font.$h-1-sizes;
+            $map-width: font.$h-1-sizes;
     
-            @for $i from 1 through list.length($list-width)
+            @each $key, $value in $map-width
             {
-                $list-width: list.set-nth($list-width, $i, list.nth($list-width, $i) * .7);
+                $map-width: map.set($map-width, $key, $value * .7);
             }
     
-            @include media-min-list(width, $list-width);
+            @include media-min-map(width, $map-width);
         }
     }
 }

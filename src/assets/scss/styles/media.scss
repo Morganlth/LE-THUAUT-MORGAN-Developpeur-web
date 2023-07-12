@@ -23,8 +23,6 @@ $media-screen-width: 320px, 375px, 425px, 768px, 1024px, 1440px;
 
 @mixin media-min-map($property, $map)
 {
-    @debug $map;
-    
     @each $width, $value in $map
     {
         @if list.index($media-screen-width, $width)
@@ -32,4 +30,9 @@ $media-screen-width: 320px, 375px, 425px, 768px, 1024px, 1440px;
             @include media-min($width) { #{$property}: $value; }
         }
     }
+}
+
+@mixin media-min-height($height)
+{
+    @media screen and (min-height: $height) { @content; }
 }

@@ -164,7 +164,7 @@ lang="scss"
     @use '../../assets/scss/styles/background' as *;
     @use '../../assets/scss/styles/font' as *;
     @use '../../assets/scss/styles/cursor' as *;
-    /* @use '../../assets/scss/styles/media' as *; */
+    @use '../../assets/scss/styles/media' as *;
 
     /* #GROUPS */
 
@@ -178,7 +178,7 @@ lang="scss"
         width: calc(100% - 100vw);
         height: 100vh;
 
-        padding: 70px 0 30px 20px;
+        padding: 70px 0 30px;
 
         box-sizing: border-box;
 
@@ -207,7 +207,6 @@ lang="scss"
 
             border-right: solid rgba($s-light, .3) 4px;
             border-bottom: solid $o-primary 4px;
-            border-left: solid $dark 8px;
 
             box-sizing: border-box;
         }
@@ -226,6 +225,13 @@ lang="scss"
 
             background: linear-gradient(90deg, transparent 0%, $dark 50%);
         }
+
+        @include media-min(1024px)
+        {
+            padding-left: 20px;
+
+            &>div { border-left: solid $dark 8px; }
+        }
     }
 
     .content
@@ -239,7 +245,7 @@ lang="scss"
 
         width: 50%;
 
-        padding: 1% 0 1% 2.5%;
+        padding-block: 1%;
 
         box-sizing: border-box;
 
@@ -250,7 +256,9 @@ lang="scss"
             @include no-event;
 
             bottom: 0;
-            right: 0;
+            left: 0;
+
+            transform: translateX(-30%) scaleX(-1);
 
             opacity: .3;
 
@@ -258,44 +266,82 @@ lang="scss"
 
             object-position: bottom;
             object-fit: cover;
+
+            transition: transform .6s;
         }
 
-        .lang,
-        .scroll-icon
+        .lang, .scroll-icon
         {
             @include p-interact;
 
             opacity: 0.7;
         }
-        .scroll-icon
-        {
-            @include flex;
-            @include f-a-center;
+        .lang { margin: 10px 0 0 20px; }
+        .scroll-icon { display: none; }
 
-            gap: 10px;
+        @include media-min(768px)
+        {
+            padding-left: 2.5%;
+
+            .lang { margin: 0; }
+        }
+        @include media-min(1024px)
+        {
+            .me
+            {
+                right: 0;
+                left: auto;
+    
+                transform: translateX(0) scaleX(1);
+            }
+
+            .scroll-icon
+            {
+                @include flex;
+                @include f-a-center;
+
+                gap: 10px;
+            }
         }
     }
 
     .main
     {
         @include flex;
+        @include f-column;
+        @include any-h;
 
-        justify-content: space-between;
+        justify-content: space-around;
         align-items: flex-end;
-
+        
         z-index: 2;
 
-        margin: 0 15% 5% 0;
+        width: max-content;
+
+        margin: auto;
+
+        box-sizing: border-box;
 
         section
         {
             @include flex;
-            @include f-column;
+            @include f-a-center;
 
-            align-items: flex-end;
+            flex-direction: column-reverse;
         }
 
-        ul { @include flex; }
+        nav { @include any-w; }
+
+        ul
+        {
+            @include flex;
+            @include f-column;
+            @include any-w;
+
+            align-items: flex-end;
+
+            gap: 3px;
+        }
 
         a { @include a-interact; }
 
@@ -308,11 +354,12 @@ lang="scss"
             @include no-event;
 
             align-items: flex-end;
-            gap: 20px;
+
+            gap: 10px;
 
             opacity: .95;
 
-            margin-top: 20px;
+            margin-block: 20px;
 
             &::before
             {
@@ -323,19 +370,56 @@ lang="scss"
                 bottom: 0;
                 left: 4px;
 
-                width: 88%;
+                width: 86%;
                 height: 63%;
 
                 border-left: solid $secondary 2px;
                 border-bottom: solid $secondary 2px;
             }
 
-            &>span
-            {
-                @include flex;
+            &>span { @include flex; }
+        }
 
-                gap: 5px;
+        @include media-min(768px)
+        {
+            @include any-w;
+    
+            margin: 0;
+            padding-block: 5%;
+            padding-right: 15%;
+
+            section
+            {
+                @include f-column;
+    
+                align-self: flex-start;
             }
+
+            ul
+            {
+                flex-direction: row;
+                justify-content: flex-end;
+
+                gap: 0;
+            }
+
+            h1
+            {
+                gap: 20px;
+
+                &>span { gap: 3px; }
+            }
+        }
+        @include media-min(1440px)
+        {
+            flex-direction: row;
+            justify-content: space-between;
+
+            height: auto;
+
+            padding-top: 0;
+
+            section { align-self: flex-end; }
         }
     }
 

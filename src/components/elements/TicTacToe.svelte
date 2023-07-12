@@ -220,22 +220,32 @@ on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 <style
 lang="scss"
 >
-    /* #IMPORT */
+    /* #USES */
 
-    @import '../../assets/scss/styles/grid.scss';
+    @use '../../assets/scss/styles/grid' as *;
+    @use '../../assets/scss/styles/media' as *;
 
-    /* #GROUP */
+    /* #TICTACTOE */
 
     .tictactoe
     {
         @include grid(calc(100% / 3), calc(100% / 3), 3, 3);
 
-        width: 180px;
-        height: 180px;
+        display: none;
+
+        width: 160px;
+        height: 160px;
 
         border-right: solid 1px;
         border-bottom: solid 1px;
 
         transition: border .25s; /* reset() timeout delay / 2 */
+
+        @include media-min(375px)
+        {
+            width: 180px;
+            height: 180px;
+        }
+        @include media-min-height(620px) { display: grid; }
     }
 </style>
