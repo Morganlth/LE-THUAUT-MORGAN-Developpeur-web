@@ -116,7 +116,7 @@ lang="scss"
 
             p
             {
-                @include text-info;
+                @include p-interact;
 
                 margin: 30px 0;
                 padding: 15px 0;

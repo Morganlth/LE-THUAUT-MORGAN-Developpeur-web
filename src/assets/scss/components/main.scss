@@ -1,15 +1,16 @@
-/* #MAIN */
+// #USES
 
-@use '../styles/flex.scss' as *;
-@use '../styles/position.scss' as *;
-@use '../styles/size.scss' as *;
+@use '../styles/flex' as *;
+@use '../styles/position' as *;
+@use '../styles/size' as *;
+
+// #MAIN
 
 main
 {
     will-change: scroll-position;
 
-    &
-    >div:nth-child(1)
+    &>div:nth-child(1)
     {
         .wrapper
         {
@@ -19,8 +20,7 @@ main
             width: 300vw;
             height: 100vh;
 
-            &
-            >* { flex-shrink: 0; }
+            &>* { flex-shrink: 0; }
         }
     }
 

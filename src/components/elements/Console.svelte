@@ -237,9 +237,9 @@ lang="scss"
             margin-bottom: 20px;
         }
 
-        h3 { @include title-3; }
+        h3 { @include h-2; }
 
-        p { @include text-info; }
+        p { @include p-interact; }
 
         .cmd
         {

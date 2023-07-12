@@ -1,51 +1,60 @@
-/* #USE */
+// #USES
 
-@use '../../../../static/variables.scss' as *;
+@use 'sass:list';
 
-/* #FONT */
+@use '../../../../static/variables' as *;
 
-@mixin font-primary { font-family: 'Montserrat'; }
-@mixin font-secondary { font-family: 'Cremona'; }
-@mixin font-command {  font-family: 'AnonymousPro'; }
+@use './media' as *;
 
-@mixin title($color, $size, $height)
+// #VARIABLE
+
+$h-1-sizes: 24px, 36px, 48px, 60px, 72px, 86px;
+
+// #FONT
+
+@mixin f-title { font-family: 'Montserrat'; }
+@mixin f-interact { font-family: 'Cremona'; }
+@mixin f-content { font-family: 'AnonymousPro'; }
+
+@mixin h-($color, $size, $height)
 {
-    @include font-primary;
+    @include f-title;
 
     color: $color;
-    font-size: $size;
+
+    @if $size { font-size: $size; }
+
     font-weight: 900;
     line-height: $height;
     user-select: none;
 }
 
-@mixin title-1($color: $light)
+@mixin h-1($color: $light)
 {
-    @include title($color, 86px, 60px);
+    @include h-($color, false, .7);
+    @include media-min-list(font-size, $h-1-sizes);
 
     letter-spacing: -3px;
 }
 
-@mixin title-2($color: $light)
+@mixin h-2($color: $light)
 {
-    @include title($color, 48px, 48px);
-
-    text-align: center;
+    @include h-($color, 36px, 36px);
 }
 
-@mixin title-3($color: $light)
+@mixin h-3($color: $light)
 {
-    @include title($color, 36px, 36px);
+    @include h-($color, 24px, 24px);
 }
 
-@mixin title-4($color: $light)
+@mixin h-4($color: $light)
 {
-    @include title($color, 24px, 24px);
+    // @include h($color, 24px, 24px);
 }
 
-@mixin text-info($color: $s-light)
+@mixin p-interact($color: $s-light)
 {
-    @include font-secondary;
+    @include f-interact;
 
     color: $color;
     font-size: 18px;
@@ -54,18 +63,18 @@
     user-select: none;
 }
 
-@mixin text-command
+@mixin p-content
 {
-    @include font-command;
+    @include f-content;
 
     font-size: 24px;
     font-weight: 100;
     line-height: 24px;
 }
 
-@mixin link
+@mixin a-interact
 {
-    @include font-secondary;
+    @include f-interact;
 
     color: $secondary;
     font-size: 22px;
@@ -73,3 +82,5 @@
     text-decoration: none;
     user-select: none;
 }
+
+

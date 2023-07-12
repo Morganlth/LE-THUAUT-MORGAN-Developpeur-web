@@ -50,9 +50,9 @@ style:opacity={opacity}
 bind:this={popup}
 >
     <section>
-        <h5>
+        <h3>
             RESSOURCES LIMITÉES :/
-        </h5>
+        </h3>
 
         <figure
         class="content"
@@ -169,10 +169,7 @@ lang="scss"
             box-sizing: border-box;
         }
 
-        h5
-        {
-            @include title($light, 48px, 48px);
-        }
+        h3 { @include h-($light, 48px, 48px); }
 
         .content
         {
@@ -187,7 +184,7 @@ lang="scss"
         p,
         figcaption
         {
-            @include font-command;
+            @include f-content;
 
             font-size: 18px;
             font-weight: 100;
@@ -195,7 +192,7 @@ lang="scss"
         }
         p
         {
-            @include font-command;
+            @include f-content;
 
             color: $light;
         }
@@ -217,7 +214,7 @@ lang="scss"
 
         button
         {
-            @include text-info;
+            @include p-interact;
             @include pointer;
     
             padding: 8px 15px;

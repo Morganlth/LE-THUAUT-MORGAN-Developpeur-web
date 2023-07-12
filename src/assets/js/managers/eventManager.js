@@ -11,7 +11,8 @@ class EventManager
         wheel: [],
         mouseMove: [],
         mouseDown: [],
-        mouseUp: []
+        mouseUp: [],
+        resize: []
     }
 
     scrollFrame = false
@@ -51,6 +52,8 @@ class EventManager
     mouseDown(e) { this.run.call(this.manager.mouseDown, e) }
 
     mouseUp() { this.run.call(this.manager.mouseUp) }
+
+    resize() { this.run.call(this.manager.resize) }
 
     // --UTILS
     add(category, func) { this.manager[category].push(func) }

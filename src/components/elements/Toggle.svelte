@@ -43,7 +43,7 @@ lang="scss"
     {
         @include flex;
         @include f-a-center;
-        @include text-info($light);
+        @include p-interact($light);
         @include no-event;
 
         justify-content: space-between;
@@ -54,8 +54,7 @@ lang="scss"
         {
             display: none;
 
-            &:checked
-            + span::after
+            &:checked + span::after
             {
                 transform: translateX(100%);
 
@@ -76,19 +75,20 @@ lang="scss"
             border-bottom: solid $light 2px;
 
             box-sizing: border-box;
-        }
-        span::after
-        {
-            @include xy-start(true);
-            @include any-h;
-        
-            content: '';
 
-            width: 50%;
+            &::after
+            {
+                @include xy-start(true);
+                @include any-h;
+            
+                content: '';
 
-            background-color: $secondary;
+                width: 50%;
 
-            transition: transform 400ms;
+                background-color: $secondary;
+
+                transition: transform 400ms;
+            }
         }
     }
 </style>

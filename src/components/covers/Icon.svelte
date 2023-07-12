@@ -78,8 +78,8 @@ class="icon"
 style:--icon-color={_color}
 style:transform={_transform}
 style:opacity={_opacity}
-style:width={_size}
-style:height={_size}
+style:width={_size ?? 'auto'}
+style:height={_size ?? 'auto'}
 {...(_href ? { href: _href, alt: _alt } : {})}
 bind:this={icon}
 >
@@ -91,9 +91,9 @@ bind:this={icon}
 <style
 lang="scss"
 >
-    /* #IMPORT */
+    /* #USE */
 
-    @import '../../assets/scss/styles/flex.scss';
+    @use '../../assets/scss/styles/flex.scss' as *;
 
     /* #GROUP */
 

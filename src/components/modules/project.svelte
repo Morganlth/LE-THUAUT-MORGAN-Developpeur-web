@@ -6,7 +6,6 @@
         // --PROPS
         export let
         _subPath,
-        _height,
         _colors
 
     // #IMPORTS
@@ -378,7 +377,6 @@
 
 <div
 id="project"
-style:height={_height}
 bind:this={project}
 >
     <canvas
@@ -462,6 +460,7 @@ lang="scss"
         align-items: flex-end;
 
         width: 100vw;
+        height: calc(100% / 11 * 2);
 
         overflow: clip;
 
@@ -525,7 +524,7 @@ lang="scss"
         p
         {
             @include absolute;
-            @include text-info;
+            @include p-interact;
 
             bottom: 30px;
             left: 3%;

@@ -48,21 +48,14 @@ context="module"
 
     // #CONSTANTE
 
-    const structures =
-    [
-        {
-            e1: 200,
-            e2: 100,
-            unit: 'vw'
-        },
-        {
-            e1: 900,
-            e2: 200,
-            unit: 'vh'
-        }
-    ]
+    const structures = ['300vw', '1100vh']
 
     // #VARIABLES
+
+        // --ELEMENT-WINDOW
+        let
+        window_LAST = +new Date(),
+        window_TIMEOUT
 
         // --ELEMENT-MAIN
         let
@@ -79,12 +72,13 @@ context="module"
         // --SET
         function set()
         {
-            max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 // (140vh + 200vw) - 140vh = 200vw
-
+            setWrapper()
             setRouter()
             setCommand()
             setEvent()
         }
+
+        function setWrapper() { max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4; console.log(max) } // (140vh + 200vw) - 140vh = 200vw | => height of main>div:nth-child(1)
 
         function setRouter()
         {
@@ -104,9 +98,17 @@ context="module"
 
         function setEvent()
         {
+            setWindowEvent()
             setMainEvent()
             setRouterEvent()
             setSpringEvent()
+        }
+
+        function setWindowEvent()
+        {
+            window.addEventListener('resize', resize)
+
+            event.add('resize', setWrapper)
         }
 
         function setMainEvent() { event.add('scroll', scroll) }
@@ -144,9 +146,17 @@ context="module"
         // --DESTROY
         function destroy()
         {
+            destroyWindowEvent()
             destroyMainEvent()
             destroyRouterEvent()
             destroySpringEvent()
+        }
+
+        function destroyWindowEvent()
+        {
+            event.remove('resize', setWrapper)
+    
+            try { window.removeEventListener('resize', resize) } catch {}
         }
 
         function destroyMainEvent() { event.remove('scroll', scroll) }
@@ -160,12 +170,23 @@ context="module"
             event.remove('mouseUp', spring.spring_mouseUp.bind(spring))
         }
 
-        // --EVENT
+        // --EVENTS
         async function scroll()
         {
             const scrollTop = main.scrollTop
             
             translateX = - (scrollTop < max ? scrollTop : max)
+        }
+
+        async function resize()
+        {
+            const now = +new Date()
+
+            clearTimeout(window_TIMEOUT)
+
+            now > window_LAST + 2000
+            ? (event.resize(), window_LAST = now)
+            : window_TIMEOUT = setTimeout(event.resize.bind(event), 100)
         }
 
     // #CYCLES
@@ -188,37 +209,33 @@ on:mouseleave={event.mouseUp.bind(event)}
 class:freeze={$freeze}
 >
     <div
-    style:height="calc(140vh + {structures[0].e1 + structures[0].e2 - 100 + structures[0].unit})"
+    style:height="calc(140vh - 100vw + {structures[0]})"
     >
         <Wrapper
         _translateX={translateX}
         >
             <Home
-            _width={structures[0].e1 + structures[0].unit}
             {_colors}
             />
 
             <Presentation
-            _width={structures[0].e2 + structures[0].unit}
             {_colors}
             />
         </Wrapper>
     </div>
 
     <div
-    style:height={structures[1].e1 + structures[1].e2 + structures[1].unit}
+    style:height={structures[1]}
     >
         <Wrapper
         _background={_colors.dark}
         >
             <Competence
-            _height={structures[1].e1 + structures[1].unit}
             {_colors}
             />
 
             <Project
             _subPath={_page.subPath}
-            _height={structures[1].e2 + structures[1].unit}
             {_colors}
             />
         </Wrapper>
@@ -232,9 +249,9 @@ lang="scss"
 >
     /* #USE */
 
-    @use '../../assets/scss/styles/size.scss' as *;
+    @use '../../assets/scss/styles/size' as *;
 
-    /* #GROUPS */
+    /* #MAIN */
 
     main
     {

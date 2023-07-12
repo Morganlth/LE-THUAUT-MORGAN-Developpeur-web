@@ -17,13 +17,11 @@
 
     box-sizing: border-box;
 
-    &,
-    .mirror
-    { @include flex; }
+    &, .mirror { @include flex; }
 
     .line-indicator
     {
-        @include font-command;
+        @include f-content;
     
         width: 30px;
 
@@ -64,7 +62,7 @@
     .console-result
     {
         @include any;
-        @include text-command;
+        @include p-content;
     }
 
     input

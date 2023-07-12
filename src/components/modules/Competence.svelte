@@ -1,12 +1,10 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORTS
+    // #EXPORT
 
-        // --PROPS
-        export let
-        _height,
-        _colors
+        // --PROP
+        export let _colors
 
     // #IMPORTS
 
@@ -405,7 +403,6 @@
 
 <div
 id="competence"
-style:height={_height}
 bind:this={competence}
 >
     <div
@@ -423,7 +420,7 @@ bind:this={competence}
                     on:outrostart={outrostart.bind(orbit)}
                     >
                         <section>
-                            <h3
+                            <h2
                             bind:this={orbit.elementTitle}
                             >
                                 {#each orbit.title as title}
@@ -437,7 +434,7 @@ bind:this={competence}
                                         {/each}
                                     </div>
                                 {/each}
-                            </h3>
+                            </h2>
 
                             <p
                             bind:this={orbit.elementSubtitle}
@@ -539,6 +536,7 @@ lang="scss"
         z-index: 1;
 
         width: 100vw;
+        height: calc(100% / 11 * 9);
 
         .track
         {
@@ -596,9 +594,9 @@ lang="scss"
 
                 box-sizing: border-box;
 
-                h3
+                h2
                 {
-                    @include title(rgba($light, .1), 190px, 190px);
+                    @include h-(rgba($light, .1), 190px, 190px);
 
                     perspective: 100vh;
 
@@ -615,7 +613,7 @@ lang="scss"
                 p
                 {
                     @include flex;
-                    @include font-command;
+                    @include f-content;
 
                     color: $primary;
                     font-size: 18px;
@@ -654,7 +652,7 @@ lang="scss"
 
                     p
                     {
-                        @include text-command;
+                        @include p-content;
 
                         display: inline;
 

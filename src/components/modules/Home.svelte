@@ -1,14 +1,15 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORTS
+    // #EXPORT
 
-        // --PROPS
-        export let
-        _width,
-        _colors
+        // --PROP
+        export let _colors
 
     // #IMPORTS
+
+        // --SCSS
+        import '../../assets/scss/components/home.scss'
 
         // --CONTEXT
         import { router } from '../field/Main.svelte'
@@ -37,7 +38,6 @@
 
 <div
 id="home"
-style:width={_width}
 >
     <div>
         <div
@@ -92,7 +92,6 @@ style:width={_width}
                             D
                             <Icon
                             _transform="rotate(-90deg)"
-                            _size="60px"
                             _color={_colors.primary}
                             >
                                 <E />
@@ -104,7 +103,6 @@ style:width={_width}
                             W
                             <Icon
                             _transform="rotate(-90deg)"
-                            _size="60px"
                             _color={_colors.primary}
                             >
                                 <E />
@@ -113,7 +111,6 @@ style:width={_width}
                         </span>
     
                         <Icon
-                        _size="60px"
                         _color={_colors.primary}
                         >
                             <Logo />
@@ -155,20 +152,19 @@ style:width={_width}
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #USES */
 
-    @import
-    '../../assets/scss/styles/grid.scss',
-    '../../assets/scss/styles/flex.scss',
-    '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/background.scss',
-    '../../assets/scss/styles/font.scss',
-    '../../assets/scss/styles/cursor.scss';
+    /* @use 'sass:map'; */
 
-    /* #VARIABLE */
-
-    $width: 50%;
+    @use '../../assets/scss/styles/grid' as *;
+    @use '../../assets/scss/styles/grid' as *;
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/background' as *;
+    @use '../../assets/scss/styles/font' as *;
+    @use '../../assets/scss/styles/cursor' as *;
+    /* @use '../../assets/scss/styles/media' as *; */
 
     /* #GROUPS */
 
@@ -179,6 +175,7 @@ lang="scss"
     
         overflow: hidden;
 
+        width: calc(100% - 100vw);
         height: 100vh;
 
         padding: 70px 0 30px 20px;
@@ -196,17 +193,13 @@ lang="scss"
                 @include any-h;
                 @include glitch(false);
     
-                width: $width;
+                width: 50%;
             }
 
-            div:nth-child(2)
-            {
-                transform: scaleX(-1)
-            }
+            div:nth-child(2) { transform: scaleX(-1) }
         }
 
-        &
-        >div
+        &>div
         {
             @include flex;
             @include relative;
@@ -244,7 +237,7 @@ lang="scss"
 
         justify-content: space-between;
 
-        width: $width;
+        width: 50%;
 
         padding: 1% 0 1% 2.5%;
 
@@ -261,8 +254,6 @@ lang="scss"
 
             opacity: .3;
 
-            width: 43%;
-
             mix-blend-mode: screen;
 
             object-position: bottom;
@@ -272,7 +263,7 @@ lang="scss"
         .lang,
         .scroll-icon
         {
-            @include text-info;
+            @include p-interact;
 
             opacity: 0.7;
         }
@@ -288,14 +279,13 @@ lang="scss"
     .main
     {
         @include flex;
-        @include relative;
 
+        justify-content: space-between;
         align-items: flex-end;
-        gap: 34%;
 
         z-index: 2;
 
-        margin-bottom: 5%;
+        margin: 0 15% 5% 0;
 
         section
         {
@@ -307,14 +297,14 @@ lang="scss"
 
         ul { @include flex; }
 
-        a { @include link; }
+        a { @include a-interact; }
 
         h1
         {
             @include flex;
             @include f-column;
             @include relative;
-            @include title-1;
+            @include h-1;
             @include no-event;
 
             align-items: flex-end;
@@ -339,23 +329,22 @@ lang="scss"
                 border-left: solid $secondary 2px;
                 border-bottom: solid $secondary 2px;
             }
-        }
 
-        span
-        {
-            @include flex;
+            &>span
+            {
+                @include flex;
 
-            gap: 5px;
+                gap: 5px;
+            }
         }
     }
 
     .manager
     {
         @include f-center(true);
-        @include relative;
 
         z-index: 2;
 
-        width: $width;
+        width: 50%;
     }
 </style>

@@ -1,12 +1,10 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORTS
+    // #EXPORT
 
-        // --PROPS
-        export let
-        _width,
-        _colors
+        // --PROP
+        export let _colors
 
     // #IMPORTS
    
@@ -439,7 +437,6 @@
 
 <div
 id="presentation"
-style:width={_width}
 bind:this={presentation}
 >
     <div
@@ -455,7 +452,7 @@ bind:this={presentation}
                 bind:view={tag.view}
                 bind:hidden={tag.hidden}
                 >
-                    <h3>{tag.title}</h3>
+                    <h2>{tag.title}</h2>
 
                     <div
                     class="content"
@@ -477,11 +474,11 @@ bind:this={presentation}
                 bind:view={gameOver.view}
                 bind:hidden={gameOver.hidden}
                 >
-                    <h6>
+                    <h4>
                         &lt GAME
                         <br>
                         OVER &gt
-                    </h6>
+                    </h4>
 
                     <p>CLICK POUR REJOUER</p>
                 </Tag>
@@ -598,13 +595,14 @@ lang="scss"
     {
         @include relative;
 
+        width: 100vw;
         height: 100vh;
 
         .tag-container
         {
-            h3
+            h2
             {
-                @include title-3($o-primary);
+                @include h-2($o-primary);
 
                 padding-right: 30px;
 
@@ -621,7 +619,7 @@ lang="scss"
 
             p
             {
-                @include text-command;
+                @include p-content;
 
                 color: $light;
                 user-select: none;
@@ -630,9 +628,9 @@ lang="scss"
 
         .game-over
         {
-            h6
+            h4
             {
-                @include title($light, 90px, 77px);
+                @include h-1;
 
                 margin-bottom: 10px;
                 white-space: nowrap;
@@ -655,7 +653,7 @@ lang="scss"
 
             box-sizing: border-box;
 
-            p { @include text-info; }
+            p { @include p-interact; }
 
             nav
             {
@@ -683,7 +681,7 @@ lang="scss"
 
             h4
             {
-                @include title-4;
+                @include h-3;
                 @include any-w;
 
                 text-align: right;

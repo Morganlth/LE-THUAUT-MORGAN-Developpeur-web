@@ -3,9 +3,6 @@
 
 <script>
     // #IMPORTS
-
-        // --SCSS
-        import '../../assets/scss/projects/ninacarducci/style.scss'
         
         // --SVELTE
         import { onMount } from 'svelte'
@@ -393,26 +390,26 @@ id="nina-carducci"
                 <ul>
                     <li>
                         <a
-                        href="#about"
+                        href="#ninacarducci-about"
                         >
                             À propos
                         </a>
                     </li>
                     <li>
                         <a
-                        href="#gallery"
+                        href="#ninacarducci-gallery"
                         >
                             Galerie
                         </a>
                     </li>
                     <li><a
-                        href="#services"
+                        href="#ninacarducci-service"
                         >
                             Service
                         </a>
                     </li>
                     <li><a
-                        href="#contact"
+                        href="#ninacarducci-contact"
                         >
                             Contact
                         </a>
@@ -506,7 +503,7 @@ id="nina-carducci"
             </div>
         
             <div
-            class="about"
+            id="ninacarducci-about"
             >
                 <picture>
                     <source
@@ -558,7 +555,7 @@ id="nina-carducci"
             </div>
 
             <section
-            class="gallery"
+            id="ninacarducci-gallery"
             itemscope
             itemtype="https://schema.org/ImageGallery"
             itemprop="subjectOf"
@@ -684,7 +681,7 @@ id="nina-carducci"
             </article>
 
             <section
-            class="service"
+            id="ninacarducci-service"
             >
                 <h2>Mes services</h2>
 
@@ -756,7 +753,9 @@ id="nina-carducci"
             </article>
         </main>
 
-        <footer>
+        <footer
+        id="ninacarducci-contact"
+        >
             <div>
                 <section>
                     <h2>Une question ? Une demande de devis ?</h2>
@@ -802,27 +801,59 @@ id="nina-carducci"
                     </form>
                 </section>
 
-                <picture class="picture right">
-                    <source media="(min-width: 1180px)" srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png 419w" sizes="419px">
-                    <source media="(min-width: 650px)" srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-279.png 279w" sizes="279px">
-                    <source media="(max-width: 650px)" srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-159.png 159w" sizes="159px">
-                    <img srcset="
+                <picture>
+                    <source
+                    media="(min-width: 1180px)"
+                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png 419w"
+                    sizes="419px"
+                    >
+                    <source media="(min-width: 650px)"
+                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-279.png 279w"
+                    sizes="279px"
+                    >
+                    <source
+                    media="(max-width: 650px)"
+                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-159.png 159w"
+                    sizes="159px"
+                    >
+                    <img
+                    srcset="
                     {$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png 419w,
                     {$page.url.origin}/src/assets/images/projects/ninacarducci/camera-279.png 279w,
                     {$page.url.origin}/src/assets/images/projects/ninacarducci/camera-159.png 159w"
                     sizes="(min-width: 1180px) 418px, (min-width: 650px) 279px, 158px"
-                    src="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png" alt="Caméra" width="419" height="418">
+                    src="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png"
+                    alt="Caméra"
+                    width="419"
+                    height="418"
+                    >
                 </picture>
             </div>
 
-            <div class="infos">
+            <div>
                 <section>
                     <h2>Adresse</h2>
 
-                    <p itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
-                        <span itemprop="streetAddress">68 avenue Alsace-Lorraine</span> <br>
-                        <span itemprop="postalCode">33200</span>
-                        <span itemprop="addressLocality">Bordeaux</span>
+                    <p
+                    itemprop="address"
+                    itemscope itemtype="https://schema.org/PostalAddress"
+                    >
+                        <span
+                        itemprop="streetAddress"
+                        >
+                            68 avenue Alsace-Lorraine
+                        </span>
+                    <br>
+                        <span
+                        itemprop="postalCode"
+                        >
+                            33200
+                        </span>
+                        <span
+                        itemprop="addressLocality"
+                        >
+                            Bordeaux
+                        </span>
                     </p>
                 </section>
 
@@ -830,16 +861,25 @@ id="nina-carducci"
                     <h2>Contact</h2>
 
                     <p>
-                        téléphone <br>
-                        <span itemprop="telephone">05 56 67 78 89</span>
+                        téléphone
+                    <br>
+                        <span
+                        itemprop="telephone"
+                        >
+                            05 56 67 78 89
+                        </span>
                     </p>
                 </section>
 
                 <section>
                     <h2>Horaires</h2>
 
-                    <p itemprop="openingHours" content = "Mo, Tu, We, Th, Fr 10:00-19:00">
-                        Du lundi au vendredi <br>
+                    <p
+                    itemprop="openingHours"
+                    content="Mo, Tu, We, Th, Fr 10:00-19:00"
+                    >
+                        Du lundi au vendredi
+                    <br>
                         de 10h à 19h.
                     </p>
                 </section>
@@ -848,8 +888,17 @@ id="nina-carducci"
                     <h2>Tarifs</h2>
 
                     <p>
-                        <span itemprop="priceRange">50€ à 400€</span> <br>
-                        <a href="#services">voir mes services</a>
+                        <span
+                        itemprop="priceRange"
+                        >
+                            50€ à 400€
+                        </span>
+                    <br>
+                        <a
+                        href="#ninacarducci-service"
+                        >
+                            voir mes services
+                        </a>
                     </p>
                 </section>
             </div>
@@ -898,11 +947,7 @@ lang="scss"
         line-height: 1.2;
     }
 
-    a
-    {
-        color: #330808;
-        text-decoration: none;
-    }
+    a { color: #000; }
 
     button
     {
@@ -933,6 +978,8 @@ lang="scss"
         box-sizing: border-box;
 
         h1 { font-size: 1.6em; }
+
+        a { text-decoration: none; }
 
         nav ul
         {
@@ -986,8 +1033,7 @@ lang="scss"
             button.active { opacity: 1; }
         }
 
-        &
-        >div
+        &>div
         {
             position: relative;
 
@@ -1039,7 +1085,7 @@ lang="scss"
         }
     }
 
-    .about
+    #ninacarducci-about
     {
         display: flex;
 
@@ -1108,7 +1154,7 @@ lang="scss"
         }
     }
 
-    .gallery
+    #ninacarducci-gallery
     {
         width: 100%;
 
@@ -1146,14 +1192,15 @@ lang="scss"
 
         .container
         {
+            display: flex;
+            justify-content: center;
+
             &>div
             {
                 display: grid;
                 grid-template-columns: repeat(var(--columns), auto);
 
                 gap: 1em;
-
-                transform: translateX(50%);
 
                 img { user-select: none; }
             }
@@ -1253,7 +1300,7 @@ lang="scss"
         }
     }
 
-    .service
+    #ninacarducci-service
     {
         position: relative;
     
@@ -1319,11 +1366,122 @@ lang="scss"
         }
     }
 
+    #ninacarducci-contact
+    {
+        position: relative;
+
+        padding: 100px;
+
+        background-color: #d8d3a8;
+
+        &>div
+        {
+            display: flex;
+
+            margin: auto;
+
+            font-size: 1rem;
+            line-height: 1.5;
+
+            &>* { z-index: 1; }
+
+            h2 { margin-bottom: 0.5rem; }
+        }
+        &>div:nth-child(1)
+        {
+            section { flex: 2; }
+
+            p { margin-bottom: 1rem; }
+
+            form
+            {
+                display: flex;
+                flex-direction: column;
+
+                width: 70%;
+
+                label
+                {
+                    font-size: inherit;
+                    line-height: inherit;
+                }
+
+                input,
+                textarea
+                {
+                    width: 100%;
+    
+                    margin-bottom: 20px;
+    
+                    background-color: transparent;
+    
+                    border: 1px solid;
+
+                    font-size: inherit;
+                    line-height: inherit;
+
+                    box-sizing: border-box;
+                }
+                input { height: 2.5em; }
+                input[type="text"], input[type="email"] { padding: 1px 2px; }
+                input[type=submit]
+                {
+                    padding: 0.5em 1em;
+    
+                    background-color: #beb45a;
+
+                    cursor: pointer;
+                }
+                textarea 
+                {
+                    height: 5em;
+    
+                    font-size: 1.2em;
+                    line-height: 2.5em;
+                }
+            }
+
+            picture
+            {
+                margin-inline: 20px;
+
+                &::before
+                {
+                    content: '';
+        
+                    position: absolute;
+                    right: 0;
+                    bottom: 0;
+
+                    z-index: -1;
+
+                    width: 374px;
+                    height: 329px;
+                
+                    background-color: #beb45a;
+                }
+            }
+        }
+        &>div:nth-child(2)
+        {
+            justify-content: space-between;
+
+            margin-top: 60px;
+
+            section { text-align: center; }
+
+            p
+            {
+                font-size: inherit;
+                line-height: inherit;
+            }
+        }
+    }
+
     @media (min-width: 576px)
     {
-        .service>div,
-        footer>div
-        { max-width: 540px; }
+        #ninacarducci-service>div,
+        #ninacarducci-contact>div { max-width: 540px; }
     }
 
     @media all and (max-width: 650px)
@@ -1349,70 +1507,73 @@ lang="scss"
             }
         }
     
-        /* .picture.left::before, .picture.right::before { height: 150px; } */
+        #ninacarducci-about,
+        #ninacarducci-contact { padding: 2em; }
 
-        .service>div,
-        footer>div
+        #ninacarducci-about picture::before,
+        #ninacarducci-contact picture::before { height: 150px; }
+
+        #ninacarducci-about picture
+        {
+            width: 224px;
+            height: 223px;
+        }
+
+        #ninacarducci-service>div
         {
             align-items: center;
 
             article { max-width: 90%; }
         }
-    
-        /* #about, #contact
-        {
-            padding-inline: 2em;
-            padding-block: 2em;
-        }
 
-        form { width: 100%; }
-
-        .picture.left
-        {
-            width: 224px;
-            height: 223px;
-        } */
+        #ninacarducci-contact form { width: 100%; }
     }
 
     @media (min-width: 768px)
     {
-        .service>div,
-        footer>div
-        { max-width: 720px; }
+        #ninacarducci-service>div,
+        #ninacarducci-contact>div { max-width: 720px; }
     }
 
     @media (min-width: 992px)
     {
-        .service>div,
-        footer>div
-        { max-width: 960px; }
+        #ninacarducci-service>div,
+        #ninacarducci-contact>div { max-width: 960px; }
     }
 
     @media all and (max-width: 1000px)
     {
-        /* #about { flex-direction: column; }
-        #about-me { width: 100%; }
-
-        .picture.left::before
+        #ninacarducci-about
         {
-            position: absolute;
+            flex-direction: column;
 
-            top: 0;
-            bottom: auto;
-            left: 0;
+            picture,
+            h2
+            {
+                margin-top: 1em;
+
+                text-align: center;
+            }
     
-            z-index: -1;
-        
-            width: 100%;
-            height: 30%;
-        }
-        .about-me__title
-        {
-            margin-top: 1em;
+            picture
+            {
+                &::before
+                {
+                    position: absolute;
 
-            text-align: center;
-        } */
-        .service
+                    top: 0;
+                    bottom: auto;
+                    left: 0;
+                
+                    width: 100%;
+                    height: 30%;
+                }
+            }
+
+            /* article { width: 100%; } */
+        }
+
+        #ninacarducci-service
         {
             &
             >div
@@ -1442,49 +1603,57 @@ lang="scss"
             }
         }
 
-        /* #contact .container { flex-direction: column; }
-        #contact .picture.right { margin-top: 1em; }
-        .picture.right::before
-        {
-            position: absolute;
-    
-            right: 0;
-            bottom: 0;
 
-            z-index: -1;
-            width: 100%;
-            height: 40%;
-        } */
+        #ninacarducci-contact
+        {
+            &>div { flex-direction: column; }
+    
+            picture
+            {
+                margin-top: 1em;
+
+                &::before
+                {
+                    width: 100%;
+                    height: 40%;
+                }
+            }
+        }
     }
 
-     /* @media all and (max-width: 1180px)
+     @media all and (max-width: 1180px)
     {
-        .picture.left
+        #ninacarducci-about
         {
-            width: 420px;
-            height: 419px;
+            align-items: center;
+    
+            picture
+            {
+                width: 420px;
+                height: 419px;
+            }
+
+            h2
+            {
+                margin-top: 0;
+                margin-bottom: 1em;
+            }
         }
-        #about, #contact .container { align-items: center; }
-        .about-me__title
-        {
-            margin-top: 0;
-            margin-bottom: 1em;
-        }
-    } */
+
+        #ninacarducci-contact>div { align-items: center; }
+    }
 
     @media (min-width: 1200px)
     {
         h2 { font-size: 2rem; }
 
-        .service>div,
-        footer>div
-        { max-width: 1140px; }
+        #ninacarducci-service>div,
+        #ninacarducci-contact>div { max-width: 1140px; }
     }
 
     @media (min-width: 1400px)
     {
-        .service>div,
-        footer>div
-        { max-width: 1320px; }
+        #ninacarducci-service>div,
+        #ninacarducci-contact>div { max-width: 1320px; }
     }
 </style>

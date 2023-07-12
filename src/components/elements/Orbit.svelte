@@ -202,7 +202,6 @@ lang="scss"
     @use '../../assets/scss/styles/flex.scss' as *;
     @use '../../assets/scss/styles/position.scss' as *;
     @use '../../assets/scss/styles/size.scss' as *;
-    @use '../../assets/scss/styles/font.scss' as *;
     @use '../../assets/scss/styles/cursor.scss' as *;
 
     /* #VARIABLE */
@@ -237,8 +236,7 @@ lang="scss"
 
             transition: transform .4s;
 
-            &
-            >div { transition: transform .6s; }
+            &>div { transition: transform .6s; }
         }
 
         .satellite

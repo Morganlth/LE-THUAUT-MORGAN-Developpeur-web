@@ -1,0 +1,28 @@
+// #USES
+
+@use 'sass:list';
+
+@use '../styles/media' as *;
+@use '../styles/font';
+
+// #HOME
+
+#home
+{
+    .main
+    {
+        svg
+        {
+            height: 100%;
+
+            $list-width: font.$h-1-sizes;
+    
+            @for $i from 1 through list.length($list-width)
+            {
+                $list-width: list.set-nth($list-width, $i, list.nth($list-width, $i) * .7);
+            }
+    
+            @include media-min-list(width, $list-width);
+        }
+    }
+}

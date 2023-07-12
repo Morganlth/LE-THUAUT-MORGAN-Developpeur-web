@@ -94,7 +94,7 @@ lang="scss"
 
         p
         {
-            @include text-info($light);
+            @include p-interact($light);
     
             margin-left: 30px;
         }

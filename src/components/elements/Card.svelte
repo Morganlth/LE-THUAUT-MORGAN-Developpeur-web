@@ -139,7 +139,7 @@ lang="scss"
 
             p
             {
-                @include text-command;
+                @include p-content;
 
                 color: $s-light;
             }
