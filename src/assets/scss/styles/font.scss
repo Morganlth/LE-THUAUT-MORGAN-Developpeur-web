@@ -6,9 +6,11 @@
 
 @use './media' as *;
 
+// DESIRED FONT SIZE - 12 - 18 - 24 - 36 - 48 - 60 - 72
+
 // #VARIABLE
 
-$h-1-sizes: (375px: 44px, 768px: 60px, 1024px: 72px, 1440px: 86px);
+$h-1-sizes: (375px: 42px, 768px: 60px, 1024px: 72px, 1440px: 86px);
 
 // #FONT
 
@@ -16,7 +18,7 @@ $h-1-sizes: (375px: 44px, 768px: 60px, 1024px: 72px, 1440px: 86px);
 @mixin f-interact { font-family: 'Cremona'; }
 @mixin f-content { font-family: 'AnonymousPro'; }
 
-@mixin h-($color, $size, $height)
+@mixin h-($color, $size, $line-height)
 {
     @include f-title;
 
@@ -25,23 +27,22 @@ $h-1-sizes: (375px: 44px, 768px: 60px, 1024px: 72px, 1440px: 86px);
     @if $size { font-size: $size; }
 
     font-weight: 900;
-    line-height: $height;
+    line-height: $line-height;
     user-select: none;
 }
 
 @mixin h-1($color: $light)
 {
-    @include h-($color, 36px, .7);
-
-    letter-spacing: -3px;
+    @include h-($color, 32px, .7);
 
     @include media-min-map(font-size, $h-1-sizes);
-    @include media-min(1024px) { letter-spacing: 0; }
 }
 
 @mixin h-2($color: $light)
 {
-    @include h-($color, 36px, 36px);
+    @include h-($color, 24px, 1);
+
+    @include media-min(1024px) { font-size: 36px; }
 }
 
 @mixin h-3($color: $light)
@@ -59,12 +60,12 @@ $h-1-sizes: (375px: 44px, 768px: 60px, 1024px: 72px, 1440px: 86px);
     @include f-interact;
 
     color: $color;
-    font-size: 18px;
+    font-size: 12px;
     font-weight: 900;
     letter-spacing: 1px;
     user-select: none;
 
-    // @include media-min(425px) { font-size: 18px };
+    @include media-min(425px) { font-size: 18px };
 }
 
 @mixin a-interact
@@ -84,9 +85,11 @@ $h-1-sizes: (375px: 44px, 768px: 60px, 1024px: 72px, 1440px: 86px);
 {
     @include f-content;
 
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 100;
-    line-height: 24px;
+    line-height: 1;
+
+    @include media-min(425px) { font-size: 24px; }
 }
 
 

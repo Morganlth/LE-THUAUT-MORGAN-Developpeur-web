@@ -45,11 +45,6 @@
         // --SET
         function set()
         {
-            const appElement = document.body.firstElementChild
-            
-            appElement.style.backgroundColor = colors.dark
-            appElement.style.opacity = 1
-
             restore()
             testPerformance()
         }

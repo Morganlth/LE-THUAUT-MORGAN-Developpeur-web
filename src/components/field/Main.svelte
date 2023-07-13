@@ -78,7 +78,7 @@ context="module"
             setEvent()
         }
 
-        function setWrapper() { max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4; console.log(max) } // (140vh + 200vw) - 140vh = 200vw | => height of main>div:nth-child(1)
+        function setWrapper() { max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 } // (140vh + 200vw) - 140vh = 200vw | => height of main>div:nth-child(1)
 
         function setRouter()
         {

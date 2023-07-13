@@ -1,0 +1,17 @@
+// #USE
+
+@use '../styles/media' as *;
+
+// #HEADER
+
+#app>header
+{
+    .icon
+    {
+        @include media-max(425px, 650px, true)
+        {
+            width: 25px !important;
+            height: 25px !important;
+        }
+    }
+}

@@ -1,5 +1,6 @@
 // #USE
 
+@use 'sass:map';
 @use 'sass:list';
 
 // #VARIABLE
@@ -8,17 +9,10 @@ $media-screen-width: 320px, 375px, 425px, 768px, 1024px, 1440px;
 
 // #MEDIA
 
-@mixin media-min($width)
+@mixin media-min($width, $max-height: false)
 {
-    @media screen and (min-width: $width) { @content; }
-}
-
-@mixin media-min-list($property, $list)
-{
-    @for $i from 1 through list.length($media-screen-width)
-    {
-        @include media-min(list.nth($media-screen-width, $i)) { #{$property}: list.nth($list, $i); }
-    }
+    @if $max-height { @media screen and (min-width: $width) and (max-height: $max-height) { @content; } }
+    @else { @media screen and (min-width: $width) { @content; } }
 }
 
 @mixin media-min-map($property, $map)
@@ -32,7 +26,8 @@ $media-screen-width: 320px, 375px, 425px, 768px, 1024px, 1440px;
     }
 }
 
-@mixin media-min-height($height)
+@mixin media-max($width, $height, $or: false)
 {
-    @media screen and (min-height: $height) { @content; }
+    @if $or { @media screen and (max-width: $width), screen and (max-height: $height) { @content; } }
+    @else { @media screen and (max-width: $width) and (max-height: $height) { @content; } }
 }

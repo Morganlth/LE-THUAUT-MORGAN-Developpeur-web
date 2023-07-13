@@ -1,8 +1,16 @@
-@use './styles/size.scss' as *;
+// #USES
+
+@use '../../../static/variables.scss' as *;
+
+@use './styles/size' as *;
+
+// #APP
 
 #app
 {
     @include any;
 
     overflow: hidden;
+
+    background-color: $dark;
 }

@@ -10,8 +10,8 @@
         _size = null,
         _href = null,
         _alt = null,
-        _spring = true,
-        _color = '#fff'
+        _color = '#fff',
+        _spring = true
 
     // #IMPORTS
 
@@ -93,9 +93,9 @@ lang="scss"
 >
     /* #USE */
 
-    @use '../../assets/scss/styles/flex.scss' as *;
+    @use '../../assets/scss/styles/flex' as *;
 
-    /* #GROUP */
+    /* #ICON */
 
     .icon
     {

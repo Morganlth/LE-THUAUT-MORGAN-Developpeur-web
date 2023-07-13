@@ -8,6 +8,9 @@
 
     // #IMPORTS
 
+        // --SCSS
+        import '../../assets/scss/components/header.scss'
+
         // --SVELTE
         import { page } from '$app/stores'
 
@@ -103,7 +106,9 @@ lang="scss"
 
             gap: 10px;
     
-            margin-left: 30px;
+            margin-left: 15px;
+
+            @include media-min(425px) { margin-left: 30px; }
         }
         strong
         {

@@ -151,7 +151,7 @@ on:mouseenter={spring.spring_mouseEnter.bind(spring)}
 on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 >
     <section>
-        <h3>Console</h3>
+        <h3>CONSOLE</h3>
 
         <p>RECHERCHER & MODIFIER</p>
     </section>
@@ -203,25 +203,29 @@ on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #USES */
 
-    @import
-    '../../assets/scss/styles/flex.scss',
-    '../../assets/scss/styles/background.scss',
-    '../../assets/scss/styles/font.scss';
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/background' as *;
+    @use '../../assets/scss/styles/font' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #GROUPS */
 
     .console
     {
-        @include black-glass(hue-rotate(180deg));
+        @include flex;
+        @include f-column;
+        @include any-w;
 
-        width: 50%;
-        height: 50%;
+        gap: 20px;
 
-        padding: 30px 40px 20px;
+        height: auto;
 
-        border: solid $dark 4px;
+        padding: 15% 5% 3% 3%;
+
+        /* border: solid $dark 4px; */
 
         box-sizing: border-box;
 
@@ -231,10 +235,9 @@ lang="scss"
 
             justify-content: space-between;
             align-items: flex-end;
+            flex-wrap: wrap;
 
-            height: 40px;
-    
-            margin-bottom: 20px;
+            gap: 5px;
         }
 
         h3 { @include h-2; }
@@ -243,12 +246,12 @@ lang="scss"
 
         .cmd
         {
+            @include any-h;
+    
             overflow-x: hidden;
             overflow-y: auto;
 
-            height: calc(100% - 60px); /* div:nth-child(1) height + margin */
-
-            padding-bottom: 10px;
+            padding-bottom: 20px;
 
             border-right: solid $secondary 2px;
             border-bottom: solid $secondary 2px;
@@ -267,6 +270,23 @@ lang="scss"
 
                 border-left: solid $dark 10px;
             }
+        }
+
+        @include media-min(768px)
+        {
+            width: 70%;
+            height: 60%;
+
+            padding: 30px 30px 20px 20px;
+
+            backdrop-filter: blur(5px);
+
+            .cmd { padding-bottom: 10px; }
+        }
+        @include media-min(1440px)
+        {
+            width: 50%;
+            height: 50%;
         }
     }
 </style>

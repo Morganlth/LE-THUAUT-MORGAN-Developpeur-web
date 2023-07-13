@@ -1,19 +1,20 @@
-/* #CONSOLE */
+// #USES
 
-@use '../../../../static/variables.scss' as *;
-@use '../styles/flex.scss' as *;
-@use '../styles/position.scss' as *;
-@use '../styles/size.scss' as *;
-@use '../styles/font.scss' as *;
-@use '../styles/cursor.scss' as *;
+@use '../../../../static/variables' as *;
+@use '../styles/flex' as *;
+@use '../styles/position' as *;
+@use '../styles/size' as *;
+@use '../styles/font' as *;
+@use '../styles/cursor' as *;
+@use '../styles/media' as *;
 
-/* #GROUPS */
+// #CONSOLE
 
 .line
 {
     @include f-a-center;
 
-    padding: 0px 10px 0px 30px;
+    padding-inline: 10px;
 
     box-sizing: border-box;
 
@@ -46,13 +47,15 @@
 
         overflow: hidden;
 
-        height: 40px;
+        height: 34px;
 
         white-space: nowrap;
 
         cursor: text;
 
         pre { display: inline; }
+
+        @include media-min(425px) { height: 44px; }
     }
 
     input,
@@ -109,4 +112,6 @@
 
     .console-error { color: $indicator; }
     .console-success { color: $primary; }
+
+    @include media-min(1440px) { padding-left: 30px; }
 }

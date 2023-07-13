@@ -231,8 +231,6 @@ lang="scss"
     {
         @include grid(calc(100% / 3), calc(100% / 3), 3, 3);
 
-        display: none;
-
         width: 160px;
         height: 160px;
 
@@ -246,6 +244,6 @@ lang="scss"
             width: 180px;
             height: 180px;
         }
-        @include media-min-height(620px) { display: grid; }
+        @include media-max(768px, 650px) { display: none; }
     }
 </style>

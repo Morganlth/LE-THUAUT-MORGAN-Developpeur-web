@@ -256,9 +256,9 @@ lang="scss"
             @include no-event;
 
             bottom: 0;
-            left: 0;
+            right: 0;
 
-            transform: translateX(-30%) scaleX(-1);
+            transform: scaleX(-1);
 
             opacity: .3;
 
@@ -268,6 +268,8 @@ lang="scss"
             object-fit: cover;
 
             transition: transform .6s;
+
+            @include media-min(768px, 940px) { transform: translateX(-50%) scaleX(-1); }
         }
 
         .lang, .scroll-icon
@@ -277,32 +279,33 @@ lang="scss"
             opacity: 0.7;
         }
         .lang { margin: 10px 0 0 20px; }
-        .scroll-icon { display: none; }
+        .scroll-icon
+        {
+            @include flex;
+            @include f-a-center;
+
+            opacity: 0;
+        }
 
         @include media-min(768px)
         {
             padding-left: 2.5%;
-
+    
             .lang { margin: 0; }
         }
         @include media-min(1024px)
         {
-            .me
-            {
-                right: 0;
-                left: auto;
-    
-                transform: translateX(0) scaleX(1);
-            }
+            .me { transform: translateX(0) scaleX(1); }
 
             .scroll-icon
             {
-                @include flex;
-                @include f-a-center;
+                opacity: 1;
 
                 gap: 10px;
             }
         }
+
+        @include media-max(768px, 375px) { padding-top: 0; }
     }
 
     .main
@@ -338,7 +341,7 @@ lang="scss"
             @include f-column;
             @include any-w;
 
-            align-items: flex-end;
+            align-items: flex-start;
 
             gap: 3px;
         }
@@ -380,20 +383,26 @@ lang="scss"
             &>span { @include flex; }
         }
 
-        @include media-min(768px)
+        @include media-min(425px)
         {
             @include any-w;
-    
-            margin: 0;
-            padding-block: 5%;
-            padding-right: 15%;
 
-            section
-            {
-                @include f-column;
+            margin: 0;
+            padding-inline: 5%;
+
+            section { align-self: flex-start; }
+        }
+        @include media-min(768px)
+        {
+            flex-direction: row;
+            justify-content: space-between;
+
+            height: auto;
     
-                align-self: flex-start;
-            }
+            padding-bottom: 5%;
+            padding-left: 0;
+
+            section { @include f-column; }
 
             ul
             {
@@ -407,28 +416,40 @@ lang="scss"
             {
                 gap: 20px;
 
+                margin-bottom: 0;
+
                 &>span { gap: 3px; }
             }
         }
-        @include media-min(1440px)
+        @include media-min(1024px) { padding-right: 12%; }
+
+        @include media-max(768px, 375px)
         {
-            flex-direction: row;
-            justify-content: space-between;
+            @include any-w;
 
-            height: auto;
-
-            padding-top: 0;
-
-            section { align-self: flex-end; }
+            section
+            {
+                @include any-w;
+        
+                flex-direction: row;
+                justify-content: space-around;
+            }
+            
+            nav { width: auto; }
         }
     }
 
     .manager
     {
-        @include f-center(true);
+        @include flex;
+        @include f-j-center;
+
+        align-items: flex-start;
 
         z-index: 2;
 
         width: 50%;
+
+        @include media-min(768px) { @include f-a-center; }
     }
 </style>
