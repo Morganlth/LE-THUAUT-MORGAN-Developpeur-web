@@ -139,7 +139,7 @@
         {
             const start = presentation.offsetLeft
 
-            router.add(1, 'presentation', start, presentation_call)
+            router.router_add(1, 'presentation', start, presentation_call)
         }
         
         async function setFps()

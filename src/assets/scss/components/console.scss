@@ -25,11 +25,13 @@
     .line-indicator
     {
         @include f-content;
+
+        flex-shrink: 0;
     
         width: 30px;
 
         color: $secondary;
-        font-size: 22px;
+        font-size: 24px;
         font-weight: 900;
         user-select: none;
     }
@@ -99,6 +101,7 @@
 
         background-color: $dark;
 
+        line-height: 1.2;
         white-space: nowrap;
 
         pre

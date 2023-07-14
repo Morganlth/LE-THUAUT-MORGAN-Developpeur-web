@@ -60,7 +60,7 @@
 
             update(false, true, true, boundingClientRect.width)
     
-            requestAnimationFrame(() => spring.setPosition(x, y))
+            requestAnimationFrame(() => spring.spring_setPosition(x, y))
         }
 
         function icon_mouseLeave() { update(true, false, false, 7) }

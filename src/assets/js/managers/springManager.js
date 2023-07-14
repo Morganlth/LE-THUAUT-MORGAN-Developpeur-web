@@ -3,7 +3,7 @@
 class SpringManager
 {
     // --VARIABLES
-    on = true
+    on = false
     lock = false
     hover = false
     timeout = null
@@ -19,7 +19,55 @@ class SpringManager
     }
 
     // --SET
-    setPosition(x, y) { this.coords.set({ x: x, y: y }) }
+    spring_set() { app.add('spring', this.spring_command.bind(this), true) }
+
+    spring_setPosition(x, y) { this.coords.set({ x: x, y: y }) }
+
+    spring_setEvent()
+    {
+        for (const EVENT_NAME of ['mouseMove', 'mouseDown', 'mouseUp'])
+        {
+            const
+            FUNC = this['spring_' + EVENT_NAME].bind(this),
+            INDEX = event.contain(EVENT_NAME, FUNC.name)
+
+            if (INDEX === -1) event.add(EVENT_NAME, FUNC)
+        }
+    }
+
+    // --UPDATES
+    spring_update(on)
+    {
+        if (this.on !== on)
+        {
+            on ? (this.spring_setEvent(), app.eco(false)) : this.spring_destroy()
+
+            this.on = on
+            this.size.set(on ? 7 : 0)
+        }
+    }
+
+    // --DESTROY
+    spring_destroy()
+    {
+        event.remove('mouseMove', this.spring_mouseMove.bind(this))
+        event.remove('mouseDown', this.spring_mouseDown.bind(this))
+        event.remove('mouseUp', this.spring_mouseUp.bind(this))
+    }
+
+    // --COMMAND
+    spring_command(on)
+    {
+        if (wwindow.window_testMobile()) return
+
+        on = app.testDefault(on) ? true : app.testBoolean(on)
+
+        this.spring_update(on)
+
+        localStorage.setItem('spring', on)
+
+        app.success('Spring ' + on)
+    }
 
     // --EVENTS
     async spring_mouseMove(x, y) { if (!this.hover) this.coords.set({ x: x, y: y }) }
@@ -60,7 +108,13 @@ class SpringManager
 
 // #IMPORT
 
-import { spring } from 'svelte/motion'
+    // --CONTEXTS
+    import app from './appManager'
+    import event from './eventManager'
+    import wwindow from './windowManager'
+
+    // --SVELTE
+    import { spring } from 'svelte/motion'
 
 // #EXPORT
 

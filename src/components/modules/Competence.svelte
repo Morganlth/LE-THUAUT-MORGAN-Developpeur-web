@@ -227,7 +227,7 @@
         {
             const start = competence.parentNode.offsetTop
     
-            router.add(2, 'competence', start)
+            router.router_add(2, 'competence', start)
         }
 
         // --RESET

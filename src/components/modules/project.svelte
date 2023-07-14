@@ -17,7 +17,6 @@
 
         // --SVELTE
         import { onMount, onDestroy } from 'svelte'
-        // import { page } from '$app/stores'
 
         // --COMPONENT-PAGES
         import Booki from '../pages/Booki.svelte'
@@ -206,7 +205,7 @@
 
         function setRouter()
         {
-            router.add(3, 'project', offsetTop, project_call)
+            router.router_add(3, 'project', offsetTop, project_call)
 
             if (_subPath)
                 for (let i = 0; i < cards.length; i++)
@@ -225,8 +224,8 @@
             cards[target].on = on
             cards[target].update(on)
 
-           router.setSubPath(3, on ? cards[target].subPath : null)
-           router.updatePage()
+           router.router_setSubPath(3, on ? cards[target].subPath : null)
+           router.router_update()
         }
 
         // --DESTROY

@@ -2,56 +2,81 @@
 
 class RouterManager
 {
-    // --VARIABLES
-    main
-    last = +new Date()
-    timeout = null
-    
-    pages = []
+    // #VARIABLES
 
-    // --SET
-    setPage(id)
-    {
-        const page = this.pages[id]
-    
-        this.main.scrollTo({ top: page.start, behavior: 'instant' })
+        // --ELEMENT-MAIN
+        main
 
-        if (page.call) page.call()
-    }
+        // --CONTEXT-ROUTER
+        router_LAST = +new Date()
+        router_TIMEOUT = null
+        router_PAGES = []
 
-    // --UPDATE
-    updatePage()
-    {
-        const
-        pages = this.pages,
-        scrollTop = this.main.scrollTop
+    // #FUNCTIONS
 
-        for (let i = pages.length - 1; i >= 0; i--)
-            if (pages[i].start <= scrollTop) return history.pushState({}, '', location.origin + '/' + pages[i].name + (pages[i].subPath ?? ''))
-    }
-
-    // --EVENT
-    async router_scroll()
-    {
-        const now = +new Date()
-
-        clearTimeout(this.timeout)
-
-        if (now > this.last + 1000)
+        // --SET
+        router_set(main, id)
         {
-            this.last = now
+            this.main = main
+        
+            this.router_setPage(id)
 
-            this.updatePage.call(this)
+            this.router_setEvent()
         }
-        else this.timeout = setTimeout(this.updatePage.bind(this), 1000)
-    }
 
-    // --UTILS
-    add(id, name, start, call) { this.pages[id] = { name: name, start: start, call: call } }
+        router_setEvent() { event.add('scroll', this.router_scroll.bind(this) )}
 
-    setSubPath(id, subPath) { this.pages[id].subPath = subPath ? '/' + subPath : undefined }
+        router_setPage(id)
+        {
+            const page = this.router_PAGES[id]
+        
+            this.main.scrollTo({ top: page.start, behavior: 'instant' })
+
+            if (page.call) page.call()
+        }
+
+        router_setSubPath(id, subPath) { this.router_PAGES[id].subPath = subPath ? '/' + subPath : undefined }
+
+        // --UPDATE
+        router_update()
+        {
+            const
+            pages = this.router_PAGES,
+            scrollTop = this.main.scrollTop
+
+            for (let i = pages.length - 1; i >= 0; i--)
+                if (pages[i].start <= scrollTop) return history.pushState({}, '', location.origin + '/' + pages[i].name + (pages[i].subPath ?? ''))
+        }
+
+        // --DESTROY
+        router_destroy() { event.remove('scroll', this.router_scroll.bind(this)) }
+
+        // --EVENT
+        async router_scroll()
+        {
+            const now = +new Date()
+
+            clearTimeout(this.router_TIMEOUT)
+
+            if (now > this.router_LAST + 1000)
+            {
+                this.router_LAST = now
+
+                this.router_update.call(this)
+            }
+            else this.router_TIMEOUT = setTimeout(this.router_update.bind(this), 1000)
+        }
+
+        // --UTIL
+        router_add(id, name, start, call) { this.router_PAGES[id] = { name: name, start: start, call: call } }
 }
+
+// #IMPORT
+
+    // --CONTEXT
+    import event from './eventManager'
 
 // #EXPORT
 
-export default new RouterManager()
+    // --CONTEXT
+    export default new RouterManager()

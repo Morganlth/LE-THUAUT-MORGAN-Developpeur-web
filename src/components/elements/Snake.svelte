@@ -50,6 +50,7 @@
         // #CONTEXTS
         import { app } from '../field/Main.svelte'
         import { event } from '../field/Main.svelte'
+        import { wwindow } from '../field/Main.svelte'
         import { spring } from '../field/Main.svelte'
 
         // #SVELTE
@@ -134,10 +135,21 @@
 
         function setEvent()
         {
-            event.add('scroll', snake_scroll)
-            event.add('mouseMove', snake_mouseMove)
-            event.add('mouseDown', snake_mouseDown)
+            if (!wwindow.window_testMobile()) snake_setEventDesktop()
+
             event.add('resize', snake_resize)
+        }
+
+        function snake_setEventDesktop()
+        {
+            const DATAS = { scroll: snake_scroll, mouseMove: snake_mouseMove, mouseDown: snake_mouseDown }
+        
+            for (const KEY in DATAS)
+            {
+                const INDEX = event.contain(KEY, DATAS[KEY].name)
+
+                if (INDEX === -1) event.add(KEY, DATAS[KEY])
+            }
         }
 
         // --GET
@@ -248,10 +260,16 @@
         // --DESTROY
         function destroy()
         {
+            event.remove('resize', snake_resize)
+
+            snake_destroyEventDesktop()
+        }
+
+        function snake_destroyEventDesktop()
+        {
             event.remove('scroll', snake_scroll)
             event.remove('mouseMove', snake_mouseMove)
             event.remove('mouseDown', snake_mouseDown)
-            event.remove('resize', snake_resize)
         }
 
         // --COMMAND
@@ -302,11 +320,16 @@
             if (_challenge) _gameOver.update(true)
         }
 
-        function snake_resize() { reset() }
+        function snake_resize(mobile)
+        {
+            reset()
+
+            mobile ? snake_destroyEventDesktop() : snake_setEventDesktop()
+        }
 
         function snake_touchMove(e)
         {
-            console.log(e)
+            // console.log(e)
         }
 
         // --MOVE

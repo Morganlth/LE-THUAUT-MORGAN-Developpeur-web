@@ -9,6 +9,7 @@ context="module"
         export const
         app = a,
         event = e,
+        wwindow = w,
         router = r,
         spring = s
 
@@ -17,6 +18,7 @@ context="module"
         // --CONTEXTS
         import a from '../../assets/js/managers/appManager'
         import e from '../../assets/js/managers/eventManager'
+        import w from '../../assets/js/managers/windowManager'
         import r from '../../assets/js/managers/routerManager'
         import s from '../../assets/js/managers/springManager'
 </script>
@@ -46,157 +48,94 @@ context="module"
         // --COMPONENT-COVER
         import Wrapper from '../covers/Wrapper.svelte'
 
-    // #CONSTANTE
-
-    const structures = ['300vw', '1100vh']
-
     // #VARIABLES
-
-        // --ELEMENT-WINDOW
-        let
-        window_LAST = +new Date(),
-        window_TIMEOUT
 
         // --ELEMENT-MAIN
         let
         main,
-        freeze = app.freeze
+        main_FREEZE = app.freeze
 
         // --ELEMENT-WRAPPER-1
         let
-        max,
-        translateX = 0
+        wrapper_MAX,
+        wrapper_TRANSLATEX = 0
     
     // #FUNCTIONS
 
         // --SET
-        function set()
+        function main_set()
         {
-            setWrapper()
-            setRouter()
-            setCommand()
-            setEvent()
+            wwindow.window_set()
+            router.router_set(main, _page.id)
+            spring.spring_set()
+
+            main_setWrapper()
+            main_setCommand()
+            main_setEvent()
         }
 
-        function setWrapper() { max = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 } // (140vh + 200vw) - 140vh = 200vw | => height of main>div:nth-child(1)
-
-        function setRouter()
-        {
-            router.main = main
-        
-            router.setPage(_page.id)
-        }
-
-        function setCommand()
+        function main_setWrapper() { wrapper_MAX = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 }
+    
+        function main_setCommand()
         {
             app.add('app', () => console.log(app))
             app.add('event', () => console.log(event))
             app.add('router', () => console.log(router))
-
-            app.add('spring', updateSpring, true)
         }
 
-        function setEvent()
+        function main_setEvent()
         {
-            setWindowEvent()
-            setMainEvent()
-            setRouterEvent()
-            setSpringEvent()
+            event.add('resize', main_resize)
+
+            if (!wwindow.window_testMobile()) main_setEventDesktop()
         }
 
-        function setWindowEvent()
-        {
-            window.addEventListener('resize', resize)
-
-            event.add('resize', setWrapper)
-        }
-
-        function setMainEvent() { event.add('scroll', scroll) }
-
-        function setRouterEvent() { event.add('scroll', router.router_scroll.bind(router) )}
-
-        function setSpringEvent()
-        {
-            event.add('mouseMove', spring.spring_mouseMove.bind(spring))
-            event.add('mouseDown', spring.spring_mouseDown.bind(spring))
-            event.add('mouseUp', spring.spring_mouseUp.bind(spring))
-        }
-
-        // --UPDATE
-        function updateSpring(on)
-        {
-            on = app.testDefault(on) ? true : app.testBoolean(on)
-    
-            destroySpringEvent()
-    
-            if (on)
-            {
-                setSpringEvent()
-    
-                app.eco(false)
-            }
-
-            spring.on = on
-            spring.size.set(on ? 7 : 0) 
-            localStorage.setItem('spring', on)
-
-            app.success('Spring ' + on)
-        }
+        function main_setEventDesktop() { event.add('scroll', main_scroll) }
 
         // --DESTROY
-        function destroy()
+        function main_destroy()
         {
-            destroyWindowEvent()
-            destroyMainEvent()
-            destroyRouterEvent()
-            destroySpringEvent()
+            main_destroyEvent()
+
+            wwindow.window_destroy()
+            router.router_destroy()
+            spring.spring_destroy()
         }
 
-        function destroyWindowEvent()
+        function main_destroyEvent()
         {
-            event.remove('resize', setWrapper)
-    
-            try { window.removeEventListener('resize', resize) } catch {}
+            event.remove('resize', main_resize)
+
+            main_destroyEventDesktop()
         }
 
-        function destroyMainEvent() { event.remove('scroll', scroll) }
-
-        function destroyRouterEvent() { event.remove('scroll', router.router_scroll.bind(router)) }
-
-        function destroySpringEvent()
-        {
-            event.remove('mouseMove', spring.spring_mouseMove.bind(spring))
-            event.remove('mouseDown', spring.spring_mouseDown.bind(spring))
-            event.remove('mouseUp', spring.spring_mouseUp.bind(spring))
-        }
+        function main_destroyEventDesktop() { event.remove('scroll', main_scroll) }
 
         // --EVENTS
-        async function scroll()
+        async function main_scroll()
         {
-            if (window.innerWidth >= 768)
-            {
-                const scrollTop = main.scrollTop
-            
-                translateX = - (scrollTop < max ? scrollTop : max)
-            }
-            else translateX = 0
+            const scrollTop = main.scrollTop
+        
+            wrapper_TRANSLATEX = -(scrollTop < wrapper_MAX ? scrollTop : wrapper_MAX)
         }
 
-        async function resize()
+        async function main_resize(mobile)
         {
-            const now = +new Date()
+            if (localStorage.getItem('spring') == 'true') spring.spring_update(!mobile)
 
-            clearTimeout(window_TIMEOUT)
+            if (mobile) main_destroyEventDesktop(), wrapper_TRANSLATEX = 0
+            else
+            {
+                if (event.contain('scroll', main_scroll.name) === -1) main_setEventDesktop()
 
-            now > window_LAST + 2000
-            ? (event.resize(), window_LAST = now)
-            : window_TIMEOUT = setTimeout(event.resize.bind(event), 100)
+                main_setWrapper()
+            }
         }
 
     // #CYCLES
 
-    onMount(set)
-    onDestroy(destroy)
+    onMount(main_set)
+    onDestroy(main_destroy)
 </script>
 
 <!-- #HTML -->
@@ -210,13 +149,11 @@ on:mousemove={event.mouseMove.bind(event)}
 on:mousedown={event.mouseDown.bind(event)}
 on:mouseup={event.mouseUp.bind(event)}
 on:mouseleave={event.mouseUp.bind(event)}
-class:freeze={$freeze}
+class:freeze={$main_FREEZE}
 >
-    <div
-    style:--desktop-version="calc(140vh - 100vw + {structures[0]})"
-    >
+    <div>
         <Wrapper
-        _translateX={translateX}
+        _translateX={wrapper_TRANSLATEX}
         >
             <Home
             {_colors}
@@ -228,9 +165,7 @@ class:freeze={$freeze}
         </Wrapper>
     </div>
 
-    <div
-    style:height={structures[1]}
-    >
+    <div>
         <Wrapper
         _background={_colors.dark}
         >
@@ -279,7 +214,8 @@ lang="scss"
         {
             height: calc(200vh + 280px);
 
-            @include media-min(768px) { height: var(--desktop-version); }
+            @include media-min(768px) { height: calc(140vh + 200vw); }
         }
+        &>div:nth-child(2) { height: 1100vh; }
     }
 </style>

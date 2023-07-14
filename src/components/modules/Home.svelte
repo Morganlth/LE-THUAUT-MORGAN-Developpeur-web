@@ -31,7 +31,7 @@
 
     // #ROUTER-SET
 
-    router.add(0, 'home', 0)
+    router.router_add(0, 'home', 0)
 </script>
 
 <!-- #HTML -->

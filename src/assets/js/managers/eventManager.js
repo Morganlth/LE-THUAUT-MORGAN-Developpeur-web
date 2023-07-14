@@ -53,19 +53,26 @@ class EventManager
 
     mouseUp() { this.run.call(this.manager.mouseUp) }
 
-    resize() { this.run.call(this.manager.resize) }
+    resize(mobile) { this.run.call(this.manager.resize, mobile) }
 
     // --UTILS
     add(category, func) { this.manager[category].push(func) }
 
     remove(category, func)
     {
-        const
-        name = func.name,
-        array = this.manager[category]
+        const index = this.contain(category, func.name)
+
+        if (index !== -1) this.manager[category].splice(index, 1)
+    }
+
+    contain(category, name)
+    {
+        const array = this.manager[category]
 
         for (let i = 0; i < array.length; i++)
-            if (name === array[i].name) { array.splice(i, 1); break }
+            if (name === array[i].name) return i
+
+        return -1
     }
 
     run() { for (const func of this) func(...arguments) }

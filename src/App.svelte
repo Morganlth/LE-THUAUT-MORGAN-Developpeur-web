@@ -12,7 +12,7 @@
         import colors from './assets/scss/modules/variables.module.scss'
         import './assets/scss/app.scss'
 
-        // --CONTEXT
+        // --CONTEXTS
         import { app } from './components/field/Main.svelte'
         import { spring } from './components/field/Main.svelte'
 
@@ -28,30 +28,31 @@
 
     // #CONSTANTE
 
-    const start = performance.now()
+        // --ELEMENT-APP
+        const APP_START = performance.now()
 
     // #VARIABLES
 
         // --ELEMENT-SPRING
         let
-        coords = spring.coords,
-        size = spring.size
+        spring_COORDS = spring.coords,
+        spring_SIZE = spring.size
     
         // --ELEMENT-ECOPOPUP
-        let eco = false
+        let ecopopup_ECO = false
 
     // #FUNCTIONS
 
         // --SET
-        function set()
+        function app_set()
         {
-            restore()
-            testPerformance()
-            testMobile()
+            app_restore()
+    
+            app_testPerformance()
         }
 
         // --RESTORE
-        function restore()
+        function app_restore()
         {
             for (let i = 0; i < app.storageKeys.length; i++)
             {
@@ -67,21 +68,16 @@
         }
 
         // --TEST
-        async function testPerformance()
+        async function app_testPerformance()
         {
             const mode = localStorage.getItem('mode')
             
-            if (mode !== 'eco' && performance.now() - start > 300) eco = true
-        }
-
-        async function testMobile()
-        {
-            //https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+            if (mode !== 'eco' && performance.now() - APP_START > 300) ecopopup_ECO = true
         }
 
     // #CYCLE
 
-    onMount(set)
+    onMount(app_set)
 </script>
 
 <!-- #HTML -->
@@ -100,13 +96,13 @@
     class="spring"
     >
 	    <circle
-        cx={$coords.x}
-        cy={$coords.y}
-        r={$size < 0 ? 0 : $size}
+        cx={$spring_COORDS.x}
+        cy={$spring_COORDS.y}
+        r={$spring_SIZE < 0 ? 0 : $spring_SIZE}
         />
     </svg>
 
-    {#if eco}
+    {#if ecopopup_ECO}
         <EcoPopup />
     {/if}
 </slot>

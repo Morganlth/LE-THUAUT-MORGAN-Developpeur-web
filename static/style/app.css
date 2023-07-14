@@ -11,7 +11,7 @@ body, h1, h2, h3, h4, h5, h6, ul, p, figure, blockquote, pre
 {
     margin: 0;
 }
-ul, button, input, textarea
+ul, button, input, input[type="text"], textarea
 {
     padding: 0;
 }
