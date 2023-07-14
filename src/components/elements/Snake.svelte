@@ -78,7 +78,9 @@
         y = -1,
         blockSize = _size,
         scope = false,
-        outside = true
+        outside = true,
+        snake_MOBILE,
+        snake_MOBILESTART
 
         // --STYLES
         let
@@ -135,14 +137,15 @@
 
         function setEvent()
         {
-            if (!wwindow.window_testMobile()) snake_setEventDesktop()
-
+            event.add('mouseDown', snake_mouseDown)
             event.add('resize', snake_resize)
+
+            if (!snake_MOBILE) snake_setEventDesktop()
         }
 
         function snake_setEventDesktop()
         {
-            const DATAS = { scroll: snake_scroll, mouseMove: snake_mouseMove, mouseDown: snake_mouseDown }
+            const DATAS = { scroll: snake_scroll, mouseMove: snake_mouseMove }
         
             for (const KEY in DATAS)
             {
@@ -215,6 +218,8 @@
         // --RESET
         function reset()
         {
+            snake_MOBILE = wwindow.window_testMobile()
+
             offsetX = window.innerWidth % blockSize
             offsetY = window.innerHeight % blockSize / 2
 
@@ -260,6 +265,7 @@
         // --DESTROY
         function destroy()
         {
+            event.remove('mouseDown', snake_mouseDown)
             event.remove('resize', snake_resize)
 
             snake_destroyEventDesktop()
@@ -269,7 +275,6 @@
         {
             event.remove('scroll', snake_scroll)
             event.remove('mouseMove', snake_mouseMove)
-            event.remove('mouseDown', snake_mouseDown)
         }
 
         // --COMMAND
@@ -327,9 +332,18 @@
             mobile ? snake_destroyEventDesktop() : snake_setEventDesktop()
         }
 
+        function snake_touchStart(e)
+        {
+            
+        }
+
         function snake_touchMove(e)
         {
-            // console.log(e)
+            const touch = e.changedTouches[0]
+
+            ;[clientX, clientY] = [touch.clientX, touch.clientY]
+
+            move()
         }
 
         // --MOVE
@@ -493,6 +507,7 @@ class="snake-game"
 style:height="{height}px"
 style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
 on:mouseleave={snake_mouseLeave}
+on:touchstart={snake_touchStart}
 on:touchmove={snake_touchMove}
 >
     <canvas

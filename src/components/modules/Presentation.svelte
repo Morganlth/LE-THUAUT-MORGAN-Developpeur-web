@@ -409,7 +409,7 @@
         }
 
         // --ROUTER-CALL
-        function presentation_call() { setTimeout(() => event.manager.scroll.find(f => f.name === 'snake_scroll')(), 50) }
+        function presentation_call() { setTimeout(() => event.manager.scroll.find(f => f.name === 'snake_scroll')(), 50) } // pas en mobile !!!
 
         // --UTILS
         function viewTags()
