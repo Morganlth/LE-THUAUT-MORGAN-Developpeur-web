@@ -47,6 +47,7 @@
         {
             restore()
             testPerformance()
+            testMobile()
         }
 
         // --RESTORE
@@ -66,11 +67,16 @@
         }
 
         // --TEST
-        function testPerformance()
+        async function testPerformance()
         {
             const mode = localStorage.getItem('mode')
             
             if (mode !== 'eco' && performance.now() - start > 300) eco = true
+        }
+
+        async function testMobile()
+        {
+            //https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
         }
 
     // #CYCLE
@@ -116,7 +122,7 @@ lang="scss"
     @use './assets/scss/styles/size.scss' as *;
     @use './assets/scss/styles/cursor.scss' as *;
 
-    /* #GROUPS */
+    /* #APP */
 
     .spring
     {

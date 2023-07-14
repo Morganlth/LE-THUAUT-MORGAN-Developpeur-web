@@ -35,7 +35,7 @@ $h-1-sizes: (375px: 42px, 768px: 60px, 1024px: 72px, 1440px: 86px);
 {
     @include h-($color, 32px, .7);
 
-    @include media-min-map(font-size, $h-1-sizes);
+    @include media-min-map(font-size, $h-1-sizes, 375px);
 }
 
 @mixin h-2($color: $light)
@@ -73,12 +73,13 @@ $h-1-sizes: (375px: 42px, 768px: 60px, 1024px: 72px, 1440px: 86px);
     @include f-interact;
 
     color: $secondary;
-    font-size: 18px;
+    font-size: 12px;
     font-weight: 900;
     text-decoration: none;
     user-select: none;
 
-    @include media-min(1024px) { font-size: 24px; }
+    @include media-min(425px, 325px) { font-size: 18px; }
+    @include media-min(1024px, 425px) { font-size: 24px; }
 }
 
 @mixin p-content

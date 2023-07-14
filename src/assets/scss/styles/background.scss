@@ -39,13 +39,14 @@
     background-blend-mode: overlay;
 }
 
-@mixin glow
+@mixin glow($any-h: true)
 {
     &::after
     {
         @include xy-start(true);
-        @include any-h;
         @include no-event;
+
+        @if $any-h { @include any-h; }
 
         content: '';
 

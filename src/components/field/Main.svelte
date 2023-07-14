@@ -173,9 +173,13 @@ context="module"
         // --EVENTS
         async function scroll()
         {
-            const scrollTop = main.scrollTop
+            if (window.innerWidth >= 768)
+            {
+                const scrollTop = main.scrollTop
             
-            translateX = - (scrollTop < max ? scrollTop : max)
+                translateX = - (scrollTop < max ? scrollTop : max)
+            }
+            else translateX = 0
         }
 
         async function resize()
@@ -209,7 +213,7 @@ on:mouseleave={event.mouseUp.bind(event)}
 class:freeze={$freeze}
 >
     <div
-    style:height="calc(140vh - 100vw + {structures[0]})"
+    style:--desktop-version="calc(140vh - 100vw + {structures[0]})"
     >
         <Wrapper
         _translateX={translateX}
@@ -247,9 +251,10 @@ class:freeze={$freeze}
 <style
 lang="scss"
 >
-    /* #USE */
+    /* #USES */
 
     @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #MAIN */
 
@@ -267,6 +272,14 @@ lang="scss"
             display: none !important;
 
             width: 0 !important;
+        }
+
+        &>div { @include any-w; }
+        &>div:nth-child(1)
+        {
+            height: calc(200vh + 280px);
+
+            @include media-min(768px) { height: var(--desktop-version); }
         }
     }
 </style>

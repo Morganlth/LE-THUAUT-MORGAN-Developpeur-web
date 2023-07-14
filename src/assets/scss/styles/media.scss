@@ -9,19 +9,25 @@ $media-screen-width: 320px, 375px, 425px, 768px, 1024px, 1440px;
 
 // #MEDIA
 
-@mixin media-min($width, $max-height: false)
+@mixin media-min($width, $height: false)
+{
+    @if $height { @media screen and (min-width: $width) and (min-height: $height) { @content; } }
+    @else { @media screen and (min-width: $width) { @content; } }
+}
+
+@mixin media-min-max($width, $max-height: false)
 {
     @if $max-height { @media screen and (min-width: $width) and (max-height: $max-height) { @content; } }
     @else { @media screen and (min-width: $width) { @content; } }
 }
 
-@mixin media-min-map($property, $map)
+@mixin media-min-map($property, $map, $height: false)
 {
     @each $width, $value in $map
     {
         @if list.index($media-screen-width, $width)
         {
-            @include media-min($width) { #{$property}: $value; }
+            @include media-min($width, $height) { #{$property}: $value; }
         }
     }
 }

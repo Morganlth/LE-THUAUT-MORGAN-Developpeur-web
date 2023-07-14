@@ -137,6 +137,7 @@
             event.add('scroll', snake_scroll)
             event.add('mouseMove', snake_mouseMove)
             event.add('mouseDown', snake_mouseDown)
+            event.add('resize', snake_resize)
         }
 
         // --GET
@@ -250,6 +251,7 @@
             event.remove('scroll', snake_scroll)
             event.remove('mouseMove', snake_mouseMove)
             event.remove('mouseDown', snake_mouseDown)
+            event.remove('resize', snake_resize)
         }
 
         // --COMMAND
@@ -298,6 +300,13 @@
             if (spring.lock) spring.spring_mouseLeave()
             if (target && target.classList.contains('icon')) return
             if (_challenge) _gameOver.update(true)
+        }
+
+        function snake_resize() { reset() }
+
+        function snake_touchMove(e)
+        {
+            console.log(e)
         }
 
         // --MOVE
@@ -461,6 +470,7 @@ class="snake-game"
 style:height="{height}px"
 style:margin="{offsetY}px {offsetX}px {offsetY}px 0"
 on:mouseleave={snake_mouseLeave}
+on:touchmove={snake_touchMove}
 >
     <canvas
     style:width="{width}px"

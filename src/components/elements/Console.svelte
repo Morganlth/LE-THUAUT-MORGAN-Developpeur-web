@@ -221,11 +221,10 @@ lang="scss"
 
         gap: 20px;
 
+        max-height: 250px;
         height: auto;
 
-        padding: 15% 5% 3% 3%;
-
-        /* border: solid $dark 4px; */
+        padding-inline: 3%;
 
         box-sizing: border-box;
 
@@ -246,12 +245,11 @@ lang="scss"
 
         .cmd
         {
-            @include any-h;
+            @include any;
     
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow: auto;
 
-            padding-bottom: 20px;
+            padding-bottom: 10px;
 
             border-right: solid $secondary 2px;
             border-bottom: solid $secondary 2px;
@@ -260,28 +258,24 @@ lang="scss"
 
             &::-webkit-scrollbar
             {
-                width: 15px;
+                width: 5px;
+                height: 5px;
 
                 background-color: $dark;
             }
-            &::-webkit-scrollbar-thumb
-            {
-                background-color: $s-light;
-
-                border-left: solid $dark 10px;
-            }
+            &::-webkit-scrollbar-thumb { background-color: $s-light; }
+            &::-webkit-scrollbar-corner { background-color: $secondary; }
         }
 
         @include media-min(768px)
         {
             width: 70%;
+            max-height: none;
             height: 60%;
 
             padding: 30px 30px 20px 20px;
 
             backdrop-filter: blur(5px);
-
-            .cmd { padding-bottom: 10px; }
         }
         @include media-min(1440px)
         {

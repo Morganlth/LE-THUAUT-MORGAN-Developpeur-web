@@ -38,10 +38,13 @@
             animation('fillRect')
         }
 
-    // #IMPORT
+    // #IMPORTS
+
+        // --CONTEXT
+        import { event } from '../field/Main.svelte';
 
         // --SVELTE
-        import { onMount } from 'svelte'
+        import { onMount, onDestroy } from 'svelte'
 
     // #VARIABLES
 
@@ -66,10 +69,8 @@
         // --SET
         function set()
         {
-            width = tag.offsetWidth + _blockSize - tag.offsetWidth % _blockSize,
-            height = tag.offsetHeight + _blockSize - tag.offsetHeight % _blockSize
-
-            setCanvas()
+            reset()
+            setEvent()
         }
 
         function setCanvas()
@@ -80,13 +81,12 @@
             columns = width / _blockSize
             rows = height / _blockSize
 
-            context = canvas.getContext('2d')
-
             even = columns % 2 ? false : true
 
-            context.fillStyle = _dark
-            context.fillRect(0, 0, columns * _blockSize, rows * _blockSize)
+            context = context ?? canvas.getContext('2d')
         }
+
+        function setEvent() { event.add('resize', tag_resize) }
 
         // --GET
         function getPosition(x, y)
@@ -114,6 +114,29 @@
             return [x, y]
         }
 
+        // --RESET
+        function reset()
+        {
+            width = tag.offsetWidth + _blockSize - tag.offsetWidth % _blockSize,
+            height = tag.offsetHeight + _blockSize - tag.offsetHeight % _blockSize
+
+            setCanvas()
+            drawBackground()
+        }
+
+        // --DESTROY
+        function destroy() { event.remove('resize', tag_resize) }
+
+        // --EVENT
+        function tag_resize() { reset() }
+
+        // --DRAW
+        function drawBackground()
+        {
+            context.fillStyle = _dark
+            context.fillRect(0, 0, columns * _blockSize, rows * _blockSize)
+        }
+
         // --ANIMATION
         function animation(action)
         {
@@ -135,9 +158,10 @@
             }
         }
 
-    // #CYCLE
+    // #CYCLES
 
      onMount(set)
+     onDestroy(destroy)
 </script>
 
 <!-- #HTML -->
@@ -164,11 +188,11 @@ bind:this={tag}
 <style
 lang="scss"
 >
-    /* #IMPORT */
+    /* #USE */
 
-    @import '../../assets/scss/styles/position.scss';
+    @use '../../assets/scss/styles/position.scss' as *;
 
-    /* #GROUP */
+    /* #TAG */
 
     .tag
     {

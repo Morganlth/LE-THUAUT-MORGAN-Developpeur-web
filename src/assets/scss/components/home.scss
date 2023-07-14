@@ -23,7 +23,7 @@
                 $map-width: map.set($map-width, $key, $value * .7);
             }
     
-            @include media-min-map(width, $map-width);
+            @include media-min-map(width, $map-width, 375px);
         }
     }
 }

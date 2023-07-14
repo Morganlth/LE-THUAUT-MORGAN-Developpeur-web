@@ -231,15 +231,15 @@ lang="scss"
     {
         @include grid(calc(100% / 3), calc(100% / 3), 3, 3);
 
-        width: 160px;
-        height: 160px;
+        width: 150px;
+        height: 150px;
 
         border-right: solid 1px;
         border-bottom: solid 1px;
 
         transition: border .25s; /* reset() timeout delay / 2 */
 
-        @include media-min(375px)
+        @include media-min(425px)
         {
             width: 180px;
             height: 180px;

@@ -166,51 +166,26 @@ lang="scss"
     @use '../../assets/scss/styles/cursor' as *;
     @use '../../assets/scss/styles/media' as *;
 
-    /* #GROUPS */
+    /* #VARIABLE */
+
+    $content-bloc-height: calc(100% - 300px);
+
+    /* #HOME */
 
     #home
     {
         @include relative;
-        @include glow;
+        @include glow(false);
     
         overflow: hidden;
 
-        width: calc(100% - 100vw);
-        height: 100vh;
+        width: 100vw;
+        height: calc(100% - 100vh);
 
-        padding: 70px 0 30px;
+        padding-top: 70px;
 
         box-sizing: border-box;
 
-        .bg
-        {
-            @include flex;
-            @include xy-start(true);
-            @include any;
-
-            div
-            {
-                @include any-h;
-                @include glitch(false);
-    
-                width: 50%;
-            }
-
-            div:nth-child(2) { transform: scaleX(-1) }
-        }
-
-        &>div
-        {
-            @include flex;
-            @include relative;
-            @include any;
-
-            border-right: solid rgba($s-light, .3) 4px;
-            border-bottom: solid $o-primary 4px;
-
-            box-sizing: border-box;
-        }
-    
         &::before
         {
             @include absolute;
@@ -225,12 +200,67 @@ lang="scss"
 
             background: linear-gradient(90deg, transparent 0%, $dark 50%);
         }
+    
+        &>div
+        {
+            @include flex;
+            @include relative;
+            @include any;
 
+            flex-wrap: wrap;
+        }
+
+        .bg
+        {
+            @include flex;
+            @include xy-start(true);
+            @include any;
+
+            div
+            {
+                @include any-w;
+                @include glitch(false);
+
+                flex-shrink: 0;
+    
+                height: $content-bloc-height;
+
+                border-bottom: solid $o-primary 4px;
+
+                box-sizing: border-box;
+            }
+
+            div:nth-child(2)
+            {
+                transform: scaleX(-1);
+
+                border-left: solid rgba($s-light, .3) 4px;
+            }
+        }
+
+        &::after { height: $content-bloc-height; }
+
+        @include media-min(768px)
+        {
+            width: calc(100% - 100vw);
+            height: 100vh;
+
+            padding-bottom: 30px;
+
+            .bg>div
+            {
+                @include any-h;
+
+                width: 50%;
+            }
+
+            &::after { @include any-h; }
+        }
         @include media-min(1024px)
         {
             padding-left: 20px;
 
-            &>div { border-left: solid $dark 8px; }
+            .bg>div:nth-child(1) { border-left: solid $dark 8px; }
         }
     }
 
@@ -239,11 +269,11 @@ lang="scss"
         @include flex;
         @include f-column;
         @include relative;
-        @include any-h;
+        @include any-w;
 
         justify-content: space-between;
 
-        width: 50%;
+        height: $content-bloc-height;
 
         padding-block: 1%;
 
@@ -269,7 +299,7 @@ lang="scss"
 
             transition: transform .6s;
 
-            @include media-min(768px, 940px) { transform: translateX(-50%) scaleX(-1); }
+            @include media-min-max(768px, 940px) { transform: translateX(-50%) scaleX(-1); }
         }
 
         .lang, .scroll-icon
@@ -289,6 +319,10 @@ lang="scss"
 
         @include media-min(768px)
         {
+            @include any-h;
+    
+            width: 50%;
+    
             padding-left: 2.5%;
     
             .lang { margin: 0; }
@@ -427,6 +461,8 @@ lang="scss"
         {
             @include any-w;
 
+            padding-inline: 0;
+
             section
             {
                 @include any-w;
@@ -441,15 +477,18 @@ lang="scss"
 
     .manager
     {
-        @include flex;
-        @include f-j-center;
-
-        align-items: flex-start;
+        @include f-center(true);
+        @include any-w;
 
         z-index: 2;
 
-        width: 50%;
+        height: 300px;
 
-        @include media-min(768px) { @include f-a-center; }
+        @include media-min(768px)
+        {
+            @include any-h;
+
+            width: 50%;
+        }
     }
 </style>
