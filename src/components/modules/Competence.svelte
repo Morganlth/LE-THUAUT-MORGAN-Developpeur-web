@@ -219,7 +219,7 @@
             }
         }
 
-        function setCommand() { app.add('spaceDimension', spaceDimension, true) }
+        function setCommand() { app.app_add('spaceDimension', spaceDimension, true) }
 
         function setEvent() { event.add('scroll', competence_scroll) }
 
@@ -269,12 +269,12 @@
         // --COMMAND
         function spaceDimension(n)
         {
-            n = app.testDefault(n) ? 6 : app.testNumber(n, 1, 6)
+            n = app.app_testDefault(n) ? 6 : app.app_testNumber(n, 1, 6)
 
             number = n
             localStorage.setItem('spaceDimension', n)
     
-            app.success('spaceDimension ' + n)
+            app.app_success('spaceDimension ' + n)
         }
 
         // --EVENTS
@@ -363,7 +363,7 @@
         // --UTILS
         function tipping(on)
         {
-            on ? (app.freeze.set(true), ratio = .3) : (app.freeze.set(false), ratio = 1)
+            on ? (app.app_FREEZE.set(true), ratio = .3) : (app.app_FREEZE.set(false), ratio = 1)
 
             tick().then(() => on
             ?   (setList.call(this),

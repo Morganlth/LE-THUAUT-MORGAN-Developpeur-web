@@ -133,7 +133,7 @@
             for (let i = 0; i < 10; i++) snake.push([-1 - i, startY])
         }
 
-        function setCommand() { app.add('snakeSize', snakeSize, true) }
+        function setCommand() { app.app_add('snakeSize', snakeSize, true) }
 
         function setEvent()
         {
@@ -280,13 +280,13 @@
         // --COMMAND
         function snakeSize(size)
         {
-            size = app.testDefault(size) ? _size : app.testNumber(size, 10, 70)
+            size = app.app_testDefault(size) ? _size : app.app_testNumber(size, 10, 70)
 
             blockSize = size
             localStorage.setItem('snakeSize', size)
             reset()
     
-            app.success('snakeSize ' + size)
+            app.app_success('snakeSize ' + size)
         }
 
         // --EVENTS
@@ -320,7 +320,7 @@
         {
             const target = e.relatedTarget
     
-            if (spring.lock) spring.spring_mouseLeave()
+            if (spring.spring_LOCK) spring.spring_mouseLeave()
             if (target && target.classList.contains('icon')) return
             if (_challenge) _gameOver.update(true)
         }
@@ -397,9 +397,9 @@
     
             if (!_snakeParam)
             {
-                if (spring.lock) spring.spring_mouseLeave()
+                if (spring.spring_LOCK) spring.spring_mouseLeave()
             }
-            else if (!spring.lock) spring.spring_mouseEnter()
+            else if (!spring.spring_LOCK) spring.spring_mouseEnter()
         }
 
         function checkOutside()

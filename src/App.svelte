@@ -32,11 +32,11 @@
         const APP_START = performance.now()
 
     // #VARIABLES
-
+    
         // --ELEMENT-SPRING
         let
-        spring_COORDS = spring.coords,
-        spring_SIZE = spring.size
+        spring_COORDS = spring.spring_COORDS,
+        spring_SIZE = spring.spring_SIZE
     
         // --ELEMENT-ECOPOPUP
         let ecopopup_ECO = false
@@ -47,32 +47,32 @@
         function app_set()
         {
             app_restore()
-    
             app_testPerformance()
+
+            document.getElementById('app').style.opacity = 1
         }
 
         // --RESTORE
         function app_restore()
         {
-            for (let i = 0; i < app.storageKeys.length; i++)
+            const KEYSTORAGE = app.app_KEYSTORAGE
+    
+            for (let i = 0; i < KEYSTORAGE.length; i++)
             {
-                const
-                key = app.storageKeys[i],
-                item = localStorage.getItem(key)
+                const [KEY, VALUE] = [KEYSTORAGE[i], localStorage.getItem(KEYSTORAGE[i])]
 
-                try { if (item !== null) app[key](item) }
-                catch { localStorage.removeItem(key) }
+                try { if (VALUE !== null) app.app_COMMANDS[KEY](VALUE) } catch { localStorage.removeItem(KEY) }
             }
 
-            app.clear()
+            if (app.app_KEYWORDS.includes('clear')) app.app_COMMANDS.clear()
         }
 
         // --TEST
-        async function app_testPerformance()
+        function app_testPerformance()
         {
-            const mode = localStorage.getItem('mode')
+            const MODE = localStorage.getItem('mode')
             
-            if (mode !== 'eco' && performance.now() - APP_START > 300) ecopopup_ECO = true
+            if (MODE !== 'eco' && performance.now() - APP_START > 300) ecopopup_ECO = true
         }
 
     // #CYCLE

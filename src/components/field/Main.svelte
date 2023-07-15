@@ -53,7 +53,7 @@ context="module"
         // --ELEMENT-MAIN
         let
         main,
-        main_FREEZE = app.freeze
+        main_FREEZE = app.app_FREEZE
 
         // --ELEMENT-WRAPPER-1
         let
@@ -78,9 +78,9 @@ context="module"
     
         function main_setCommand()
         {
-            app.add('app', () => console.log(app))
-            app.add('event', () => console.log(event))
-            app.add('router', () => console.log(router))
+            app.app_add('app', () => console.log(app))
+            app.app_add('event', () => console.log(event))
+            app.app_add('router', () => console.log(router))
         }
 
         function main_setEvent()
@@ -114,9 +114,9 @@ context="module"
         // --EVENTS
         async function main_scroll()
         {
-            const scrollTop = main.scrollTop
+            const SCROLLTOP = main.scrollTop
         
-            wrapper_TRANSLATEX = -(scrollTop < wrapper_MAX ? scrollTop : wrapper_MAX)
+            wrapper_TRANSLATEX = -(SCROLLTOP < wrapper_MAX ? SCROLLTOP : wrapper_MAX)
         }
 
         async function main_resize(mobile)
@@ -212,7 +212,7 @@ lang="scss"
         &>div { @include any-w; }
         &>div:nth-child(1)
         {
-            height: calc(200vh + 280px);
+            height: 200vh;
 
             @include media-min(768px) { height: calc(140vh + 200vw); }
         }

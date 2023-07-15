@@ -130,9 +130,9 @@
 
         function setCommand()
         {
-            app.add('presentationText', presentationText, true)
-            app.add('presentationSnake', presentationSnake, true)
-            app.add('presentationFps', presentationFps, true)
+            app.app_add('presentationText', presentationText, true)
+            app.app_add('presentationSnake', presentationSnake, true)
+            app.app_add('presentationFps', presentationFps, true)
         }
 
         function setRouter()
@@ -289,7 +289,7 @@
             
                 noneMode = false
 
-                app.eco(false)
+                app.app_updateMode(false)
             }
             else
             {
@@ -364,29 +364,29 @@
         // --COMMANDS
         async function presentationText(on)
         {
-            on = app.testDefault(on) ? true : app.testBoolean(on)
+            on = app.app_testDefault(on) ? true : app.app_testBoolean(on)
     
             updateText(on)
 
-            app.success('presentationText ' + on)
+            app.app_success('presentationText ' + on)
         }
 
         async function presentationSnake(on)
         {
-            on = app.testDefault(on) ? true : app.testBoolean(on)
+            on = app.app_testDefault(on) ? true : app.app_testBoolean(on)
         
             updateSnake(on)
 
-            app.success('presentationSnake ' + on)
+            app.app_success('presentationSnake ' + on)
         }
 
         async function presentationFps(on)
         {
-            on = app.testDefault(on) ? false : app.testBoolean(on)
+            on = app.app_testDefault(on) ? false : app.app_testBoolean(on)
         
             updateFps(on)
 
-            app.success('presentationFps ' + on)
+            app.app_success('presentationFps ' + on)
         }
 
         // --EVENTS  

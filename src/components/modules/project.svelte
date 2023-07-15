@@ -268,7 +268,7 @@
             {
                 clearTimeout(cardTimeout)
     
-                app.freeze.set(detail.on)
+                app.app_FREEZE.set(detail.on)
 
                 ;(detail.on ? show : hidden)()
             }

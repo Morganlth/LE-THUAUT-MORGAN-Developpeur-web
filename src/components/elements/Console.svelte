@@ -12,134 +12,168 @@
 
         // --JS
         import AppError from '../../assets/js/utils/error'
+        import AppSuccess from '../../assets/js/utils/success'
 
         // --SVELTE
         import { onMount } from 'svelte'
 
+        // --COMPONENT-ELEMENT
+        import Line from './Line.svelte'
+
     // #CONSTANTE
-    
-    const children = []
+
+        // --ELEMENT-CONSOLE
+        const CONSOLE_CONTAINER = []
 
     // #VARIABLES
 
-        // --THIS
+        // --ELEMENT-CONSOLE
         let
-        cmd,
-        input,
-        mirror,
-        value
-
-        // --MEMORY
-        let
-        history = ['app'],
-        i = 0
+        console_CMD,
+        console_INPUT,
+        console_CURRENTVALUE,
+        console_HISTORY = ['app'],
+        console_INDEX = 0,
+        console_LINES = []
 
     // #FUNCTIONS
 
-        // --CYCLES
-        function set()
+        // --SET
+        function console_set()
         {
-            cmd.input = input
-            cmd.analyse = analyse
+            // console_CMD.input = console_INPUT
+            // console_CMD.analyse = console_analyse
 
-            app.cmd = cmd
+            console_setCommand()
+
+            app.cmd = console_CMD
         }
 
-        function reset()
+        function console_setCommand()
         {
-            update('remove')
-            value = ''
-            cmd.scrollTop = cmd.scrollHeight - cmd.offsetHeight
+            app.app_add('log', console_log)
+            app.app_add('clear', console_clear)
         }
 
-        function restore()
+        // --RESET
+        function console_reset()
+        {
+            console_update('remove')
+            console_CURRENTVALUE = ''
+            console_CMD.scrollTop = console_CMD.scrollHeight - console_CMD.offsetHeight
+        }
+
+        // --RESTORE
+        function console_restore()
+        {
+            console_testRange()
+            console_write(console_HISTORY[console_INDEX])
+        }
+
+        // --UPDATE
+        function console_update(action, values = [])
+        {
+            CONSOLE_CONTAINER[0].classList[action]('app-context')
+
+            for (let i = 0; i < CONSOLE_CONTAINER.length; i++) CONSOLE_CONTAINER[i].innerText = values[i] ?? ''
+        }
+
+        // --COMMANDS
+        function console_log(msg)
         {
             const
-            command = history[i],
-            length = command.length
+            TYPE = msg instanceof Error ? msg instanceof AppSuccess ? 'success' : 'error' : null,
+            MESSAGE = TYPE ? { name: msg.name, message: msg.message.trim() } : msg.trim()
 
-            value = command
-            input.focus()
-            input.setSelectionRange(length, length)
-            inputEvent()
+            console_LINES = [...console_LINES, { type: TYPE, msg: MESSAGE }]
         }
 
-        function update(action, values = [])
-        {
-            children[0].classList[action]('app-context')
-
-            for (let i = 0; i < children.length; i++) children[i].innerText = values[i] ?? ''
-        }
+        function console_clear() { console_LINES = [] }
 
         // --EVENTS
-        function inputEvent()
+        function console_input()
         {
-            (value.length === 3 || value[3] === ' ') && value.substring(0, 3) === 'app'
-            ? analyse(value)
-            : update('remove', [value])
+            (console_CURRENTVALUE.length === 3 || console_CURRENTVALUE[3] === ' ') && console_CURRENTVALUE.substring(0, 3) === 'app'
+            ? console_analyse(console_CURRENTVALUE)
+            : console_update('remove', [console_CURRENTVALUE])
         }
 
-        function keyup(e)
+        function console_keyup(e)
         {
-            const key = e.key
-
-            switch (key)
+            switch (e.key)
             {
                 case 'Enter':
-                    if (children[0].innerText === 'app') execute()
+                    if (CONSOLE_CONTAINER[0].innerText === 'app') console_execute()
                     break
                 case 'ArrowUp':
-                    if (--i < 0) i = 0
-                    restore()
+                    console_INDEX--
+                    console_restore()
                     break
                 case 'ArrowDown':
-                    if (++i >= history.length) i = history.length-1
-                    restore()
+                    console_INDEX++
+                    console_restore()
                     break
                 default: break
             }
         }
 
-        // --COMMAND-CODE
-        function analyse(value)
+        // --TEST-CHECK
+        function console_testRange()
         {
-            const values = value.match(/^(app)(\s+\S*)?(\s.*)?$/)
-
-            values.shift()
-
-            if (values[1]) check(values[1])
-
-            update('add', values)
+            if (console_INDEX < 0) console_INDEX = 0
+            else if (console_INDEX >= console_HISTORY.length) console_INDEX = console_HISTORY.length-1
         }
 
-        function check(value) { children[1].classList[app.keyWords.includes(value.trim()) ? 'add' : 'remove']('func-context') }
+        function check(value) { CONSOLE_CONTAINER[1].classList[app.app_KEYWORDS.includes(value.trim()) ? 'add' : 'remove']('func-context') }
 
-        function execute()
+        // --UTILS
+        function console_analyse(value)
+        {
+            const VALUES = value.match(/^(app)(\s+\S*)?(\s.*)?$/)
+
+            VALUES.shift()
+
+            if (VALUES[1]) check(VALUES[1])
+
+            console_update('add', VALUES)
+        }
+
+        function console_write(value)
+        {
+            const LENGTH = value.length
+    
+            console_CURRENTVALUE = value
+            console_INPUT.focus()
+            console_INPUT.setSelectionRange(LENGTH, LENGTH)
+
+            console_input()
+        }
+
+        function console_execute()
         {
             const
-            func = children[1].innerText.trim(),
-            params = children[2].innerText.trim().split(',')
+            COMMAND = CONSOLE_CONTAINER[1].innerText.trim(),
+            PARAMS = CONSOLE_CONTAINER[2].innerText.trim().split(',')
 
-            history.push(value)
-            i = history.length
+            console_HISTORY.push(console_CURRENTVALUE)
+            console_INDEX = console_HISTORY.length
 
-            try
-            {
-                app[func](...params)
-
-                reset()
-            }
+            try { app.app_COMMANDS[COMMAND](...PARAMS), console_reset() }
             catch (e)
             {
-                const err = e instanceof AppError ? e : new AppError('TypeError', `"${func}" n'est pas une fonction valide`)
-                
-                app.log(err)
+                const ERROR = e instanceof AppError ? e : new AppError(
+                    ...(app.app_KEYWORDS.includes(COMMAND)
+                    ? ['Error', 'une erreur est survenue :/']
+                    : ['TypeError', `"${COMMAND}" n'est pas une commande`])
+                )
+    
+                console_log(ERROR)
             }
         }
 
     // #CYCLE
 
-    onMount(set)
+    onMount(console_set)
 </script>
 
 <!-- #HTML -->
@@ -158,8 +192,15 @@ on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 
     <div
     class="cmd"
-    bind:this={cmd}
+    bind:this={console_CMD}
     >
+        {#each console_LINES as line}
+            <Line
+            _type={line.type}
+            _msg={line.msg}
+            />
+        {/each}
+
         <div
         class="line"
         >
@@ -176,19 +217,18 @@ on:mouseleave={spring.spring_mouseLeave.bind(spring)}
                 type="text"
                 maxlength="59"
                 spellcheck="false"
-                bind:this={input}
-                bind:value={value}
-                on:input={inputEvent}
-                on:keyup|preventDefault={keyup}
+                bind:this={console_INPUT}
+                bind:value={console_CURRENTVALUE}
+                on:input={console_input}
+                on:keyup|preventDefault={console_keyup}
                 />
 
                 <div
                 class="mirror"
-                bind:this={mirror}
                 >
-                    {#each [0, 1, 2] as child}
+                    {#each [0, 1, 2] as i}
                         <pre
-                        bind:this={children[child]}
+                        bind:this={CONSOLE_CONTAINER[i]}
                         >
                         </pre>
                     {/each}
@@ -211,7 +251,7 @@ lang="scss"
     @use '../../assets/scss/styles/font' as *;
     @use '../../assets/scss/styles/media' as *;
 
-    /* #GROUPS */
+    /* #CONSOLE */
 
     .console
     {

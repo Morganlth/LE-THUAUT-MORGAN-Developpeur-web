@@ -6,38 +6,31 @@
         // --CONTEXT
         import { app } from '../field/Main.svelte'
 
-    // #VARIABLE
+    // #VARIABLES
 
         // --ELEMENT-POPUP
         let
-        popup,
-        opacity = 1,
-        blur = 20
+        ecopopup_POPUP,
+        ecopopup_OPACITY = 1,
+        ecopopup_BLUR = 20
 
     // #FUNCTIONS
 
-        // --CLEAR
-        function clear()
+        // --SET
+        function ecopopup_setMode()
         {
-            opacity = 0
-            blur = 0
-
-            setTimeout(() => popup.remove(), 1000)
-        }
-
-        // --MODE
-        function economics()
-        {
-            app.eco(true)
+            app.app_eco(this)
             
-            clear()
+            ecopopup_clear()
         }
-
-        function normal()
+    
+        // --CLEAR
+        function ecopopup_clear()
         {
-            app.eco(false)
+            ecopopup_OPACITY = 0
+            ecopopup_BLUR = 0
 
-            clear()
+            setTimeout(() => ecopopup_POPUP.remove(), 1000)
         }
 </script>
 
@@ -45,9 +38,9 @@
 
 <div
 class="eco-popup"
-style:--blur="blur({blur}px)"
-style:opacity={opacity}
-bind:this={popup}
+style:--blur="blur({ecopopup_BLUR}px)"
+style:opacity={ecopopup_OPACITY}
+bind:this={ecopopup_POPUP}
 >
     <section>
         <h3>
@@ -114,7 +107,7 @@ bind:this={popup}
             <button
             type="button"
             title="conseillé"
-            on:click={economics}
+            on:click={ecopopup_setMode.bind(true)}
             >
                 PASSER EN MODE ÉCO
             </button>
@@ -122,7 +115,7 @@ bind:this={popup}
             <button
             type="button"
             title="déconseillé"
-            on:click={normal}
+            on:click={ecopopup_setMode.bind(false)}
             >
                 GARDER LES OPTIONS ACTUELLES
             </button>
@@ -135,17 +128,16 @@ bind:this={popup}
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #USES */
 
-    @import
-    '../../assets/scss/styles/flex.scss',
-    '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/background.scss',
-    '../../assets/scss/styles/font.scss',
-    '../../assets/scss/styles/cursor.scss';
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/background' as *;
+    @use '../../assets/scss/styles/font' as *;
+    @use '../../assets/scss/styles/cursor' as *;
 
-    /* #GROUPS */
+    /* #ECOPOPUP */
 
     .eco-popup
     {

@@ -24,7 +24,7 @@
         // --SVELTE
         import { onMount } from 'svelte'
 
-    // #VARIABLES
+    // #VARIABLE
 
         // --ELEMENT-ICON
         let icon
@@ -32,7 +32,7 @@
     // #FUNCTIONS
 
         // --SET
-        function set()
+        function icon_set()
         {
             if (_spring)
             {
@@ -42,32 +42,34 @@
         }
 
         // --UPDATE
-        function update(on, lock, hover, size)
+        function icon_springUpdate(lock, hover, size)
         {
-            spring.on = on
-            spring.lock = lock
-            spring.hover = hover
-            spring.size.set(size)
+            spring.spring_LOCK = lock
+            spring.spring_HOVER = hover
+            spring.spring_SIZE.set(size)
         }
 
         // --EVENTS
         function icon_mouseEnter()
         {
-            const
-            boundingClientRect = icon.getBoundingClientRect(),
-            x = boundingClientRect.left + boundingClientRect.width / 2,
-            y = boundingClientRect.top + boundingClientRect.height / 2
+            if (spring.spring_ON)
+            {
+                const
+                boundingClientRect = icon.getBoundingClientRect(),
+                x = boundingClientRect.left + boundingClientRect.width / 2,
+                y = boundingClientRect.top + boundingClientRect.height / 2
 
-            update(false, true, true, boundingClientRect.width)
-    
-            requestAnimationFrame(() => spring.spring_setPosition(x, y))
+                icon_springUpdate(true, true, boundingClientRect.width)
+        
+                requestAnimationFrame(() => spring.spring_setPosition(x, y))
+            }
         }
 
-        function icon_mouseLeave() { update(true, false, false, 7) }
+        function icon_mouseLeave() { if (spring.spring_ON) icon_springUpdate(false, false, 7) }
 
     // #CYCLE
 
-    onMount(set)
+    onMount(icon_set)
 </script>
 
 <!-- #HTML -->

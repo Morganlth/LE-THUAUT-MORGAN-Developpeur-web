@@ -2,127 +2,145 @@
 
 class AppManager
 {
-    // --VARIABLES
-    keyWords = ['log', 'clear', 'reset', 'success', 'error', 'getFps', 'effect', 'eco']
-    storageKeys = ['effect']
+    // #VARIABLES
 
-    cmd = null
+        // --APP-CONTEXT
+        app_FREEZE = false
+        app_KEYWORDS = ['reset', 'success', 'error', 'fps', 'effect', 'eco']
+        app_KEYSTORAGE = ['effect']
+        app_COMMANDS = {}
+        app_CONFIG_BEFORE_ECO = {}
 
-    freeze
+        // --ELEMENT-CONSOLE
+        cmd = null
 
-    // --CONSTRUCTOR
-    constructor() { this.freeze = writable(false) }
+    // #CONSTRUCTOR
 
-    // --RESET
-    reset(view)
+    constructor()
     {
-        for (const key of this.storageKeys) this[key]('d')
+        this.app_FREEZE = writable(false)
 
-        if (!view) this.clear()
+        this.app_set()
     }
 
-    // --MANAGEMENT
-    log(msg)
-    {
-        const type = msg instanceof Error ? msg instanceof AppSuccess ? 'success' : 'error' : null
+    // #FUNCTIONS
 
-        this.cmd.lastChild.insertAdjacentHTML('beforebegin', `
-            <div class="line">
-                <div class="line-indicator"></div>
-                <div class="line-content">
-                    ${type ? `
-                    <span class="console-${type}">${msg.name}:</span>
-                    <pre class="console-result">${msg.message.trim()}</pre>` : `
-                    <pre class="console-result">${msg.trim()}</pre>`}
-                </div>
-            </div>
-        `)
-    }
-
-    success(msg) { this.log(new AppSuccess(msg)) }
-    
-    error(msg, type) { throw new AppError(type ?? 'Error', msg) }
-
-    // --TEST
-    testDefault(value) { return value === 'd' || value === 'default' }
-
-    testNumber(value, min, max)
-    {
-        if (!/^\d*?\.?\d+$/.test(value)) this.error('la valeur doit être un nombre', 'TypeError')
-        if (value < min || value > max) this.error(`la valeur doit être comprise entre [${min} et ${max}]`, 'RangeError')
-
-        return parseInt(value, 10)
-    }
-
-    testBoolean(value)
-    {
-        if (value === false || value === 'f' || value === 'false') return false
-        else if (value === true || value === 't' || value === 'true') return true
-        else this.error('"t" | "true" pour vrai - "f" | "false" pour faux', 'TypeError')
-    }
-
-    // --DEFAULT-COMMAND
-    clear()
-    {
-        const children = [...this.cmd.children]
-
-        for (let i = children.length - 2; i >= 0; i--) this.cmd.removeChild(children[i])
-    }
-
-    write(value)
-    {
-        this.cmd.input.value = value
-        this.cmd.analyse(value)
-    }
-
-    effect(n)
-    {
-        this.testDefault(n) ? n = .3 : this.testNumber(n, 0, 1)
-
-        document.querySelector(':root').style.setProperty('--effect', n)
-        localStorage.setItem('effect', n)
-    
-        this.success('effet ' + n)
-
-        if (n != 0) this.eco(false)
-    }
-
-    async getFps() { this.log('' + await getFps()) }
-
-    eco(value)
-    {
-        value = this.testDefault(value) ? true : this.testBoolean(value)
-
-        if (value)
+        // --SET
+        app_set()
         {
-            this.effect(0)
-            this.spring(false)
-            this.presentationSnake(false)
-    
-            this.write('app clear click et Entrée')
+            for (const KEY of this.app_KEYWORDS)
+                this.app_COMMANDS[KEY] = this['app_' + KEY].bind(this)
         }
 
-        localStorage.setItem('mode', value ? 'eco' : 'personnalisé')
-    }
+        app_setConfigBeforeEco()
+        {
+            this.app_CONFIG_BEFORE_ECO =
+            {
+                effect: localStorage.getItem('effect'),
+                spring: localStorage.getItem('spring'),
+                presentationSnake: localStorage.getItem('presentationSnake')
+            }
+        }
 
-    // --UTIL
-    add(name, command, storage) // ajouter function remove lié aux destroy des elements
-    {
-        if (!this.keyWords.includes(name)) this.keyWords.push(name)
-        if (storage && !this.storageKeys.includes(name)) this.storageKeys.push(name)
+        // --RESET
+        app_reset(view = false)
+        {
+            for (const KEY of this.app_KEYSTORAGE) this.app_COMMANDS[KEY]('d')
 
-        this[name] = command
-    }
+            if (!view && this.app_KEYWORDS.includes('clear')) this.app_COMMANDS.clear()
+        }
+
+        // --UPDATE
+        app_update(commands)
+        {
+            for (const KEY in commands)
+                if (this.app_KEYWORDS.includes(KEY)) this.app_COMMANDS[KEY](commands[KEY])
+
+            if (this.app_KEYWORDS.includes('clear')) this.app_COMMANDS.clear()
+        }
+
+        app_updateMode(eco)
+        {
+            const MODE = localStorage.getItem('mode')
+
+            if ((eco && MODE === 'eco') || (!eco && MODE === 'personnalisé')) return
+
+            localStorage.setItem('mode', eco ? 'eco' : 'personnalisé')
+        }
+        
+        // --COMMANDS
+        app_success(msg) { if (this.app_KEYWORDS.includes('log')) this.app_COMMANDS.log(new AppSuccess(msg)) }
+        
+        app_error(msg, type) { throw new AppError(type ?? 'Error', msg) }
+
+        app_effect(n)
+        {
+            this.app_testDefault(n) ? n = .3 : this.app_testNumber(n, 0, 1)
+
+            document.querySelector(':root').style.setProperty('--effect', n)
+            localStorage.setItem('effect', n)
+        
+            this.app_success('effet ' + n)
+
+            if (n != 0) this.app_updateMode(false)
+        }
+
+        async app_fps() { if (this.app_KEYWORDS.includes('log')) this.app_COMMANDS.log(await getFps() + ' fps') }
+
+        app_eco(eco)
+        {
+            eco = this.app_testDefault(eco) ? true : this.app_testBoolean(eco)
+
+            if (eco)
+            {
+                this.app_setConfigBeforeEco()
+                this.app_update({ effect: 0, spring: false, presentationSnake: false })
+            }
+            else this.app_update(this.app_CONFIG_BEFORE_ECO)
+
+            this.app_updateMode(eco)
+            this.app_success('Eco mode ' + eco)
+        }
+
+        // --TEST
+        app_testDefault(value) { return value === 'd' || value === 'default' }
+
+        app_testNumber(value, min, max)
+        {
+            if (!/^\d*?\.?\d+$/.test(value)) this.app_error('la valeur doit être un nombre', 'TypeError')
+            if (value < min || value > max) this.app_error(`la valeur doit être comprise entre [${min} et ${max}]`, 'RangeError')
+
+            return parseInt(value, 10)
+        }
+
+        app_testBoolean(value)
+        {
+            if (value === false || value === 'f' || value === 'false') return false
+            else if (value === true || value === 't' || value === 'true') return true
+            else this.app_error('"t" | "true" pour vrai - "f" | "false" pour faux', 'TypeError')
+        }
+
+        // --UTIL
+        app_add(name, command, storage) // ajouter function remove lié aux destroy des elements
+        {
+            if (!this.app_KEYWORDS.includes(name)) this.app_KEYWORDS.push(name)
+            if (storage && !this.app_KEYSTORAGE.includes(name)) this.app_KEYSTORAGE.push(name)
+
+            this.app_COMMANDS[name] = command
+        }
 }
 
 // #IMPORTS
 
-import { writable } from 'svelte/store'
+    // --JS
+    import AppSuccess from '../utils/success'
+    import AppError from '../utils/error'
+    import getFps from '../utils/fps'
 
-import AppSuccess from '../utils/success'
-import AppError from '../utils/error'
-import getFps from '../utils/fps'
+    // --SVELTE
+    import { writable } from 'svelte/store'
 
 // #EXPORT
 
-export default new AppManager()
+    // --CONTEXT
+    export default new AppManager()
