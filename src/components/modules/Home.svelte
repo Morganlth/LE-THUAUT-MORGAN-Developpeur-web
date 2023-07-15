@@ -42,15 +42,8 @@ id="home"
     <div>
         <div
         class="bg"
+        style:--url="url({$page.url.origin}/src/assets/images/glitch_1920.jpg)"
         >
-            <div
-            style:background-image="url({$page.url.origin}/src/assets/images/glitch_1920.jpg)"
-            >
-            </div>
-            <div
-            style:background-image="url({$page.url.origin}/src/assets/images/glitch_1920.jpg)"
-            >
-            </div>
         </div>
 
         <div
@@ -166,23 +159,19 @@ lang="scss"
     @use '../../assets/scss/styles/cursor' as *;
     @use '../../assets/scss/styles/media' as *;
 
-    /* #VARIABLE */
-
-    $content-bloc-height: calc(100% - 300px);
-
     /* #HOME */
 
     #home
     {
         @include relative;
-        @include glow(false);
+        @include glow(100%, 30%);
     
         overflow: hidden;
 
         width: 100vw;
-        height: calc(100% - 100vh);
+        height: 100vh;
 
-        padding-top: 70px;
+        padding-block: 70px 30px;
 
         box-sizing: border-box;
 
@@ -204,63 +193,70 @@ lang="scss"
         &>div
         {
             @include flex;
+            @include f-column;
             @include relative;
             @include any;
 
-            flex-wrap: wrap;
+            padding-inline: 5%;
+
+            border-bottom: solid $o-primary 4px;
+
+            box-sizing: border-box;
         }
 
         .bg
         {
-            @include flex;
             @include xy-start(true);
             @include any;
 
-            div
+            &::before, &::after
             {
-                @include any-w;
+                @include any;
                 @include glitch(false);
 
-                flex-shrink: 0;
-    
-                height: $content-bloc-height;
-
-                border-bottom: solid $o-primary 4px;
-
-                box-sizing: border-box;
+                background-image: var(--url);
             }
-
-            div:nth-child(2)
+            &::before
             {
-                transform: scaleX(-1);
+                @include xy-start(true);
+        
+                content: '';
+            }
+            &::after
+            {
+                @include absolute;
 
-                border-left: solid rgba($s-light, .3) 4px;
+                top: 0;
+                right: 0;
+    
+                transform: scaleX(-1);
             }
         }
-
-        &::after { height: $content-bloc-height; }
 
         @include media-min(768px)
         {
             width: calc(100% - 100vw);
-            height: 100vh;
 
-            padding-bottom: 30px;
-
-            .bg>div
+            &>div
             {
-                @include any-h;
+                flex-direction: row;
 
-                width: 50%;
+                padding-inline: 0;
+
+                border-right: solid rgba($s-light, .3) 4px;
             }
 
-            &::after { @include any-h; }
+            .bg
+            {
+                &::before, &::after { width: 50%; }
+                &::after { content: ''; }
+            }
         }
         @include media-min(1024px)
         {
             padding-left: 20px;
 
-            .bg>div:nth-child(1) { border-left: solid $dark 8px; }
+            &>div { border-left: solid $dark 8px; }
         }
     }
 
@@ -268,21 +264,19 @@ lang="scss"
     {
         @include flex;
         @include f-column;
-        @include relative;
-        @include any-w;
+        @include any;
 
         justify-content: space-between;
 
-        height: $content-bloc-height;
+        gap: 20px;
 
-        padding-block: 1%;
+        padding-block: 10px;
 
         box-sizing: border-box;
 
         .me
         {
             @include absolute;
-            @include any-h;
             @include no-event;
 
             bottom: 0;
@@ -292,6 +286,8 @@ lang="scss"
 
             opacity: .3;
 
+            height: 70%;
+
             mix-blend-mode: screen;
 
             object-position: bottom;
@@ -299,7 +295,9 @@ lang="scss"
 
             transition: transform .6s;
 
-            @include media-min-max(768px, 940px) { transform: translateX(-50%) scaleX(-1); }
+            @include media-min-max(1024px, 584px, true) { transform: translateX(0) scaleX(1); }
+
+            /* @include media-max(768px, 374px) { left: 0; } */
         }
 
         .lang, .scroll-icon
@@ -308,30 +306,14 @@ lang="scss"
 
             opacity: 0.7;
         }
-        .lang { margin: 10px 0 0 20px; }
         .scroll-icon
         {
             @include flex;
             @include f-a-center;
 
             opacity: 0;
-        }
 
-        @include media-min(768px)
-        {
-            @include any-h;
-    
-            width: 50%;
-    
-            padding-left: 2.5%;
-    
-            .lang { margin: 0; }
-        }
-        @include media-min(1024px)
-        {
-            .me { transform: translateX(0) scaleX(1); }
-
-            .scroll-icon
+            @include media-min(1024px, 475px)
             {
                 opacity: 1;
 
@@ -339,7 +321,18 @@ lang="scss"
             }
         }
 
-        @include media-max(768px, 375px) { padding-top: 0; }
+        @include media-min(768px)
+        {
+            @include relative;
+            @include any-h;
+    
+            width: 50%;
+    
+            padding-block: 20px;
+            padding-left: 2.5%;
+
+            .me { @include any-h; }
+        }
     }
 
     .main
@@ -355,7 +348,7 @@ lang="scss"
 
         width: max-content;
 
-        margin: auto;
+        margin: 0 auto;
 
         box-sizing: border-box;
 
@@ -396,7 +389,7 @@ lang="scss"
 
             opacity: .95;
 
-            margin-block: 20px;
+            margin-block: 10px;
 
             &::before
             {
@@ -422,19 +415,28 @@ lang="scss"
             @include any-w;
 
             margin: 0;
-            padding-inline: 5%;
 
             section { align-self: flex-start; }
         }
-        @include media-min(768px)
+        @include media-min(768px) { padding-right: 5%; }
+        @include media-min(1024px)
+        {
+            padding: 0 12% 5% 0;
+
+            h1
+            {
+                gap: 20px;
+    
+                margin-top: 20px;
+            }
+        }
+    
+        @include media-min-max(1024px, 584px, true)
         {
             flex-direction: row;
             justify-content: space-between;
 
             height: auto;
-    
-            padding-bottom: 5%;
-            padding-left: 0;
 
             section { @include f-column; }
 
@@ -448,47 +450,38 @@ lang="scss"
 
             h1
             {
-                gap: 20px;
-
                 margin-bottom: 0;
 
                 &>span { gap: 3px; }
             }
         }
-        @include media-min(1024px) { padding-right: 12%; }
-
-        @include media-max(768px, 375px)
-        {
-            @include any-w;
-
-            padding-inline: 0;
-
-            section
-            {
-                @include any-w;
-        
-                flex-direction: row;
-                justify-content: space-around;
-            }
-            
-            nav { width: auto; }
-        }
     }
 
     .manager
     {
-        @include f-center(true);
-        @include any-w;
+        @include flex;
+        @include any;
+
+        align-items: flex-end;
+        flex-grow: 1;
 
         z-index: 2;
 
-        height: 300px;
+        overflow: auto;
+
+        max-height: 100%;
 
         @include media-min(768px)
         {
-            @include any-h;
+            @include f-center;
 
             width: 50%;
+
+            padding-block: 30px;
+
+            box-sizing: border-box;
         }
+
+        @include media-max(768px, 666px) { display: none; }
     }
 </style>

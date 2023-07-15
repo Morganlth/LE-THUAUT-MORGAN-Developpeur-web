@@ -11,9 +11,6 @@ class AppManager
         app_COMMANDS = {}
         app_CONFIG_BEFORE_ECO = {}
 
-        // --ELEMENT-CONSOLE
-        cmd = null
-
     // #CONSTRUCTOR
 
     constructor()

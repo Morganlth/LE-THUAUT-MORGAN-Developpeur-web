@@ -579,17 +579,16 @@ bind:this={presentation}
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #USES */
 
-    @import
-    '../../assets/scss/styles/flex.scss',
-    '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/background.scss',
-    '../../assets/scss/styles/font.scss',
-    '../../assets/scss/styles/cursor.scss';
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/background' as *;
+    @use '../../assets/scss/styles/font' as *;
+    @use '../../assets/scss/styles/cursor' as *;
 
-    /* #GROUPS */
+    /* #PRESENTATION */
 
     #presentation
     {

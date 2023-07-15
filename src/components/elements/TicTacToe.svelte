@@ -231,19 +231,25 @@ lang="scss"
     {
         @include grid(calc(100% / 3), calc(100% / 3), 3, 3);
 
-        width: 150px;
-        height: 150px;
+        width: 120px;
+        height: 120px;
 
         border-right: solid 1px;
         border-bottom: solid 1px;
 
         transition: border .25s; /* reset() timeout delay / 2 */
 
-        @include media-min(425px)
+        @include media-min(375px, 325px)
+        {
+            width: 150px;
+            height: 150px;
+        }
+        @include media-min(425px, 585px)
         {
             width: 180px;
             height: 180px;
         }
-        @include media-max(768px, 650px) { display: none; }
+
+        @include media-max(650px, 584px) { display: none; }
     }
 </style>

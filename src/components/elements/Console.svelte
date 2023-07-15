@@ -15,7 +15,7 @@
         import AppSuccess from '../../assets/js/utils/success'
 
         // --SVELTE
-        import { onMount } from 'svelte'
+        import { onMount, tick } from 'svelte'
 
         // --COMPONENT-ELEMENT
         import Line from './Line.svelte'
@@ -39,15 +39,7 @@
     // #FUNCTIONS
 
         // --SET
-        function console_set()
-        {
-            // console_CMD.input = console_INPUT
-            // console_CMD.analyse = console_analyse
-
-            console_setCommand()
-
-            app.cmd = console_CMD
-        }
+        function console_set() { console_setCommand() }
 
         function console_setCommand()
         {
@@ -60,7 +52,8 @@
         {
             console_update('remove')
             console_CURRENTVALUE = ''
-            console_CMD.scrollTop = console_CMD.scrollHeight - console_CMD.offsetHeight
+
+            tick().then(() => console_CMD.scrollTop = console_CMD.scrollHeight - console_CMD.offsetHeight)
         }
 
         // --RESTORE
@@ -259,12 +252,11 @@ lang="scss"
         @include f-column;
         @include any-w;
 
-        gap: 20px;
+        gap: 10px;
 
-        max-height: 250px;
-        height: auto;
+        max-height: 100%;
 
-        padding-inline: 3%;
+        padding-bottom: 20px;
 
         box-sizing: border-box;
 
@@ -309,18 +301,20 @@ lang="scss"
 
         @include media-min(768px)
         {
-            width: 70%;
-            max-height: none;
-            height: 60%;
+            gap: 20px;
 
-            padding: 30px 30px 20px 20px;
+            max-width: 1000px;
+            width: 80%;
+
+            padding-bottom: 0;
+        }
+        @include media-min(1024px, 768px)
+        {
+            height: 50%;
+
+            padding: 30px 30px 20px;
 
             backdrop-filter: blur(5px);
-        }
-        @include media-min(1440px)
-        {
-            width: 50%;
-            height: 50%;
         }
     }
 </style>
