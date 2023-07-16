@@ -61,7 +61,7 @@
             {
                 const [KEY, VALUE] = [KEYSTORAGE[i], localStorage.getItem(KEYSTORAGE[i])]
 
-                try { if (VALUE !== null) app.app_COMMANDS[KEY](VALUE) } catch { localStorage.removeItem(KEY) }
+                try { app.app_COMMANDS[KEY](VALUE ?? 'd') } catch { localStorage.removeItem(KEY) }
             }
 
             if (app.app_KEYWORDS.includes('clear')) app.app_COMMANDS.clear()

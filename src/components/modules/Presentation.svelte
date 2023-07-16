@@ -594,6 +594,8 @@ lang="scss"
     {
         @include relative;
 
+        flex-shrink: 0;
+
         width: 100vw;
         height: 100vh;
 

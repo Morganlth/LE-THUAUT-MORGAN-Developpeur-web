@@ -6,11 +6,11 @@
         // --PROPS
         export let
         _transform = '',
-        _opacity = 1, /*tictactoe*/
+        _opacity = 1,
         _size = null,
         _href = null,
         _alt = null,
-        _color = '#fff',
+        _color = '#FFF',
         _spring = true
 
     // #IMPORTS
@@ -55,13 +55,13 @@
             if (spring.spring_ON)
             {
                 const
-                boundingClientRect = icon.getBoundingClientRect(),
-                x = boundingClientRect.left + boundingClientRect.width / 2,
-                y = boundingClientRect.top + boundingClientRect.height / 2
+                BOUNDINGCLIENTRECT = icon.getBoundingClientRect(),
+                X = BOUNDINGCLIENTRECT.left + BOUNDINGCLIENTRECT.width / 2,
+                Y = BOUNDINGCLIENTRECT.top + BOUNDINGCLIENTRECT.height / 2
 
-                icon_springUpdate(true, true, boundingClientRect.width)
+                icon_springUpdate(true, true, BOUNDINGCLIENTRECT.width)
         
-                requestAnimationFrame(() => spring.spring_setPosition(x, y))
+                requestAnimationFrame(() => spring.spring_setPosition(X, Y))
             }
         }
 

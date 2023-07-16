@@ -163,6 +163,8 @@ lang="scss"
     {
         @include relative;
         @include glow(100%, 30%);
+
+        flex-shrink: 0;
     
         overflow: hidden;
 

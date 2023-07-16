@@ -4,7 +4,7 @@
     // #EXPORT
 
         // --PROP
-        export let _iconColor = '#FFF'
+        export let _iconColor
 
     // #IMPORTS
 
@@ -68,7 +68,7 @@ lang="scss"
     @use '../../assets/scss/styles/cursor' as *;
     @use '../../assets/scss/styles/media' as *;
 
-    /* #GROUPS */
+    /* #HEADER */
 
     header
     {

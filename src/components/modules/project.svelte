@@ -136,7 +136,9 @@
             size = Math.sqrt(width * width + height * height)
             sizeBy2 = size / 2
 
-            offsetTop = project.offsetTop + project.parentNode.offsetTop + height
+            offsetTop = project.offsetTop + height
+
+            console.log(offsetTop)
         }
 
         function setCanvas()
@@ -469,8 +471,6 @@ lang="scss"
 
             top: 75%;
             left: 50%;
-
-            z-index: -1;
 
             transform: translate(-50%, -50%);
         }

@@ -13,12 +13,13 @@
 
     // #CONSTANTE
 
-    const dispatch = createEventDispatcher()
+        // --SVELTE
+        const DISPATCH = createEventDispatcher()
 
     // #FUNCTION
 
         // --EVENT
-        function click(e) { dispatch('click', { event: e }) }
+        function click(e) { DISPATCH('click', { event: e }) }
 </script>
 
 <!-- #HTML -->
@@ -35,6 +36,8 @@ on:click={click}
 <!-- #STYLE -->
 
 <style>
+    /* #CELL */
+
     .cell
     {
         background-color: transparent;

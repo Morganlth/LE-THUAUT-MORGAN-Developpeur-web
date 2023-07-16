@@ -33,9 +33,6 @@ context="module"
 
     // #IMPORTS
 
-        // --SCSS
-        import '../../assets/scss/components/main.scss'
-
         // --SVELTE
         import { onMount, onDestroy } from 'svelte'
 
@@ -44,9 +41,6 @@ context="module"
         import Presentation from '../modules/Presentation.svelte'
         import Competence from '../modules/Competence.svelte'
         import Project from '../modules/project.svelte'
-
-        // --COMPONENT-COVER
-        import Wrapper from '../covers/Wrapper.svelte'
 
     // #VARIABLES
 
@@ -152,8 +146,9 @@ on:mouseleave={event.mouseUp.bind(event)}
 class:freeze={$main_FREEZE}
 >
     <div>
-        <Wrapper
-        _translateX={wrapper_TRANSLATEX}
+        <div
+        class="wrapper"
+        style:transform="translateX({wrapper_TRANSLATEX}px)"
         >
             <Home
             {_colors}
@@ -162,22 +157,18 @@ class:freeze={$main_FREEZE}
             <Presentation
             {_colors}
             />
-        </Wrapper>
+        </div>
     </div>
 
     <div>
-        <Wrapper
-        _background={_colors.dark}
-        >
-            <Competence
-            {_colors}
-            />
+        <Competence
+        {_colors}
+        />
 
-            <Project
-            _subPath={_page.subPath}
-            {_colors}
-            />
-        </Wrapper>
+        <Project
+        _subPath={_page.subPath}
+        {_colors}
+        />
     </div>
 </main>
 
@@ -188,6 +179,8 @@ lang="scss"
 >
     /* #USES */
 
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
     @use '../../assets/scss/styles/size' as *;
     @use '../../assets/scss/styles/media' as *;
 
@@ -196,6 +189,8 @@ lang="scss"
     main
     {
         @include any;
+
+        will-change: scroll-position;
 
         overflow: clip scroll;
 
@@ -209,13 +204,33 @@ lang="scss"
             width: 0 !important;
         }
 
-        &>div { @include any-w; }
-        &>div:nth-child(1)
+        &>div
         {
-            height: 200vh;
+            @include any-w;
 
-            @include media-min(768px) { height: calc(140vh + 200vw); }
+            &:nth-child(1)
+            {
+                height: 200vh;
+
+                @include media-min(768px) { height: calc(140vh + 200vw); }
+            }
+            &:nth-child(2) { height: 1100vh; }
         }
-        &>div:nth-child(2) { height: 1100vh; }
+
+        .wrapper
+        {
+            @include flex;
+            @include any;
+
+            flex-wrap: wrap;
+
+            @include media-min(768px)
+            {
+                @include sticky;
+
+                width: 300vw;
+                height: 100vh;
+            }
+        }
     }
 </style>
