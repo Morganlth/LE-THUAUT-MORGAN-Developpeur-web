@@ -7,23 +7,17 @@
 
 // #HOME
 
-#home
+#home h1 svg
 {
-    .main
-    {
-        svg
-        {
-            width: 30px * .7;
-            height: 100%;
+    width: 30px * .7;
+    height: 100%;
 
-            $map-width: font.$h-1-sizes;
-    
-            @each $key, $value in $map-width
-            {
-                $map-width: map.set($map-width, $key, $value * .7);
-            }
-    
-            @include media-min-map(width, $map-width, 325px);
-        }
+    $map-width: font.$h-1-sizes;
+
+    @each $key, $value in $map-width
+    {
+        $map-width: map.set($map-width, $key, $value * .7);
     }
+
+    @include media-min-map(width, $map-width, 325px);
 }

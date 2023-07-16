@@ -80,8 +80,8 @@ class="icon"
 style:--icon-color={_color}
 style:transform={_transform}
 style:opacity={_opacity}
-style:width={_size ?? 'auto'}
-style:height={_size ?? 'auto'}
+style:width={_size ?? 'var(--icon-size, auto)'}
+style:height={_size ?? 'var(--icon-size, auto)'}
 {...(_href ? { href: _href, alt: _alt } : {})}
 bind:this={icon}
 >
@@ -103,7 +103,7 @@ lang="scss"
     {
         @include f-center(true);
 
-        transition: opacity 0.6s;
+        transition: opacity .3s;
 
         pointer-events: auto;
     }

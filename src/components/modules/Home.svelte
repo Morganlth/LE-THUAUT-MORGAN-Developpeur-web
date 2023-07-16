@@ -29,7 +29,7 @@
         import Logo from '../icons/Logo.svelte'
         import Mouse from '../icons/Mouse.svelte'
 
-    // #ROUTER-SET
+    // #ROUTER
 
     router.router_add(0, 'home', 0)
 </script>
@@ -146,8 +146,6 @@ id="home"
 lang="scss"
 >
     /* #USES */
-
-    /* @use 'sass:map'; */
 
     @use '../../assets/scss/styles/grid' as *;
     @use '../../assets/scss/styles/grid' as *;

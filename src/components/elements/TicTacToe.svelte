@@ -8,13 +8,10 @@
 
     // #IMPORTS
 
-        // --SCSS
-        import '../../assets/scss/components/tictactoe.scss'
-
         // --CONTEXT
         import { spring } from '../field/Main.svelte'
 
-        // --ELEMENT-COVER
+        // --ELEMENT-COVERS
         import Cell from '../covers/Cell.svelte'
         import Icon from '../covers/Icon.svelte'
 
@@ -24,20 +21,17 @@
 
     // #CONSTANTES
     
-        // #PLAYERS
+        // --ELEMENT-TICTACTOE
         const
-        player = -1,
-        ai = 1
-
-        // #GAME-BOARD
-        const
-        board =
+        TICTACTOE_PLAYER = -1,
+        TICTACTOE_AI = 1,
+        TICTACTOE_BOARD =
         [
             0, 0, 0,
             0, 0, 0,
             0, 0, 0
         ],
-        winningModels =
+        TICTACTOE_WINNING_MODELS =
         [
             [0, 1, 2],
             [3, 4, 5],
@@ -51,137 +45,149 @@
 
     // #VARIABLES
 
-        // --STYLES
+        // --ELEMENT-TICTACTOE
         let
-        opacity = 1,
-        borderColor = _colors.sLight
+        tictactoe_OPACITY = 1,
+        tictactoe_BORDERCOLOR = _colors.sLight,
+        tictactoe_SIMULATION = [],
+        tictactoe_ROUND = 0,
+        tictactoe_AIROUND = false
 
-        // --GAME-INFOS
-        let
-        simulation = [],
-        tour = 0,
-        aiTour = false
+        // --ELEMENT-CELL
+        let cell_STYLE =
+        `
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            width: 100%;
+            height: 100%;
+
+            border: solid ${_colors.sLight} 1px;
+            border-top: none;
+            border-left: none;
+        `
+        .trim().replaceAll(/((?<=;)\s*[!^\s]|\n)/gm, '')
 
     // #FUNCTIONS
 
-        // --CYCLE
-        function reset(result)
+        // --GET
+        function tictactoe_getResult(emptyCells, depth)
         {
-            opacity = 0
-            borderColor = _colors[result === player ? 'primary' : result === ai ? 'secondary' : 'dark']
+            const RESULT = tictactoe_isWinning()
 
+            return (depth === 0 || RESULT || !emptyCells.length) ? RESULT : null
+        }
+
+        function tictactoe_getEmptyCells()
+        {
+            const EMPTYCELLS = []
+
+            for (let i = 0; i < TICTACTOE_BOARD.length; i++)
+                if (!TICTACTOE_BOARD[i]) EMPTYCELLS.push(i)
+
+            return EMPTYCELLS
+        }
+
+        // --RESET
+        function tictactoe_reset(result)
+        {
+            tictactoe_BORDERCOLOR = _colors[result === TICTACTOE_PLAYER ? 'primary' : result === TICTACTOE_AI ? 'secondary' : 'sLight']
+    
             setTimeout(() =>
             {
-                for (let i = 0; i < board.length; i++) board[i] = 0
+                tictactoe_OPACITY = 0
 
-                opacity = 1
-                borderColor = _colors.sLight
-                tour = 0
-                aiTour = false
-            }, 500)
+                setTimeout(tictactoe_resetGame, 300)
+            }, 250)
         }
 
-        // --GET
-        function getResult(emptyCells, depth)
+        function tictactoe_resetGame()
         {
-            const result = isWinning()
+            for (let i = 0; i < TICTACTOE_BOARD.length; i++) TICTACTOE_BOARD[i] = 0
 
-            return (depth === 0 || result || !emptyCells.length) ? result : null
+            tictactoe_OPACITY = 1
+            tictactoe_BORDERCOLOR = _colors.sLight
+            tictactoe_ROUND = 0
+            tictactoe_AIROUND = false
         }
-
-        function getEmptyCells()
-        {
-            const emptyCells = []
-
-            for (let i = 0; i < board.length; i++)
-                if (!board[i]) emptyCells.push(i)
-
-            return emptyCells
-        }
-
+    
         // --EVENT
-        function click(id)
+        function tictactoe_click()
         {
-            if (aiTour || board[id]) return
+            if (tictactoe_AIROUND || TICTACTOE_BOARD[this]) return
 
-            aiTour = true
+            tictactoe_AIROUND = true
 
-            newTour(id, false)
+            tictactoe_newRound(this, false)
         }
 
-        // --GAME-CODE
-        function newTour(id, isAi)
+        // --UTILS
+        function tictactoe_newRound(id, isAi)
         {
-            tour++
+            tictactoe_ROUND++
 
-            board[id] = isAi ? ai : player
-            simulation = [...board]
+            TICTACTOE_BOARD[id] = isAi ? TICTACTOE_AI : TICTACTOE_PLAYER
+            tictactoe_SIMULATION = [...TICTACTOE_BOARD]
 
-            const
-            emptyCells = getEmptyCells(),
-            result = getResult(emptyCells)
+            const RESULT = tictactoe_getResult(tictactoe_getEmptyCells())
 
-            result !== null ? reset(result) : isAi ? aiTour = false : play()
+            RESULT !== null ? tictactoe_reset(RESULT) : isAi ? tictactoe_AIROUND = false : tictactoe_play()
         }
 
-        function isWinning() /* return -1 || 0 || 1 */
+        function tictactoe_isWinning() /* return -1 || 0 || 1 */
         {
-            for (const model of winningModels)
+            for (const MODEL of TICTACTOE_WINNING_MODELS)
             {
                 const
-                [a, b, c] = model,
-                cell = simulation[a]
+                [A, B, C] = MODEL,
+                CELL = tictactoe_SIMULATION[A]
 
-                if (cell && cell === simulation[b] && cell === simulation[c]) return cell
+                if (CELL && CELL === tictactoe_SIMULATION[B] && CELL === tictactoe_SIMULATION[C]) return CELL
             }
 
             return 0
         }
 
-        function play()
+        function tictactoe_play()
         {
             const
-            emptyCells = getEmptyCells(),
-            depth = Math.round(Math.random()) + 2, /* changer la valeur pour augmenter ou diminuer la difficulté */
-            i = tour > -1 ? run(emptyCells, depth, true, true) : emptyCells[Math.round(Math.random() * (emptyCells.length - 1))]
+            EMPTYCELLS = tictactoe_getEmptyCells(),
+            DEPTH = Math.round(Math.random()) + 2, /* changer la valeur pour augmenter ou diminuer la difficulté */
+            ID = tictactoe_ROUND > -1 ? tictactoe_run(EMPTYCELLS, DEPTH, true, true) : EMPTYCELLS[Math.round(Math.random() * (EMPTYCELLS.length - 1))]
 
-            newTour(i, emptyCells, true)
+            tictactoe_newRound(ID, true)
         }
 
-        function run(emptyCells, depth, maximizingPlayer, start)
+        function tictactoe_run(emptyCells, depth, maximizingPlayer, start)
         {
             let
-            [value, currentPlayer, type] = maximizingPlayer ? [-Infinity, ai, 'max'] : [Infinity, player, 'min'],
-            i = emptyCells[0]
+            [value, currentPlayer, type] = maximizingPlayer ? [-Infinity, TICTACTOE_AI, 'max'] : [Infinity, TICTACTOE_PLAYER, 'min'],
+            id = emptyCells[0]
 
             depth--
 
-            for (const cell of emptyCells)
+            for (const CELL of emptyCells)
             {
-                simulation[cell] = currentPlayer
+                tictactoe_SIMULATION[CELL] = currentPlayer
 
-                const
-                currentEmptyCells = emptyCells.filter(c => c != cell),
-                currentValue = minimax(currentEmptyCells, depth, !maximizingPlayer)
+                const CURRENTVALUE = tictactoe_minimax(emptyCells.filter(c => c != CELL), depth, !maximizingPlayer)
 
-                if (start && (value < currentValue || (value === currentValue && Math.round(Math.random()))))
-                {
-                    value = currentValue
-                    i = cell
-                }
-                else value = Math[type](currentValue, value)
+                ;[value, id] = start && (value < CURRENTVALUE || (value === CURRENTVALUE && Math.round(Math.random())))
+                ? [CURRENTVALUE, CELL]
+                : [Math[type](CURRENTVALUE, value), id]
 
-                simulation[cell] = 0
+                tictactoe_SIMULATION[CELL] = 0
             }
 
-            return start ? i : value
+            return start ? id : value
         }
 
-        function minimax(emptyCells, depth, maximizingPlayer)
+        function tictactoe_minimax(emptyCells, depth, maximizingPlayer)
         {
-            const result = getResult(emptyCells, depth)
+            const RESULT = tictactoe_getResult(emptyCells, depth)
             
-            return result !== null ? result * (1 + emptyCells.length) : run(emptyCells, depth, maximizingPlayer)
+            return RESULT !== null ? RESULT * (1 + emptyCells.length) : tictactoe_run(emptyCells, depth, maximizingPlayer)
         }
 </script>
 
@@ -190,24 +196,23 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
 class="tictactoe"
-style:border-color={borderColor}
+style:border-color={tictactoe_BORDERCOLOR}
 on:mouseenter={spring.spring_mouseEnter.bind(spring)}
 on:mouseleave={spring.spring_mouseLeave.bind(spring)}
 >
-    {#each board as cell, i (i)}
+    {#each TICTACTOE_BOARD as cell, i (i)}
         <Cell
-        _style="border: solid {_colors.sLight} 1px; border-top: none; border-left: none"
-        on:click={click.bind(null, i)}
+        _style={cell_STYLE}
+        on:click={tictactoe_click.bind(i)}
         >
             <Icon
-            _opacity={opacity}
-            _size="30px"
+            _opacity={tictactoe_OPACITY}
             _spring={false}
-            _color={cell === ai ? _colors.secondary : _colors.primary}
+            _color={cell === TICTACTOE_AI ? _colors.secondary : _colors.primary}
             >
-                {#if cell === player}
+                {#if cell === TICTACTOE_PLAYER}
                     <Circle />
-                {:else if cell === ai}
+                {:else if cell === TICTACTOE_AI}
                     <Cross />
                 {/if}
             </Icon>
@@ -231,21 +236,27 @@ lang="scss"
     {
         @include grid(calc(100% / 3), calc(100% / 3), 3, 3);
 
+        --icon-size: 20px;
+
         width: 120px;
         height: 120px;
 
         border-right: solid 1px;
         border-bottom: solid 1px;
 
-        transition: border .25s; /* reset() timeout delay / 2 */
+        transition: border .4s;
 
         @include media-min(375px, 325px)
         {
+            --icon-size: 25px;
+
             width: 150px;
             height: 150px;
         }
         @include media-min(425px, 585px)
         {
+            --icon-size: 30px;
+    
             width: 180px;
             height: 180px;
         }
