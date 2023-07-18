@@ -137,8 +137,6 @@
             sizeBy2 = size / 2
 
             offsetTop = project.offsetTop + height
-
-            console.log(offsetTop)
         }
 
         function setCanvas()
@@ -251,15 +249,13 @@
         }
 
         // --EVENTS
-        async function project_wheel(deltaY, target)
+        async function project_wheel(deltaY)
         {
-            const scrollTop = target.scrollTop
-
-            if (scrollTop >= offsetTop - size)
+            if (event.main_scrollTop >= offsetTop - size)
             {
                 if (!frameId) animate()
 
-                if (deltaY > 0 && scrollTop >= offsetTop) move()
+                if (deltaY > 0 && event.main_scrollTop >= offsetTop) move()
             }
             else destroyFrame()
         }
@@ -277,7 +273,7 @@
         }
 
         // --ROUTER-CALL
-        function project_call() { project_wheel(true, router.main) }
+        function project_call() { project_wheel(true, router.main.scrollTop) }
 
         // --DRAW
         function draw()
@@ -478,6 +474,8 @@ lang="scss"
         .container
         {
             @include any-w;
+
+            z-index: 1;
     
             height: 50%;
 

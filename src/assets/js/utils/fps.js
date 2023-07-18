@@ -1,20 +1,20 @@
-/* #FPS */
+// #FPS
 
-export default function getFps()
+export default function fps_get()
 {
-    const startTime = performance.now()
+    const START = performance.now()
 
     let count = 0
 
     return new Promise(resolve =>
     {
-        function frame()
+        (function frame()
         {
             count++
 
-            performance.now() - startTime >= 500 ? resolve(count * 2) : requestAnimationFrame(frame)
-        }
-
-        frame()
+            performance.now() - START >= 500
+            ? resolve(count * 2)
+            : requestAnimationFrame(frame)
+        })()
     })
-  }
+}

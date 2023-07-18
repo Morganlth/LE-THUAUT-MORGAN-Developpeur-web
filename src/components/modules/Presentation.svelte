@@ -9,17 +9,15 @@
     // #IMPORTS
    
         // --CONTEXTS
-        import { app, event } from '../field/Main.svelte'
-        import { router } from '../field/Main.svelte'
-        import { spring } from '../field/Main.svelte'
+        import { app, event, wwindow, router, spring } from '../field/Main.svelte'
 
         // --JS
-        import getFps from '../../assets/js/utils/fps'
+        import fps_get from '../../assets/js/utils/fps'
 
         // --SVELTE
-        import { onMount, tick } from 'svelte'
+        import { onMount, onDestroy, tick } from 'svelte'
 
-        // --COMPONENT-ELEMENT
+        // --COMPONENT-ELEMENTS
         import Snake from '../elements/Snake.svelte'
         import Tag from '../elements/Tag.svelte'
         import Toggle from '../elements/Toggle.svelte'
@@ -31,406 +29,422 @@
         // --COMPONENT-ICON
         import Side from '../icons/Side.svelte'
 
-    // #CONSTANTE
+    // #CONSTANTES
 
-        // --PARAM
-        const size = 40
-
-        // --TO-ITERATE
-        const tags =
+        // --ELEMENT-PRESENTATION
+        const
+        PRESENTATION_BLOCKSIZE = 40,
+        PRESENTATION_PARAMS =
         [
-            { title: 'NOM - PRÉNOM', content: ['LE THUAUT Morgan'] },
-            { title: 'AGE', content: ['21 ans'] },
-            { title: 'PROFESSION', content: ['Développeur Web - FULL STACK'] },
-            { title: 'LOCALITÉ', content: ['Morbihan - FRANCE'] },
-            { title: 'ÉTUDES - FORMATIONS', content: ['Lycée Jeanne d\'Arc PONTIVY - bac S SVT spécialité MATHS', 'OpenClassrooms - formation de Développeur Web'] },
-            { title: 'CONTACT', content: ['Tel:  06 09 23 72 08', 'Email:  lethuaut.morgan@gmail.com'] }
+            {
+                on: true,
+                name: 'text',
+                content: 'LE TEXTE',
+                update: presentation_updateText
+            },
+            {
+                on: true,
+                name: 'snake',
+                content: 'LE SERPENT',
+                update: presentation_updateSnake
+            },
+            {
+                on: false,
+                name: 'fps',
+                content: 'LES FPS',
+                update: presentation_updateFps
+            }
+        ],
+        PRESENTATION_MODES =
+        [
+            {
+                on: false,
+                name: 'none',
+                text: false,
+                snake: false,
+                content: 'AUCUN'
+            },
+            {
+                on: false,
+                name: 'read',
+                text: true,
+                snake: false,
+                content: 'LECTURE'
+            },
+            {
+                on: true,
+                name: 'play',
+                text: null, // auto
+                snake: true,
+                content: 'JOUER'
+            },
+            {
+                on: false,
+                name: 'challenge',
+                text: false,
+                snake: true,
+                content: 'CHALLENGE'
+            }
         ]
 
+        // --ELEMENT-TAG
+        const TAG_ELEMENTS =
+        [
+            {
+                title: 'NOM - PRÉNOM',
+                content: ['LE THUAUT Morgan']
+            },
+            {
+                title: 'AGE',
+                content: ['21 ans']
+            },
+            {
+                title: 'PROFESSION',
+                content: ['Développeur Web - FULL STACK']
+            },
+            {
+                title: 'LOCALITÉ',
+                content: ['Morbihan - FRANCE']
+            },
+            {
+                title: 'ÉTUDES - FORMATIONS',
+                content: ['Lycée Jeanne d\'Arc PONTIVY - bac S SVT spécialité MATHS', 'OpenClassrooms - formation de Développeur Web']
+            },
+            {
+                title: 'CONTACT',
+                content: ['Tel:  06 09 23 72 08', 'Email:  lethuaut.morgan@gmail.com']
+            }
+        ]
+
+        // --ELEMENT-GAMEOVER
+        const GAMEOVER = { on: false }
+
     // #VARIABLES
+
+        // --EVENT-CONTEXT
+        let event_GRABBING = event.grabbing
 
         // --ELEMENT-PRESENTATION
         let presentation
 
         // --ELEMENT-TAG
         let
-        charged = false,
-        i = 0,
-        j = -1
-
-        // --ELEMENT-TAG-GAME-OVER
-        let gameOver = { on: false, update: updateGameOver }
+        tag_CHARGED = false,
+        tag_INDEX = 0,
+        tag_SAVE = -1
 
         // --ELEMENT-SNAKE
         let
-        score,
-        snakeTail = [0, 0],
-        resetSnake,
-        animation,
-        lock = false,
-        invincible = false
+        snake_SCORE,
+        snake_TAIL = [0, 0],
+        snake_INVINCIBLE = false,
+        snake_resetSize,
+        snake_updateEvent,
+        snake_animation
 
         // --ELEMENT-FRAME
         let
-        fps = 0,
-        translateX = 100
-
-        // --PARAMS
-        let
-        textParam = true,
-        snakeParam = true,
-        fpsParam = false
-
-        // --MODES
-        let
-        noneMode = false,
-        normalMode = true,
-        challengeMode = false
+        frame_FPS = 0,
+        frame_TRANSLATEX = 100
 
     // #REACTIVE
 
-        // --UPDATE
-        $: updateTag(snakeTail)
+        // --ELEMENT-PRESENTATION
+        $: presentation_$TEXT = PRESENTATION_PARAMS.find(p => p.name === 'text').on
+        $: presentation_$SNAKE = PRESENTATION_PARAMS.find(p => p.name === 'snake').on
+        $: presentation_$FPS = PRESENTATION_PARAMS.find(p => p.name === 'fps').on
+        $: presentation_$CHALLENGE = PRESENTATION_MODES.find(m => m.name === 'challenge').on
 
-        // --TO-ITERATE
-        $: params =
-        [
-            { on: textParam, content: 'AFFICHER LE TEXTE' },
-            { on: snakeParam, content: 'AFFICHER LE SERPENT' },
-            { on: fpsParam, content: 'AFFICHER LES FPS' }
-        ]
-        
-        $: modes =
-        [
-            { on: noneMode, content: 'AUCUN' },
-            { on: normalMode, content: 'NORMAL' },
-            { on: challengeMode, content: 'CHALLENGE' }
-        ]
+        // --ELEMENT-TAG
+        $: tag_update(snake_TAIL)
+
+        // --ELEMENT-SNAKE
+        $: snake_updateEvent instanceof Function ? snake_updateEvent(!$event_GRABBING && snake_test()) : null // set default desktop event snake
 
     // #FUNCTIONS
 
         // --SET
-        function set()
+        function presentation_set()
         {
-            restore()
-            setTag()
-            setCommand()
-            setRouter()
+            tag_set()
+    
+            presentation_setCommand()
+            presentation_setEvent()
+            presentation_setRouter()
         }
 
-        function setTag()
+        function tag_set()
         {
             document.fonts.ready.then(() =>
             {
-                charged = true
+                tag_CHARGED = true
 
-                if (!snakeParam && textParam) tick().then(viewTags)
+                if (presentation_$TEXT && !presentation_$SNAKE) tick().then(tag_showAll)
             })
         }
 
-        function setCommand()
+        function presentation_setCommand()
         {
-            app.app_add('presentationText', presentationText, true)
-            app.app_add('presentationSnake', presentationSnake, true)
-            app.app_add('presentationFps', presentationFps, true)
+            app.app_add('presentation_text', presentation_text, true)
+            app.app_add('presentation_snake', presentation_snake, true)
+            app.app_add('presentation_fps', presentation_fps, true)
         }
 
-        function setRouter()
-        {
-            const start = presentation.offsetLeft
+        function presentation_setEvent() { event.add('resize', presentation_resize) }
 
-            router.router_add(1, 'presentation', start, presentation_call)
-        }
-        
-        async function setFps()
+        function presentation_setRouter()
         {
-            fps = await getFps()
+            const START = presentation.offsetLeft
 
-            if (fpsParam) setFps()
+            router.router_add(1, 'presentation', START, presentation_call)
         }
 
-        function setInvincible()
+        async function presentation_setFps()
         {
-            invincible = true
+            frame_FPS = await fps_get()
 
-            setTimeout(() => invincible = false, 500)
+            if (presentation_$FPS) presentation_setFps()
+        }
+
+        function presentation_setItem(key, value) { localStorage.setItem('presentation_' + key, value) }
+
+        function snake_setInvincibleTime() { setTimeout(() => snake_INVINCIBLE = false, 500) }
+
+        // --GET
+        function presentation_getParam(name) { return PRESENTATION_PARAMS.find(p => p.name === name) }
+
+        function presentation_getMode(text, snake)
+        {
+            return snake ?? presentation_getParam('snake').on
+            ? 'play'
+            : text ?? presentation_getParam('text').on
+                ? 'read'
+                : 'none'
         }
 
         // --RESTORE
-        function restore()
+        function tag_restore()
         {
-            restoreParams()
-            restoreModes()
-        }
-
-        function restoreParams()
-        {
-            const
-            textStorage = localStorage.getItem('presentation_text'),
-            snakeStorage = localStorage.getItem('presentation_snake'),
-            fpsStorage = localStorage.getItem('presentation_fps')
-
-            textParam = (!textStorage || textStorage === 'true')
-            snakeParam = (!snakeStorage || snakeStorage === 'true')
-            fpsParam = fpsStorage === 'true'
-        }
-
-        function restoreModes()
-        {
-            if (!snakeParam)
+            if (tag_SAVE > -1)
             {
-                if (textParam) noneMode = true
-        
-                normalMode = false
-            }
-            else if (!textParam) normalMode = false
-        }
+                tag_INDEX = tag_SAVE
 
-        function restoreTag()
-        {
-            if (j > -1)
-            {
-                i = j
-
-                updateTag(snakeTail)
+                tag_update(snake_TAIL)
             }
         }
 
         // --UPDATE
-        function updateTag([tagX, tagY])
+        function presentation_updateParam(name, on)
         {
-            if (!textParam || !charged) return
+            const PARAM = presentation_getParam(name)
+
+            if (PARAM.on === on) return null
+
+            PARAM.on = on ?? !PARAM.on
+            PRESENTATION_PARAMS[PARAM] = PARAM // svelte
+            presentation_setItem(PARAM.name, PARAM.on)
+
+            if (on == undefined) { PARAM.update(PARAM.on) } else return PARAM 
+        }
+
+        function presentation_updateParamPair(text_ON, snake_ON)
+        {
+            const
+            TEXT = presentation_updateParam('text', text_ON),
+            SNAKE = presentation_updateParam('snake', snake_ON)
+
+            tick().then(() =>
+            {
+                if (TEXT) TEXT.update(text_ON)
+                if (SNAKE) SNAKE.update(snake_ON)
+            })
+        }
+
+        function presentation_updateMode(mode, param)
+        {
+            for (const MODE of PRESENTATION_MODES)
+                if (MODE.name === mode)
+                    if (MODE.on)
+                        return
+                    else
+                        MODE.on = true,
+                        PRESENTATION_MODES[MODE] = MODE, // svelte
+                        GAMEOVER.on
+                        ? gameover_update(false)
+                        : null,
+                        param
+                        ? presentation_updateParamPair(MODE.text ?? presentation_$TEXT, MODE.snake ?? presentation_$SNAKE)
+                        : null
+                else if (MODE.on)
+                    MODE.on = false,
+                    PRESENTATION_MODES[MODE] = MODE // svelte
+        }
+
+        function presentation_updateText(on)
+        {
+            if (tag_CHARGED)
+            {
+                on
+                ? presentation_$SNAKE
+                    ? tag_restore()
+                    : tag_showAll()
+                : tag_hideAll()
+            }
+        }
+
+        function presentation_updateSnake(on)
+        {
+            if (presentation_$TEXT && tag_CHARGED) on ? (tag_hideAll(), tag_restore()) : tag_showAll()
     
-            if (i === tags.length) i = 0
+            if (on) app.app_updateMode(false)
 
-            tags[j < 0 ? tags.length - 1 : j].hidden()
+            snake_animation(on)
+        }
 
-            j = i
+        function presentation_updateFps(on) { if (on) presentation_setFps() }
 
-            tags[i++].view(tagX, tagY, 100)
+        function tag_update([x, y])
+        {
+            if (!presentation_$TEXT || !tag_CHARGED) return
+    
+            if (tag_INDEX === TAG_ELEMENTS.length) tag_INDEX = 0
+
+            if (tag_SAVE > -1) TAG_ELEMENTS[tag_SAVE].hidden()
+
+            tag_SAVE = tag_INDEX
+
+            TAG_ELEMENTS[tag_INDEX++].view(x, y, 100)
         }
     
-        async function updateGameOver(on)
+        async function gameover_update(on)
         {
-            gameOver.on = on
+            GAMEOVER.on = on
     
-            await gameOver[on ? 'view' : 'hidden']()
+            await GAMEOVER[on ? 'view' : 'hidden']()
            
-            if (snakeParam) animation(!on)
+            if (presentation_$SNAKE) snake_animation(!on)
             
-            on ? spring.spring_mouseLeave() : setInvincible()
+            on ? (snake_updateEvent(false), spring.spring_mouseLeave()) : (snake_INVINCIBLE = true, snake_setInvincibleTime())
         }
 
-        function updateParam(id)
-        {
-            switch (id)
-            {
-                case 0:
-                    updateText(!textParam)
-                    break
-                case 1:
-                    updateSnake(!snakeParam)
-                    break
-                case 2:
-                    updateFps(!fpsParam)
-                    break
-                default:
-                    break
-            }
-        }
-
-        function updateMode(id)
-        {
-            switch (id)
-            {
-                case 0:
-                    updateNone(!noneMode)
-                    break
-                case 1:
-                    updateNormal(!normalMode)
-                    break
-                case 2:
-                    updateChallenge(!challengeMode)
-                    break
-                default:
-                    break
-            }
-        }
-
-        function updateText(on)
-        {
-            textParam = on
-
-            if (on)
-            {
-                if (charged) snakeParam ? restoreTag() : viewTags()
-                if (gameOver.on) gameOver.update(false)
-                
-                challengeMode = false
-            }
-            else
-            {
-                if (charged) hiddenTags()
-    
-                noneMode = false
-                normalMode = false
-            }
-
-            localStorage.setItem('presentationText', on)
-        }
-
-        function updateSnake(on)
-        {
-            snakeParam = on
-        
-            if (on)
-            {
-                if (textParam && charged) hiddenTags(), restoreTag()
-            
-                noneMode = false
-
-                app.app_updateMode(false)
-            }
-            else
-            {
-                if (textParam && charged) viewTags()
-                if (gameOver.on) gameOver.update(false)
-    
-                normalMode = false
-                challengeMode = false
-            }
-
-            animation(on)
-
-            localStorage.setItem('presentationSnake', on)
-        }
-
-        function updateFps(on)
-        {
-            if (on) setFps()
-
-            fpsParam = on
-
-            localStorage.setItem('presentationFps', on)
-        }
-
-        function updateNone(on)
-        {
-            if (on)
-            {
-                if (!textParam) updateText(true)
-                if (snakeParam) updateSnake(false)
-                if (gameOver.on) gameOver.update(false)
-    
-                normalMode = false
-                challengeMode = false
-            }
-
-            noneMode = on
-        }
-
-        function updateNormal(on)
-        {
-            if (on)
-            {
-                if (!textParam) updateText(true)
-                if (!snakeParam) updateSnake(true)
-                if (gameOver.on) gameOver.update(false)
-                
-                noneMode = false
-                challengeMode = false
-            }
-
-            normalMode = on
-        }
-
-        function updateChallenge(on)
-        {
-            if (on)
-            {
-                if (textParam) updateText(false)
-                if (!snakeParam) updateSnake(true)
-                
-                noneMode = false
-                normalMode = false
-
-                resetSnake()
-            }
-            else if (gameOver.on) gameOver.update(false)
-
-            challengeMode = on
-        }
+        // --DESTROY
+        function presentation_destroy() { event.remove('resize', presentation_resize) }
 
         // --COMMANDS
-        async function presentationText(on)
+        function presentation_text(on)
         {
             on = app.app_testDefault(on) ? true : app.app_testBoolean(on)
+
+            ;((mode = presentation_getMode(on)) => presentation_updateMode(mode, false))()
+            ;((text = presentation_updateParam('text', on)) => text ? text.update(on) : null)()
     
-            updateText(on)
-
-            app.app_success('presentationText ' + on)
+            app.app_success('presentation text - ' + on)
         }
 
-        async function presentationSnake(on)
+        function presentation_snake(on)
         {
             on = app.app_testDefault(on) ? true : app.app_testBoolean(on)
-        
-            updateSnake(on)
 
-            app.app_success('presentationSnake ' + on)
+            ;((mode = presentation_getMode(null, on)) => presentation_updateMode(mode, false))()
+            ;((snake = presentation_updateParam('snake', on)) => snake ? snake.update(on) : null)()
+
+            app.app_success('presentation snake - ' + on)
         }
 
-        async function presentationFps(on)
+        function presentation_fps(on)
         {
             on = app.app_testDefault(on) ? false : app.app_testBoolean(on)
         
-            updateFps(on)
+            ;((fps = presentation_updateParam('fps', on)) => fps ? fps.update(on) : null)()
 
-            app.app_success('presentationFps ' + on)
+            app.app_success('presentation fps - ' + on)
         }
 
-        // --EVENTS  
-        function click()
+        // --EVENTS
+        async function presentation_click_param()
         {
-            translateX = translateX ? 0 : 100
-            translateX ? (lock = false, setTimeout(() => { invincible = false }, 100)) : (lock = true, invincible = true)
+            if (this !== 'fps')
+            {
+                const MODE = presentation_getMode(...(this === 'text' ? [!presentation_$TEXT] : [null, !presentation_$SNAKE]))
+        
+                presentation_updateMode(MODE, false)
+            }
+    
+            presentation_updateParam(this)
         }
 
-        function mouseLeave(e)
+        async function presentation_click_mode()
+        {
+            if (this === 'challenge') snake_resetSize(true)
+
+            presentation_updateMode(this, true)
+        }
+
+        async function presentation_resize()
+        {
+            GAMEOVER.reset()
+    
+            for (const TAG of TAG_ELEMENTS)
+                TAG.reset()
+        }
+
+        async function options_click()
+        {
+            (frame_TRANSLATEX = frame_TRANSLATEX ? 0 : 100)
+            ? (snake_test()
+                ? snake_updateEvent(true)
+                : null,
+              snake_setInvincibleTime())
+            : (snake_updateEvent(false), snake_INVINCIBLE = true)
+        }
+
+        async function options_mouseLeave(e)
         {
             const target = e.relatedTarget
 
             if (!target || target.classList.contains('icon')) return
         
-            setTimeout(() => { invincible = false }, 200)
+            snake_setInvincibleTime()
 
-            translateX = 100
-            lock = false
+            frame_TRANSLATEX = 100
+            
+            if (snake_test()) snake_updateEvent(true)
         }
 
         // --ROUTER-CALL
-        function presentation_call() { setTimeout(() => event.manager.scroll.find(f => f.name === 'snake_scroll')(), 50) } // pas en mobile !!!
+        function presentation_call()
+        {
+            setTimeout(() =>
+            {
+                if (presentation_$SNAKE && wwindow.window_MOBILE === false && event.contain('scroll', 'snake_scroll') > -1)
+                    event.manager.scroll.find(f => f.name === 'snake_scroll')()
+            }, 50)
+        }
+
+        // --TEST
+        function snake_test() { return presentation_$SNAKE && !GAMEOVER.on }
 
         // --UTILS
-        function viewTags()
+        function tag_showAll()
         {
-            let y = size + 30
+            let y = PRESENTATION_BLOCKSIZE + 30
 
-            for (const tag of tags)
+            for (const TAG of TAG_ELEMENTS)
             {
-                const x = Math.random() * (window.innerWidth - tag.width - size * 2) + size
+                const X = Math.random() * (window.innerWidth - TAG.width - PRESENTATION_BLOCKSIZE * 2) + PRESENTATION_BLOCKSIZE
         
-                tag.view(x, y)
+                TAG.view(X, y)
 
-                y += tag.height
+                y += TAG.height
             }
         }
 
-        function hiddenTags() { for (let i = 0; i < tags.length; i++) tags[i].hidden() }
+        function tag_hideAll() { for (let i = 0; i < TAG_ELEMENTS.length; i++) TAG_ELEMENTS[i].hidden() }
 
-    // #CYCLE
+    // #CYCLES
 
-    onMount(set)
+    onMount(presentation_set)
+    onDestroy(presentation_destroy)
 </script>
 
 <!-- #HTML -->
@@ -442,13 +456,14 @@ bind:this={presentation}
     <div
     class="tag-container"
     >
-        {#if charged}
-            {#each tags as tag}
+        {#if tag_CHARGED}
+            {#each TAG_ELEMENTS as tag}
                 <Tag
-                _blockSize={size}
+                _blockSize={PRESENTATION_BLOCKSIZE}
                 _dark={_colors.dark}
                 bind:width={tag.width}
                 bind:height={tag.height}
+                bind:reset={tag.reset}
                 bind:view={tag.view}
                 bind:hidden={tag.hidden}
                 >
@@ -468,11 +483,12 @@ bind:this={presentation}
             class="game-over"
             >
                 <Tag
-                _blockSize={size}
+                _blockSize={PRESENTATION_BLOCKSIZE}
                 _start={false}
                 _dark={_colors.dark}
-                bind:view={gameOver.view}
-                bind:hidden={gameOver.hidden}
+                bind:reset={GAMEOVER.reset}
+                bind:view={GAMEOVER.view}
+                bind:hidden={GAMEOVER.hidden}
                 >
                     <h4>
                         &lt GAME
@@ -487,38 +503,36 @@ bind:this={presentation}
     </div>
 
     <Snake
-    _size={size}
-    _snakeParam={snakeParam}
-    _challenge={challengeMode}
-    _gameOver={gameOver}
-    _lock={lock}
-    _invincible={invincible}
+    _modes={{ challenge: presentation_$CHALLENGE }}
+    _gameover={{ on: GAMEOVER.on, update: gameover_update }}
+    _snake={{ invincible: snake_INVINCIBLE, blockSize: PRESENTATION_BLOCKSIZE }}
     {_colors}
-    bind:score={score}
-    bind:snakeTail={snakeTail}
-    bind:resetSnake={resetSnake}
-    bind:animation={animation}
+    bind:snake_SCORE={snake_SCORE}
+    bind:snake_TAIL={snake_TAIL}
+    bind:snake_resetSize={snake_resetSize}
+    bind:snake_updateEvent={snake_updateEvent}
+    bind:snake_animation={snake_animation}
     />
 
     <div
     class="frame"
-    style:padding="30px {size}px"
+    style:padding="30px {PRESENTATION_BLOCKSIZE}px"
     >
         <p
         class="score"
         >
-            SCORE {score}
+            SCORE {snake_SCORE}
         </p>
 
-        {#if fpsParam}
+        {#if presentation_$FPS}
             <p>
-                FPS {fps}
+                FPS {frame_FPS}
             </p>
         {/if}
 
         <Cell
         _style="border: none; cursor: pointer"
-        on:click={click}
+        on:click={options_click}
         >
             <Icon
             _size="18px"
@@ -529,23 +543,23 @@ bind:this={presentation}
         </Cell>
 
         <nav
-        style:transform="translateX({translateX}%)"
-        style:padding="{size * 2}px {size}px"
-        on:mouseleave={mouseLeave}
+        style:transform="translateX({frame_TRANSLATEX}%)"
+        style:padding="{PRESENTATION_BLOCKSIZE * 2}px {PRESENTATION_BLOCKSIZE}px"
+        on:mouseleave={options_mouseLeave}
         >
             <h4>PARAMÈTRES</h4>
 
             <ul>
-                {#each params as param, i}
+                {#each PRESENTATION_PARAMS as param}
                     <li>
                         <Cell
                         _style="display: block; width: 100%; border: none; cursor: pointer"
-                        on:click={updateParam.bind(null, i)}
+                        on:click={presentation_click_param.bind(param.name)}
                         >
                             <Toggle
                             _check={param.on}
                             >
-                                {param.content}
+                                AFFICHER {param.content}
                             </Toggle>
                         </Cell>
                     </li>
@@ -555,11 +569,11 @@ bind:this={presentation}
             <h4>MODES DE JEU</h4>
 
             <ul>
-                {#each modes as mode, i}
+                {#each PRESENTATION_MODES as mode}
                     <li>
                         <Cell
                         _style="display: block; width: 100%; border: none; cursor: pointer"
-                        on:click={updateMode.bind(null, i)}
+                        on:click={presentation_click_mode.bind(mode.name)}
                         >
                             <Toggle
                             _check={mode.on}
@@ -631,7 +645,7 @@ lang="scss"
         {
             h4
             {
-                @include h-1;
+                @include h-1($light, 1);
 
                 margin-bottom: 10px;
                 white-space: nowrap;
@@ -667,7 +681,7 @@ lang="scss"
                 gap: 30px;
 
                 top: 0;
-                right: 0;
+                right: -1px;
 
                 z-index: -1;
 

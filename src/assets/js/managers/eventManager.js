@@ -2,82 +2,101 @@
 
 class EventManager
 {
-    // --VARIABLES
-    scrollTop = 0
+    // #VARIABLES
 
-    manager =
-    {
-        scroll: [],
-        wheel: [],
-        mouseMove: [],
-        mouseDown: [],
-        mouseUp: [],
-        resize: []
-    }
-
-    scrollFrame = false
-    mouseFrame = false
-
-    grabbing = false
-
-    // --EVENTS
-    scroll({target})
-    {
-        if (this.scrollFrame) return
-
-        this.scrollFrame = requestAnimationFrame(() =>
+        // --EVENT-CONTEXT
+        manager =
         {
-            this.scrollTop = target.scrollTop
+            scroll: [],
+            wheel: [],
+            mouseMove: [],
+            mouseDown: [],
+            mouseUp: [],
+            resize: []
+        }
+        scrollFrame = false
+        mouseFrame = false
+        grabbing
 
-            this.run.call(this.manager.scroll)
+        // --ELEMENT-MAIN
+        main_scrollTop
 
-            this.scrollFrame = false
-        })
-    }
+    // #CONSTRUCTOR
 
-    wheel({deltaY, currentTarget}) { this.run.call(this.manager.wheel, deltaY, currentTarget) }
+    constructor() { this.grabbing = writable(false) }
 
-    mouseMove({clientX, clientY})
-    {
-        if (this.mouseFrame) return
+    // #FUNCTIONS
 
-        this.mouseFrame = requestAnimationFrame(() =>
+        // --EVENTS
+        scroll({target})
         {
-            this.run.call(this.manager.mouseMove, clientX, clientY)
+            if (this.scrollFrame) return
 
-            this.mouseFrame = false
-        })
-    }
+            this.scrollFrame = requestAnimationFrame(() =>
+            {
+                this.main_scrollTop = target.scrollTop
 
-    mouseDown(e) { this.run.call(this.manager.mouseDown, e) }
+                this.run.call(this.manager.scroll)
 
-    mouseUp() { this.run.call(this.manager.mouseUp) }
+                this.scrollFrame = false
+            })
+        }
 
-    resize(mobile) { this.run.call(this.manager.resize, mobile) }
+        wheel({deltaY}) { this.run.call(this.manager.wheel, deltaY) }
 
-    // --UTILS
-    add(category, func) { this.manager[category].push(func) }
+        mouseMove({clientX, clientY})
+        {
+            if (this.mouseFrame) return
 
-    remove(category, func)
-    {
-        const index = this.contain(category, func.name)
+            this.mouseFrame = requestAnimationFrame(() =>
+            {
+                this.run.call(this.manager.mouseMove, clientX, clientY)
 
-        if (index !== -1) this.manager[category].splice(index, 1)
-    }
+                this.mouseFrame = false
+            })
+        }
 
-    contain(category, name)
-    {
-        const array = this.manager[category]
+        mouseDown(e) { this.run.call(this.manager.mouseDown, e) }
 
-        for (let i = 0; i < array.length; i++)
-            if (name === array[i].name) return i
+        mouseUp() { this.run.call(this.manager.mouseUp) }
 
-        return -1
-    }
+        resize(smallScreen) { this.run.call(this.manager.resize, smallScreen) }
 
-    run() { for (const func of this) func(...arguments) }
+        // --UTILS
+        add(category, func) { this.manager[category].push(func) }
+
+        addSeveral(events)
+        {
+            for (const KEY in events)
+                if (this.contain(KEY, events[KEY].name) === -1) this.add(KEY, events[KEY])
+        }
+
+        remove(category, func)
+        {
+            const INDEX = this.contain(category, func.name)
+
+            if (INDEX !== -1) this.manager[category].splice(INDEX, 1)
+        }
+
+        contain(category, name)
+        {
+            const EVENT_CONTAINER = this.manager[category]
+
+            for (let i = 0; i < EVENT_CONTAINER.length; i++)
+                if (name === EVENT_CONTAINER[i].name) return i
+
+            return -1
+        }
+
+        run() { for (const func of this) func(...arguments) }
 }
+
+// #IMPORT
+
+    // --SVELTE
+    import { writable } from "svelte/store"
 
 // #EXPORT
 
-export default new EventManager()
+    // --CONTEXT
+    export default new EventManager()

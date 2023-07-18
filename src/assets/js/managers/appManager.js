@@ -82,7 +82,7 @@ class AppManager
             if (n != 0) this.app_updateMode(false)
         }
 
-        async app_fps() { if (this.app_KEYWORDS.includes('log')) this.app_COMMANDS.log(await getFps() + ' fps') }
+        async app_fps() { if (this.app_KEYWORDS.includes('log')) this.app_COMMANDS.log(await fps_get() + ' fps') }
 
         app_eco(eco)
         {
@@ -132,7 +132,7 @@ class AppManager
     // --JS
     import AppSuccess from '../utils/success'
     import AppError from '../utils/error'
-    import getFps from '../utils/fps'
+    import fps_get from '../utils/fps'
 
     // --SVELTE
     import { writable } from 'svelte/store'

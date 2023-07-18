@@ -5,9 +5,9 @@ class SpringManager
     // --VARIABLES
 
         // --SPRING-CONTEXT
-        spring_ON = false
-        spring_LOCK = false
-        spring_HOVER = false
+        spring_ON = false // active / desactive
+        spring_LOCK = false // bloque / debloque action
+        spring_HOVER = false // icon hover
         spring_TIMEOUT = null
         spring_COORDS
         spring_SIZE
@@ -41,12 +41,26 @@ class SpringManager
     {
         if (this.spring_ON !== on)
         {
-            on ? (this.spring_setEvent(), app.app_updateMode(false)) : this.spring_destroy()
+            on
+            ? (this.spring_setEvent(), app.app_updateMode(false))
+            : (this.spring_destroy(), this.spring_clear())
 
             this.spring_ON = on
             this.spring_SIZE.set(on ? 7 : 0)
         }
     }
+
+    spring_updateState(lock, size)
+    {
+        if (this.spring_ON)
+        {
+            this.spring_LOCK = lock
+            this.spring_SIZE.set(size)
+        }
+    }
+
+    // --CLEAR
+    spring_clear() { clearTimeout(this.spring_TIMEOUT) }
 
     // --DESTROY
     spring_destroy()
@@ -59,7 +73,7 @@ class SpringManager
     // --COMMAND
     spring_command(on)
     {
-        if (wwindow.window_testMobile()) return
+        if (wwindow.window_MOBILE) return
 
         on = app.app_testDefault(on) ? true : app.app_testBoolean(on)
 
@@ -73,34 +87,23 @@ class SpringManager
     // --EVENTS
     async spring_mouseMove(x, y) { if (!this.spring_HOVER) this.spring_COORDS.set({ x: x, y: y }) }
 
-    async spring_mouseDown() { if (!this.spring_LOCK) this.spring_TIMEOUT = setTimeout(() => { this.spring_SIZE.set(150) }, 200) }
+    async spring_mouseDown() { if (!this.spring_LOCK) this.spring_TIMEOUT = setTimeout(this.spring_SIZE.set.bind(null, 150), 200) }
 
     async spring_mouseUp()
     {
-        if (this.spring_LOCK) return
+        this.spring_clear()
 
-        clearTimeout(this.spring_TIMEOUT)
-
-        this.spring_SIZE.set(7)
+        if (!this.spring_LOCK) this.spring_SIZE.set(7)
     }
 
     async spring_mouseEnter()
     {
-        if (this.spring_ON)
-        {
-            this.spring_LOCK = true
-            this.spring_SIZE.set(0)
-        }
+        this.spring_clear()
+
+        this.spring_updateState(true, 0)
     }
 
-    async spring_mouseLeave()
-    {
-        if (this.spring_ON)
-        {
-            this.spring_LOCK = false
-            this.spring_SIZE.set(7)
-        }
-    }
+    async spring_mouseLeave() { this.spring_updateState(false, 7) }
 }
 
 // #IMPORT

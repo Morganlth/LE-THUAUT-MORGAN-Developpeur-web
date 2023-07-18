@@ -15,6 +15,15 @@
         width = 0,
         height = 0
 
+        export async function reset()
+        {
+            width = tag.offsetWidth + _blockSize - tag.offsetWidth % _blockSize,
+            height = tag.offsetHeight + _blockSize - tag.offsetHeight % _blockSize
+
+            setCanvas()
+            drawBackground()
+        }
+
         export async function view(x, y, delay)
         {
             [translateX, translateY] = getPosition(x, y)
@@ -38,13 +47,10 @@
             animation('fillRect')
         }
 
-    // #IMPORTS
-
-        // --CONTEXT
-        import { event } from '../field/Main.svelte';
+    // #IMPORT
 
         // --SVELTE
-        import { onMount, onDestroy } from 'svelte'
+        import { onMount } from 'svelte'
 
     // #VARIABLES
 
@@ -67,11 +73,7 @@
     // #FUNCTIONS
 
         // --SET
-        function set()
-        {
-            reset()
-            setEvent()
-        }
+        function set() { reset() }
 
         function setCanvas()
         {
@@ -85,8 +87,6 @@
 
             context = context ?? canvas.getContext('2d')
         }
-
-        function setEvent() { event.add('resize', tag_resize) }
 
         // --GET
         function getPosition(x, y)
@@ -113,22 +113,6 @@
 
             return [x, y]
         }
-
-        // --RESET
-        function reset()
-        {
-            width = tag.offsetWidth + _blockSize - tag.offsetWidth % _blockSize,
-            height = tag.offsetHeight + _blockSize - tag.offsetHeight % _blockSize
-
-            setCanvas()
-            drawBackground()
-        }
-
-        // --DESTROY
-        function destroy() { event.remove('resize', tag_resize) }
-
-        // --EVENT
-        function tag_resize() { reset() }
 
         // --DRAW
         function drawBackground()
@@ -158,10 +142,9 @@
             }
         }
 
-    // #CYCLES
+    // #CYCLE
 
      onMount(set)
-     onDestroy(destroy)
 </script>
 
 <!-- #HTML -->

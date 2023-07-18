@@ -31,9 +31,9 @@ $h-1-sizes: (375px: 36px, 425px: 46px, 768px: 60px, 1024px: 72px, 1440px: 86px);
     user-select: none;
 }
 
-@mixin h-1($color: $light)
+@mixin h-1($color: $light, $font-size: .7)
 {
-    @include h-($color, 30px, .7);
+    @include h-($color, 30px, $font-size);
 
     @include media-min-map(font-size, $h-1-sizes, 325px);
 }

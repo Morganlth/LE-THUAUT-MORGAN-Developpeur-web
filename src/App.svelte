@@ -13,8 +13,7 @@
         import './assets/scss/app.scss'
 
         // --CONTEXTS
-        import { app } from './components/field/Main.svelte'
-        import { spring } from './components/field/Main.svelte'
+        import { app, spring } from './components/field/Main.svelte'
 
         // --SVELTE
         import { onMount } from 'svelte'

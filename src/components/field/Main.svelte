@@ -49,7 +49,7 @@ context="module"
         main,
         main_FREEZE = app.app_FREEZE
 
-        // --ELEMENT-WRAPPER-1
+        // --ELEMENT-WRAPPER
         let
         wrapper_MAX,
         wrapper_TRANSLATEX = 0
@@ -68,7 +68,7 @@ context="module"
             main_setEvent()
         }
 
-        function main_setWrapper() { wrapper_MAX = main.querySelector('div:nth-child(1)').offsetHeight - window.innerHeight * 1.4 }
+        function main_setWrapper() { wrapper_MAX = main.firstChild.offsetHeight - window.innerHeight * 1.4 }
     
         function main_setCommand()
         {
@@ -81,7 +81,7 @@ context="module"
         {
             event.add('resize', main_resize)
 
-            if (!wwindow.window_testMobile()) main_setEventDesktop()
+            if (!wwindow.window_testSmallScreen()) main_setEventDesktop()
         }
 
         function main_setEventDesktop() { event.add('scroll', main_scroll) }
@@ -106,18 +106,14 @@ context="module"
         function main_destroyEventDesktop() { event.remove('scroll', main_scroll) }
 
         // --EVENTS
-        async function main_scroll()
-        {
-            const SCROLLTOP = main.scrollTop
-        
-            wrapper_TRANSLATEX = -(SCROLLTOP < wrapper_MAX ? SCROLLTOP : wrapper_MAX)
-        }
+        async function main_scroll() { wrapper_TRANSLATEX = -(event.main_scrollTop < wrapper_MAX ? event.main_scrollTop : wrapper_MAX) }
 
-        async function main_resize(mobile)
+        async function main_resize(smallScreen)
         {
-            if (localStorage.getItem('spring') == 'true') spring.spring_update(!mobile)
+            console.log(wwindow.window_MOBILE)
+            if (localStorage.getItem('spring') == 'true') spring.spring_update(!wwindow.window_MOBILE)
 
-            if (mobile) main_destroyEventDesktop(), wrapper_TRANSLATEX = 0
+            if (smallScreen) main_destroyEventDesktop(), wrapper_TRANSLATEX = 0
             else
             {
                 if (event.contain('scroll', main_scroll.name) === -1) main_setEventDesktop()

@@ -13,9 +13,8 @@
 
     // #IMPORTS
 
-        // --CONTEXT
-        import { event } from '../field/Main.svelte'
-        import { spring } from '../field/Main.svelte'
+        // --CONTEXTS
+        import { event, wwindow, spring } from '../field/Main.svelte'
 
         // --SVELTE
         import { onMount, onDestroy } from 'svelte'    
@@ -69,6 +68,9 @@
 
     // #VARIABLES
 
+        // --ELEMENT-MAIN
+        let main_scrollTop = 0
+
         // --GLOBALS
         let
         delay = 50,
@@ -80,13 +82,12 @@
         rotateInterval = null
     
         // --MEMORIES
-        let
-        lastScrollTop = 0,
-        lastOffsetTop = 0
+        let lastOffsetTop = 0
 
         // --ELEMENT-DIE
         let
         die,
+        die_grab = event.grabbing,
         x = 0,
         y = 0,
         r = 0,
@@ -104,6 +105,10 @@
         rotateX = 0,
         rotateY = -20,
         rotateZ = 0
+
+    // #REACTIVE
+
+    $: die_updateEvent($die_grab)
 
     // #FUNCTIONS
 
@@ -135,12 +140,9 @@
             initY = boundingClientRect.top + r + main.scrollTop
         }
 
-        function setEvent()
-        {
-            event.add('scroll', die_scroll)
-            event.add('mouseMove', die_mouseMove)
-            event.add('mouseUp', die_mouseUp)
-        }
+        function setEvent() { event.add('mouseUp', die_mouseUp) }
+
+        function die_setEventDesktop() { event.addSeveral({ scroll: die_scroll, mouseMove: die_mouseMove }) }
 
         // --GET
         function getNumber()
@@ -173,11 +175,18 @@
         }
 
         // --UPDATE
-        function update(c, g, u)
+        function die_updateEvent(on)
         {
-            cursor = c
-            event.grabbing = g
-            document.body.style.userSelect = u
+            if (wwindow.window_MOBILE === false)
+                on ? die_setEventDesktop() : die_destroyEventDesktop(),
+                main_scrollTop = event.main_scrollTop
+        }
+
+        function update(cursor, grab, userSelect)
+        {
+            cursor = cursor
+            event.grabbing.set(grab)
+            document.body.style.userSelect = userSelect
         }
 
         function updatePosition(xNow, yNow)
@@ -203,9 +212,15 @@
         // --DESTROY
         function destroy()
         {
+            event.remove('mouseUp', die_mouseUp)
+
+            die_destroyEventDesktop()
+        }
+
+        function die_destroyEventDesktop()
+        {
             event.remove('scroll', die_scroll)
             event.remove('mouseMove', die_mouseMove)
-            event.remove('mouseUp', die_mouseUp)
         }
 
         // --EVENTS
@@ -218,41 +233,36 @@
 
         async function die_mouseUp()
         {
-            clearTimeout(timeout)
+            if (event.grabbing)
+            {
+                clearTimeout(timeout)
     
-            update('grab', false, 'auto')
+                update('grab', false, 'auto')
 
-            if (!launchedInterval && (Math.abs(vX) > gravity || Math.abs(vY) > gravity)) launched()
+                if (!launchedInterval && (Math.abs(vX) > gravity || Math.abs(vY) > gravity)) launched()
+            }
         }
 
         async function die_scroll()
         {
-            const scrollTop = event.scrollTop
+            if (lastOffsetTop === _offsetTop) y += event.main_scrollTop - main_scrollTop
 
-            if (event.grabbing)
-            {
-                if (lastOffsetTop === _offsetTop) y += scrollTop - lastScrollTop
-
-                delay = 0
+            delay = 0
+    
+            updateTranslate()
+            updateRotate()
         
-                updateTranslate()
-                updateRotate()
-            }
-        
-            lastScrollTop = scrollTop
+            main_scrollTop = event.main_scrollTop
             lastOffsetTop = _offsetTop
         }
 
         async function die_mouseMove(xNow, yNow)
         {
-            if (event.grabbing)
-            {
-                const now = +new Date()
+            const now = +new Date()
 
-                clearTimeout(timeout)
-        
-                now > last + delay ? move(xNow, yNow, now) : timeout = setTimeout(() => move(xNow, yNow, now), delay)
-            }
+            clearTimeout(timeout)
+    
+            now > last + delay ? move(xNow, yNow, now) : timeout = setTimeout(() => move(xNow, yNow, now), delay)
         }
 
         // --UTIL
@@ -261,7 +271,7 @@
             delay = 50
 
             xNow -= initX
-            yNow += event.scrollTop - (initY + _offsetTop)
+            yNow += main_scrollTop - (initY + _offsetTop)
             
             updatePosition(xNow, yNow)
             updateTranslate()
