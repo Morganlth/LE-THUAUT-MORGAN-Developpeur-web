@@ -40,10 +40,10 @@
             setEvent()
         }
 
-        function setEvent() { event.add('scroll', scene_scroll) }
+        function setEvent() { event.event_add('scroll', scene_scroll) }
 
         // --DESTROY
-        function destroy() { event.remove('scroll', scene_scroll) }
+        function destroy() { event.event_remove('scroll', scene_scroll) }
 
         // --EVENT
         async function scene_scroll() { offsetTop = scene.offsetTop }
@@ -74,7 +74,7 @@ bind:this={scene}
         bind:number={number}
         />
 
-        <p>CE DÉ NE SERT ABSOLUMENT A RIEN.</p>
+        <p>CE DÉ NE SERT ABSOLUMENT A RIEN. (EN COURS DE DÉVELOPPEMENT)</p>
     </div>
 </div>
 

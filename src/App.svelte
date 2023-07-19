@@ -31,7 +31,10 @@
         const APP_START = performance.now()
 
     // #VARIABLES
-    
+
+        // --APP-CONTEXT
+        let app_FREEZE = app.app_FREEZE
+
         // --ELEMENT-SPRING
         let
         spring_COORDS = spring.spring_COORDS,
@@ -39,6 +42,11 @@
     
         // --ELEMENT-ECOPOPUP
         let ecopopup_ECO = false
+
+    // #REACTIVE
+
+        // --ELEMENT-HEADER
+        $: header_TRANSLATEY = $app_FREEZE ? 100 : 0
 
     // #FUNCTIONS
 
@@ -83,6 +91,7 @@
 
 <slot>
     <Header
+    _translateY={header_TRANSLATEY}
     _iconColor={colors.light}
     />
 

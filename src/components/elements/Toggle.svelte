@@ -28,16 +28,15 @@ class="toggle"
 <style
 lang="scss"
 >
-    /* #IMPORTS */
+    /* #USES */
 
-    @import
-    '../../assets/scss/styles/flex.scss',
-    '../../assets/scss/styles/position.scss',
-    '../../assets/scss/styles/size.scss',
-    '../../assets/scss/styles/font.scss',
-    '../../assets/scss/styles/cursor.scss';
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/font' as *;
+    @use '../../assets/scss/styles/cursor' as *;
 
-    /* #GROUPS */
+    /* #TOGGLE */
 
     .toggle
     {
@@ -49,6 +48,8 @@ lang="scss"
         justify-content: space-between;
     
         gap: 20px;
+
+        text-align: left;
 
         input
         {
@@ -87,7 +88,7 @@ lang="scss"
 
                 background-color: $secondary;
 
-                transition: transform 400ms;
+                transition: transform .4s;
             }
         }
     }

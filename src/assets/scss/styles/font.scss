@@ -18,7 +18,7 @@ $h-1-sizes: (375px: 36px, 425px: 46px, 768px: 60px, 1024px: 72px, 1440px: 86px);
 @mixin f-interact { font-family: 'Cremona'; }
 @mixin f-content { font-family: 'AnonymousPro'; }
 
-@mixin h-($color, $size, $line-height)
+@mixin h-($color, $size, $line-height: 1)
 {
     @include f-title;
 
@@ -40,7 +40,7 @@ $h-1-sizes: (375px: 36px, 425px: 46px, 768px: 60px, 1024px: 72px, 1440px: 86px);
 
 @mixin h-2($color: $light)
 {
-    @include h-($color, 18px, 1);
+    @include h-($color, 18px);
 
     @include media-min(768px) { font-size: 24px; }
     @include media-min(1024px) { font-size: 36px; }
@@ -48,7 +48,9 @@ $h-1-sizes: (375px: 36px, 425px: 46px, 768px: 60px, 1024px: 72px, 1440px: 86px);
 
 @mixin h-3($color: $light)
 {
-    @include h-($color, 24px, 24px);
+    @include h-($color, 18px);
+
+    @include media-min(768px) { font-size: 24px; }
 }
 
 @mixin h-4($color: $light)
@@ -87,11 +89,12 @@ $h-1-sizes: (375px: 36px, 425px: 46px, 768px: 60px, 1024px: 72px, 1440px: 86px);
 {
     @include f-content;
 
-    font-size: 18px;
+    font-size: 12px;
     font-weight: 100;
     line-height: 1;
 
-    @include media-min(425px) { font-size: 24px; }
+    @include media-min(425px) { font-size: 18px; }
+    @include media-min(768px) { font-size: 24px; }
 }
 
 

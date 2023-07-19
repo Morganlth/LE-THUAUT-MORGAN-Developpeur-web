@@ -5,82 +5,102 @@ class EventManager
     // #VARIABLES
 
         // --EVENT-CONTEXT
-        manager =
+        event_MANAGER =
         {
             scroll: [],
             wheel: [],
             mouseMove: [],
             mouseDown: [],
             mouseUp: [],
-            resize: []
+            resize: [],
+            touchMove: []
         }
-        scrollFrame = false
-        mouseFrame = false
-        grabbing
+        event_SCROLLFRAME
+        event_MOUSEFRAME
+        event_TOUCHFRAME
+        event_GRABBING
 
         // --ELEMENT-MAIN
+        main
         main_scrollTop
 
     // #CONSTRUCTOR
 
-    constructor() { this.grabbing = writable(false) }
+    constructor() { this.event_GRABBING = writable(false) }
 
     // #FUNCTIONS
 
-        // --EVENTS
-        scroll({target})
-        {
-            if (this.scrollFrame) return
+        // --SET
+        event_set(main) { this.main = main }
 
-            this.scrollFrame = requestAnimationFrame(() =>
+        // --EVENTS
+        event_scroll({target})
+        {
+            if (this.event_SCROLLFRAME) return
+
+            this.event_SCROLLFRAME = requestAnimationFrame(() =>
             {
                 this.main_scrollTop = target.scrollTop
 
-                this.run.call(this.manager.scroll)
+                this.event_run.call(this.event_MANAGER.scroll)
 
-                this.scrollFrame = false
+                this.event_SCROLLFRAME = false
             })
         }
 
-        wheel({deltaY}) { this.run.call(this.manager.wheel, deltaY) }
+        event_wheel({deltaY}) { this.event_run.call(this.event_MANAGER.wheel, deltaY) }
 
-        mouseMove({clientX, clientY})
+        event_mouseMove({clientX, clientY})
         {
-            if (this.mouseFrame) return
+            if (this.event_MOUSEFRAME) return
 
-            this.mouseFrame = requestAnimationFrame(() =>
+            this.event_MOUSEFRAME = requestAnimationFrame(() =>
             {
-                this.run.call(this.manager.mouseMove, clientX, clientY)
+                this.event_run.call(this.event_MANAGER.mouseMove, clientX, clientY)
 
-                this.mouseFrame = false
+                this.event_MOUSEFRAME = false
             })
         }
 
-        mouseDown(e) { this.run.call(this.manager.mouseDown, e) }
+        event_mouseDown(e) { this.event_run.call(this.event_MANAGER.mouseDown, e) }
 
-        mouseUp() { this.run.call(this.manager.mouseUp) }
+        event_mouseUp() { this.event_run.call(this.event_MANAGER.mouseUp) }
 
-        resize(smallScreen) { this.run.call(this.manager.resize, smallScreen) }
+        event_resize(smallScreen) { this.event_run.call(this.event_MANAGER.resize, smallScreen) }
+
+        event_touchMove(e)
+        {
+            if (this.event_TOUCHFRAME) return
+
+            this.event_TOUCHFRAME = requestAnimationFrame(() =>
+            {
+                const TOUCH = e.changedTouches[0]
+    
+                this.event_run.call(this.event_MANAGER.touchMove, ...[TOUCH.clientX, TOUCH.clientY])
+
+                this.event_TOUCHFRAME = false
+            })
+        }
 
         // --UTILS
-        add(category, func) { this.manager[category].push(func) }
+        event_add(category, func) { this.event_MANAGER[category].push(func) }
 
-        addSeveral(events)
+        event_addSeveral(events)
         {
             for (const KEY in events)
-                if (this.contain(KEY, events[KEY].name) === -1) this.add(KEY, events[KEY])
+                if (this.event_contain(KEY, events[KEY].name) === -1) this.event_add(KEY, events[KEY])
         }
 
-        remove(category, func)
+        event_remove(category, func)
         {
-            const INDEX = this.contain(category, func.name)
+            const INDEX = this.event_contain(category, func.name)
 
-            if (INDEX !== -1) this.manager[category].splice(INDEX, 1)
+            if (INDEX !== -1) this.event_MANAGER[category].splice(INDEX, 1)
         }
 
-        contain(category, name)
+        event_contain(category, name)
         {
-            const EVENT_CONTAINER = this.manager[category]
+            const EVENT_CONTAINER = this.event_MANAGER[category]
 
             for (let i = 0; i < EVENT_CONTAINER.length; i++)
                 if (name === EVENT_CONTAINER[i].name) return i
@@ -88,7 +108,9 @@ class EventManager
             return -1
         }
 
-        run() { for (const func of this) func(...arguments) }
+        event_run() { for (const func of this) func(...arguments) }
+
+        event_scrollTo(top) { this.main.scrollTo({ top: top, behavior: 'instant' }) }
 }
 
 // #IMPORT

@@ -16,6 +16,7 @@
 
         // --SVELTE
         import { onMount, onDestroy, tick } from 'svelte'
+        import { fade } from 'svelte/transition'
 
         // --COMPONENT-ELEMENTS
         import Snake from '../elements/Snake.svelte'
@@ -26,7 +27,8 @@
         import Cell from '../covers/Cell.svelte'
         import Icon from '../covers/Icon.svelte'
 
-        // --COMPONENT-ICON
+        // --COMPONENT-ICONS
+        import Cross from '../icons/Cross.svelte'
         import Side from '../icons/Side.svelte'
 
     // #CONSTANTES
@@ -114,21 +116,22 @@
                 title: 'CONTACT',
                 content: ['Tel:  06 09 23 72 08', 'Email:  lethuaut.morgan@gmail.com']
             }
-        ]
-
-        // --ELEMENT-GAMEOVER
-        const GAMEOVER = { on: false }
+        ],
+        TAG_GAMEOVER = { on: false },
+        TAG_MOBILE = { on: false }
 
     // #VARIABLES
 
         // --EVENT-CONTEXT
-        let event_GRABBING = event.grabbing
+        let event_GRABBING = event.event_GRABBING
 
         // --ELEMENT-PRESENTATION
         let presentation
 
         // --ELEMENT-TAG
         let
+        tag_CONTAINER,
+        tag_Z = 0,
         tag_CHARGED = false,
         tag_INDEX = 0,
         tag_SAVE = -1
@@ -138,6 +141,7 @@
         snake_SCORE,
         snake_TAIL = [0, 0],
         snake_INVINCIBLE = false,
+        snake_MOBILE_GAME,
         snake_resetSize,
         snake_updateEvent,
         snake_animation
@@ -179,7 +183,11 @@
             {
                 tag_CHARGED = true
 
-                if (presentation_$TEXT && !presentation_$SNAKE) tick().then(tag_showAll)
+                tick().then(() =>
+                {
+                    if (wwindow.window_MOBILE) mobile_update(presentation_$SNAKE)
+                    if (presentation_$TEXT && !presentation_$SNAKE) tag_showAll()
+                })
             })
         }
 
@@ -190,11 +198,11 @@
             app.app_add('presentation_fps', presentation_fps, true)
         }
 
-        function presentation_setEvent() { event.add('resize', presentation_resize) }
+        function presentation_setEvent() { event.event_add('resize', presentation_resize) }
 
         function presentation_setRouter()
         {
-            const START = presentation.offsetLeft
+            const START = presentation[wwindow.window_testSmallScreen() ? 'offsetTop' : 'offsetLeft']
 
             router.router_add(1, 'presentation', START, presentation_call)
         }
@@ -222,6 +230,13 @@
                 : 'none'
         }
 
+        function tag_getGap()
+        {
+            const HEIGHT = window.innerHeight - PRESENTATION_BLOCKSIZE * 3
+
+            return (HEIGHT - TAG_ELEMENTS.reduce((a, tag) => a += tag.height, 0)) / (TAG_ELEMENTS.length - 1)
+        }
+
         // --RESTORE
         function tag_restore()
         {
@@ -231,6 +246,15 @@
 
                 tag_update(snake_TAIL)
             }
+        }
+
+        // --RESET
+        function tag_reset()
+        {
+            TAG_GAMEOVER.reset()
+            TAG_MOBILE.reset()
+    
+            for (const TAG of TAG_ELEMENTS) TAG.reset()
         }
 
         // --UPDATE
@@ -269,7 +293,7 @@
                     else
                         MODE.on = true,
                         PRESENTATION_MODES[MODE] = MODE, // svelte
-                        GAMEOVER.on
+                        TAG_GAMEOVER.on
                         ? gameover_update(false)
                         : null,
                         param
@@ -298,37 +322,70 @@
     
             if (on) app.app_updateMode(false)
 
-            snake_animation(on)
+            wwindow.window_MOBILE ? mobile_update(on) : snake_animation(on)
         }
 
         function presentation_updateFps(on) { if (on) presentation_setFps() }
 
         function tag_update([x, y])
         {
-            if (!presentation_$TEXT || !tag_CHARGED) return
+            if (presentation_$TEXT && tag_CHARGED)
+            {
+                if (tag_INDEX === TAG_ELEMENTS.length) tag_INDEX = 0
+                if (tag_SAVE > -1) TAG_ELEMENTS[tag_SAVE].hide()
+
+                tag_SAVE = tag_INDEX
+
+                const TAG = TAG_ELEMENTS[tag_INDEX++]
     
-            if (tag_INDEX === TAG_ELEMENTS.length) tag_INDEX = 0
+                ;[x, y] = [tag_testPosition(window.innerWidth, TAG.width, x), tag_testPosition(window.innerHeight, TAG.height, y)]
 
-            if (tag_SAVE > -1) TAG_ELEMENTS[tag_SAVE].hidden()
-
-            tag_SAVE = tag_INDEX
-
-            TAG_ELEMENTS[tag_INDEX++].view(x, y, 100)
+                TAG.show(x, y, 100)
+            }
         }
     
         async function gameover_update(on)
         {
-            GAMEOVER.on = on
+            TAG_GAMEOVER.on = on
     
-            await GAMEOVER[on ? 'view' : 'hidden']()
+            await TAG_GAMEOVER[on ? 'show' : 'hide']()
            
             if (presentation_$SNAKE) snake_animation(!on)
             
             on ? (snake_updateEvent(false), spring.spring_mouseLeave()) : (snake_INVINCIBLE = true, snake_setInvincibleTime())
         }
 
+        async function mobile_update(on)
+        {
+            if (tag_CHARGED)
+            {
+                if (on && tag_SAVE > -1) await TAG_ELEMENTS[tag_SAVE].hide()
+                if (on && TAG_GAMEOVER.on)
+                    TAG_GAMEOVER.on = false,
+                    await TAG_GAMEOVER.hide()
+    
+                mobile_updateGame(!on)
+    
+                TAG_MOBILE.on = on
+                TAG_MOBILE[on ? 'show' : 'hide']()
+            }
+        }
+
+        function mobile_updateGame(on)
+        {
+            const START = presentation_getParam('snake').on && on
+
+            START
+            ? event.event_scrollTo(presentation[wwindow.window_testSmallScreen() ? 'offsetTop' : 'offsetLeft'])
+            : snake_updateEvent(false)
+
+            app.app_FREEZE.set(START)
+            snake_MOBILE_GAME = START
+            snake_animation(START)
+        }
+
         // --DESTROY
-        function presentation_destroy() { event.remove('resize', presentation_resize) }
+        function presentation_destroy() { event.event_remove('resize', presentation_resize) }
 
         // --COMMANDS
         function presentation_text(on)
@@ -382,10 +439,12 @@
 
         async function presentation_resize()
         {
-            GAMEOVER.reset()
-    
-            for (const TAG of TAG_ELEMENTS)
-                TAG.reset()
+            tag_reset()
+            presentation_setRouter()
+            presentation_updateText(presentation_$TEXT)
+            mobile_update(wwindow.window_MOBILE && presentation_$SNAKE)
+
+            if (snake_test()) snake_updateEvent(true)
         }
 
         async function options_click()
@@ -411,35 +470,79 @@
             if (snake_test()) snake_updateEvent(true)
         }
 
+        async function mobile_click() { mobile_update(presentation_$SNAKE) }
+
         // --ROUTER-CALL
         function presentation_call()
         {
             setTimeout(() =>
             {
-                if (presentation_$SNAKE && wwindow.window_MOBILE === false && event.contain('scroll', 'snake_scroll') > -1)
-                    event.manager.scroll.find(f => f.name === 'snake_scroll')()
+                if (presentation_$SNAKE && wwindow.window_MOBILE === false && event.event_contain('scroll', 'snake_scroll') > -1)
+                    event.event_MANAGER.scroll.find(f => f.name === 'snake_scroll')()
             }, 50)
         }
 
-        // --TEST
-        function snake_test() { return presentation_$SNAKE && !GAMEOVER.on }
+        // --TESTS
+        function tag_testPosition(size, tagSize, coord)
+        {
+            if (coord < PRESENTATION_BLOCKSIZE) coord = PRESENTATION_BLOCKSIZE
+            else
+            {
+                const TOTAL = coord + tagSize + PRESENTATION_BLOCKSIZE
+
+                if (TOTAL > size) coord -= TOTAL - size
+            }
+
+            return coord
+        }
+
+        function snake_test() { return presentation_$SNAKE && !TAG_GAMEOVER.on }
 
         // --UTILS
         function tag_showAll()
         {
-            let y = PRESENTATION_BLOCKSIZE + 30
+            wwindow.window_MOBILE ? tag_showAllMobile() : tag_showAllDesktop()
+        }
+
+        function tag_showAllDesktop()
+        {
+            const GAP = tag_getGap()
+
+            let y = PRESENTATION_BLOCKSIZE * 1.5
 
             for (const TAG of TAG_ELEMENTS)
             {
                 const X = Math.random() * (window.innerWidth - TAG.width - PRESENTATION_BLOCKSIZE * 2) + PRESENTATION_BLOCKSIZE
         
-                TAG.view(X, y)
+                TAG.show(X, y)
 
-                y += TAG.height
+                y += TAG.height + GAP
             }
         }
 
-        function tag_hideAll() { for (let i = 0; i < TAG_ELEMENTS.length; i++) TAG_ELEMENTS[i].hidden() }
+        function tag_showAllMobile()
+        {
+            let i = 0
+
+            for (const TAG of TAG_ELEMENTS)
+            {
+                const
+                X = (window.innerWidth - TAG.width - PRESENTATION_BLOCKSIZE * 2) / 2 + window.innerWidth * i++,
+                Y = Math.random() * (window.innerHeight - TAG.height - PRESENTATION_BLOCKSIZE * 4) + PRESENTATION_BLOCKSIZE * 2
+        
+                TAG.show(X, Y)
+            }
+
+            tag_Z = 1
+        }
+
+        function tag_hideAll()
+        {
+            for (let i = 0; i < TAG_ELEMENTS.length; i++) TAG_ELEMENTS[i].hide()
+
+            tag_CONTAINER.scrollTo({ left: 0, behavior: 'instant' })
+            tag_Z = 0
+        }
 
     // #CYCLES
 
@@ -455,17 +558,30 @@ bind:this={presentation}
 >
     <div
     class="tag-container"
+    style:z-index={tag_Z}
+    style:overflow-x={tag_Z ? 'scroll' : 'hidden'}
+    bind:this={tag_CONTAINER}
     >
+        {#if tag_Z}
+            <span
+            class="tag-scroll"
+            transition:fade
+            >
+                SCROLL
+            </span>
+        {/if}
+
         {#if tag_CHARGED}
             {#each TAG_ELEMENTS as tag}
                 <Tag
                 _blockSize={PRESENTATION_BLOCKSIZE}
+                _max_width="calc(100vw - {PRESENTATION_BLOCKSIZE * 3}px)"
                 _dark={_colors.dark}
                 bind:width={tag.width}
                 bind:height={tag.height}
-                bind:reset={tag.reset}
-                bind:view={tag.view}
-                bind:hidden={tag.hidden}
+                bind:tag_reset={tag.reset}
+                bind:tag_show={tag.show}
+                bind:tag_hide={tag.hide}
                 >
                     <h2>{tag.title}</h2>
 
@@ -480,15 +596,15 @@ bind:this={presentation}
             {/each}
 
             <div
-            class="game-over"
+            class="super-tag"
             >
                 <Tag
                 _blockSize={PRESENTATION_BLOCKSIZE}
-                _start={false}
+                _center={true}
                 _dark={_colors.dark}
-                bind:reset={GAMEOVER.reset}
-                bind:view={GAMEOVER.view}
-                bind:hidden={GAMEOVER.hidden}
+                bind:tag_reset={TAG_GAMEOVER.reset}
+                bind:tag_show={TAG_GAMEOVER.show}
+                bind:tag_hide={TAG_GAMEOVER.hide}
                 >
                     <h4>
                         &lt GAME
@@ -499,13 +615,36 @@ bind:this={presentation}
                     <p>CLICK POUR REJOUER</p>
                 </Tag>
             </div>
+
+            <div
+            class="super-tag"
+            >
+                <Tag
+                _blockSize={PRESENTATION_BLOCKSIZE}
+                _center={true}
+                _dark={_colors.dark}
+                bind:tag_reset={TAG_MOBILE.reset}
+                bind:tag_show={TAG_MOBILE.show}
+                bind:tag_hide={TAG_MOBILE.hide}
+                >
+                    <h4>
+                        &lt SNAKE
+                        <br>
+                        GAME &gt
+                    </h4>
+
+                    <p>CLICK POUR JOUER</p>
+                </Tag>
+            </div>
         {/if}
     </div>
 
     <Snake
-    _modes={{ challenge: presentation_$CHALLENGE }}
-    _gameover={{ on: GAMEOVER.on, update: gameover_update }}
-    _snake={{ invincible: snake_INVINCIBLE, blockSize: PRESENTATION_BLOCKSIZE }}
+    _challenge={presentation_$CHALLENGE}
+    _gameover={{ on: TAG_GAMEOVER.on, update: gameover_update }}
+    _mobile={{ on: TAG_MOBILE.on, update: mobile_update }}
+    _invincible={snake_INVINCIBLE}
+    _blockSize={PRESENTATION_BLOCKSIZE}
     {_colors}
     bind:snake_SCORE={snake_SCORE}
     bind:snake_TAIL={snake_TAIL}
@@ -530,61 +669,87 @@ bind:this={presentation}
             </p>
         {/if}
 
-        <Cell
-        _style="border: none; cursor: pointer"
-        on:click={options_click}
+        <div
+        class="container"
         >
-            <Icon
-            _size="18px"
-            _color={_colors.sLight}
+            <Cell
+            _style="border: none; cursor: pointer"
+            on:click={options_click}
             >
-                <Side />
-            </Icon>
-        </Cell>
+                <Icon
+                _size="18px"
+                _color={_colors.sLight}
+                >
+                    <Side />
+                </Icon>
+            </Cell>
 
-        <nav
+            {#if snake_MOBILE_GAME}
+                <Cell
+                _style="border: none; cursor: pointer"
+                on:click={mobile_click}
+                >
+                    <Icon
+                    _size="18px"
+                    _color={_colors.sLight}
+                    >
+                        <Cross />
+                    </Icon>
+                </Cell>
+            {/if}
+        </div>
+
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div
+        class="options"
         style:transform="translateX({frame_TRANSLATEX}%)"
         style:padding="{PRESENTATION_BLOCKSIZE * 2}px {PRESENTATION_BLOCKSIZE}px"
         on:mouseleave={options_mouseLeave}
         >
-            <h4>PARAMÈTRES</h4>
+            <nav>
+                <section>
+                    <h4>PARAMÈTRES</h4>
 
-            <ul>
-                {#each PRESENTATION_PARAMS as param}
-                    <li>
-                        <Cell
-                        _style="display: block; width: 100%; border: none; cursor: pointer"
-                        on:click={presentation_click_param.bind(param.name)}
-                        >
-                            <Toggle
-                            _check={param.on}
-                            >
-                                AFFICHER {param.content}
-                            </Toggle>
-                        </Cell>
-                    </li>
-                {/each}
-            </ul>
+                    <ul>
+                        {#each PRESENTATION_PARAMS as param}
+                            <li>
+                                <Cell
+                                _style="display: block; width: 100%; border: none; cursor: pointer"
+                                on:click={presentation_click_param.bind(param.name)}
+                                >
+                                    <Toggle
+                                    _check={param.on}
+                                    >
+                                        AFFICHER {param.content}
+                                    </Toggle>
+                                </Cell>
+                            </li>
+                        {/each}
+                    </ul>
+                </section>
 
-            <h4>MODES DE JEU</h4>
+                <section>
+                    <h4>MODES DE JEU</h4>
 
-            <ul>
-                {#each PRESENTATION_MODES as mode}
-                    <li>
-                        <Cell
-                        _style="display: block; width: 100%; border: none; cursor: pointer"
-                        on:click={presentation_click_mode.bind(mode.name)}
-                        >
-                            <Toggle
-                            _check={mode.on}
-                            >
-                                {mode.content}
-                            </Toggle>
-                        </Cell>
-                    </li>
-                {/each}
-            </ul>
-        </nav>
+                    <ul>
+                        {#each PRESENTATION_MODES as mode}
+                            <li>
+                                <Cell
+                                _style="display: block; width: 100%; border: none; cursor: pointer"
+                                on:click={presentation_click_mode.bind(mode.name)}
+                                >
+                                    <Toggle
+                                    _check={mode.on}
+                                    >
+                                        {mode.content}
+                                    </Toggle>
+                                </Cell>
+                            </li>
+                        {/each}
+                    </ul>
+                </section>
+            </nav>
+        </div>
     </div>
 </div>
 
@@ -601,6 +766,7 @@ lang="scss"
     @use '../../assets/scss/styles/background' as *;
     @use '../../assets/scss/styles/font' as *;
     @use '../../assets/scss/styles/cursor' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #PRESENTATION */
 
@@ -615,6 +781,24 @@ lang="scss"
 
         .tag-container
         {
+            @include relative;
+            @include any;
+
+            overflow-y: hidden;
+
+            .tag-scroll
+            {
+                @include absolute;
+                @include h-(rgba($light, .02), 50vh);
+
+                top: 50%;
+                left: 0;
+
+                transform: translateY(-50%);
+
+                letter-spacing: 10vh;
+            }
+
             h2
             {
                 @include h-2($o-primary);
@@ -641,7 +825,7 @@ lang="scss"
             }
         }
 
-        .game-over
+        .super-tag
         {
             h4
             {
@@ -670,41 +854,73 @@ lang="scss"
 
             p { @include p-interact; }
 
-            nav
+            .container
+            {
+                @include flex;
+                @include any-h;
+
+                flex-direction: column-reverse;
+                justify-content: space-between;
+            }
+
+            .options
             {
                 @include f-center(true);
-                @include f-column;
                 @include absolute;
-                @include any-h;
+                @include any;
                 @include black-glass(blur(5px));
-
-                gap: 30px;
 
                 top: 0;
                 right: -1px;
 
                 z-index: -1;
 
-                transition: transform 0.5s ease;
-
-                border-left: solid 4px $s-light;
-
                 box-sizing: border-box;
 
                 pointer-events: auto;
+
+                transition: transform .4s ease;
+    
+                nav
+                {
+                    @include flex;
+                    @include f-column;
+
+                    justify-content: space-around;
+
+                    gap: 30px;
+
+                    @include media-max(false, 649px)
+                    {
+                        @include any-w;
+    
+                        flex-direction: row;
+                    }
+                }
+
+                h4
+                {
+                    @include h-3;
+                    @include any-w;
+
+                    margin-bottom: 30px;
+
+                    text-align: right;
+                }
+
+                ul { @include any-w; }
+
+                li { margin-bottom: 10px; }
+
+                @include media-min(768px, 650px)
+                {
+                    width: auto;
+
+                    border-left: solid 4px $s-light;
+
+                    li { margin-bottom: 20px; }
+                }
             }
-
-            h4
-            {
-                @include h-3;
-                @include any-w;
-
-                text-align: right;
-            }
-
-            ul { @include any-w; }
-
-            li { margin-bottom: 20px; }
         }
     }
 </style>

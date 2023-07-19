@@ -19,7 +19,7 @@ class WindowManager
         // --SET
         window_set()
         {
-            this.window_MOBILE = navigator.maxTouchPoints > 0
+            this.window_MOBILE = this.window_testMobile()
 
             window.addEventListener('resize', this.window_RESIZE)
         }
@@ -35,12 +35,25 @@ class WindowManager
             clearTimeout(this.window_TIMEOUT)
 
             now > this.window_LAST + 2000
-            ? (event.resize(this.window_testSmallScreen()), this.window_LAST = now)
-            : this.window_TIMEOUT = setTimeout(event.resize.bind(null, this.window_testSmallScreen()), 100)
+            ? this.window_call(now)
+            : this.window_TIMEOUT = setTimeout(this.window_call.bind(this), 100)
         }
 
-        // --TEST
+        // --TESTS
+        window_testMobile() { return navigator.maxTouchPoints > 0 }
+
         window_testSmallScreen() { return window.innerWidth < 768 }
+
+        // --UTIL
+        window_call(now)
+        {
+            this.window_LAST = now ?? +new Date()
+            this.window_MOBILE = this.window_testMobile()
+
+            const SMALLSCREEN = this.window_testSmallScreen()
+
+            event.event_resize(SMALLSCREEN)
+        }
 }
 
 // #IMPORT

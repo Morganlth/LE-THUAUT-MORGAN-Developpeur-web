@@ -201,7 +201,7 @@
             }
         }
 
-        function setEvent() { event.add('wheel', project_wheel) }
+        function setEvent() { event.event_add('wheel', project_wheel) }
 
         function setRouter()
         {
@@ -235,7 +235,7 @@
             destroyFrame()
         }
 
-        function destroyEvent() { event.remove('wheel', project_wheel) }
+        function destroyEvent() { event.event_remove('wheel', project_wheel) }
 
         function destroyFrame()
         {
@@ -273,7 +273,7 @@
         }
 
         // --ROUTER-CALL
-        function project_call() { project_wheel(true, router.main.scrollTop) }
+        function project_call() { project_wheel(true, event.main_scrollTop) }
 
         // --DRAW
         function draw()

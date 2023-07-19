@@ -5,9 +5,11 @@
 
         // --PROPS
         export let
-        _modes,
+        _challenge,
         _gameover,
-        _snake,
+        _mobile,
+        _invincible,
+        _blockSize,
         _colors
 
         // --BINDS
@@ -42,9 +44,11 @@
 
         // --ELEMENT-SNAKE
         let
+        snake_ON,
+        snake_MOBILE,
         snake_X = -1,
         snake_Y = -1,
-        snake_BLOCKSIZE = _snake.blockSize,
+        snake_BLOCKSIZE = _blockSize,
         snake_SCOPE = false, // true si snake head est à l'intérieur
         snake_OUTSIDE = true, // true si snake est entièrement à l'exterieur
         snake_OFFSET_X,
@@ -56,7 +60,7 @@
         columns,
         rows,
         context,
-        boundingClientRect,
+        clientRect,
         width,
         height
 
@@ -66,8 +70,6 @@
         function snake_set()
         {
             snake_reset()
-
-            context = canvas.getContext('2d')
 
             snake_setSnake()
             snake_setCommand()
@@ -82,7 +84,9 @@
             columns = width / snake_BLOCKSIZE
             rows = height / snake_BLOCKSIZE
 
-            boundingClientRect = canvas.getBoundingClientRect()
+            context = context ?? canvas.getContext('2d')
+
+            canvas_updateClientRect()
         }
 
         function snake_setApple()
@@ -106,11 +110,13 @@
 
         function snake_setEvent()
         {
-            event.add('mouseDown', snake_mouseDown)
-            event.add('resize', snake_resize)
+            event.event_add('mouseDown', snake_mouseDown)
+            event.event_add('resize', snake_resize)
         }
 
-        function snake_setEventDesktop() { event.addSeveral({ scroll: snake_scroll, mouseMove: snake_mouseMove }) }
+        function snake_setEventDesktop() { event.event_addSeveral({ scroll: snake_scroll, mouseMove: snake_mouseMove }) }
+
+        function snake_setEventMobile() { if (event.event_contain('touchMove', snake_touchMove.name) === -1) event.event_add('touchMove', snake_touchMove) }
 
         function snake_setScore() { snake_SCORE = SNAKE_SNAKE.length }
 
@@ -177,9 +183,8 @@
             }
         }
     
-        function resetGame() /* reset game over */
+        function snake_resetGame() /* reset game over */
         {
-            snake_updateCoords()
             snake_resetSize(false)
             snake_moveTo()
             snake_setApple()
@@ -205,16 +210,39 @@
 
         function snake_updateCoords()
         {
-            snake_X = Math.floor((clientX - boundingClientRect.left) / snake_BLOCKSIZE)
-            snake_Y = Math.floor((clientY - boundingClientRect.top) / snake_BLOCKSIZE)
+            snake_X = Math.floor((clientX - clientRect.left) / snake_BLOCKSIZE)
+            snake_Y = Math.floor((clientY - clientRect.top) / snake_BLOCKSIZE)
 
-            snake_SCOPE = snake_X >= 0 && snake_X < columns && snake_Y >= 0 && snake_Y < rows
+            snake_SCOPE = snake_X >= 0 && snake_X < columns - 1 && snake_Y >= 0 && snake_Y < rows - 1
         }
-
+    
         export function snake_updateEvent(on)
         {
-            if (wwindow.window_MOBILE === false)
-                on ? (snake_setEventDesktop(), boundingClientRect = canvas.getBoundingClientRect()) : snake_destroyEventDesktop()
+            const MOBILE = wwindow.window_MOBILE
+
+            if (on !== snake_ON || MOBILE !== snake_MOBILE)
+                MOBILE === false
+                ? snake_updateDesktop(on)
+                : snake_updateMobile(on),
+                snake_ON = on,
+                snake_MOBILE = MOBILE
+        }
+
+        function snake_updateDesktop(on)
+        {
+            if (snake_MOBILE) snake_destroyEventMobile()
+    
+            on
+            ? (snake_setEventDesktop(), canvas_updateClientRect())
+            : snake_destroyEventDesktop()
+        }
+
+        function snake_updateMobile(on)
+        {
+            if (!snake_MOBILE) snake_destroyEventDesktop()
+
+            if (!on) snake_destroyEventMobile()
+            else if (!_mobile.on) snake_setEventMobile()
         }
 
         function snake_updateInside()
@@ -223,25 +251,42 @@
             if (!spring.spring_LOCK) spring.spring_mouseEnter()
         }
 
+        function canvas_updateClientRect() { clientRect = canvas.getBoundingClientRect() }
+
+        function mobile_update()
+        {
+            snake_ON = true
+    
+            snake_moveTo()
+
+            _mobile.update(false)
+
+            canvas_updateClientRect()
+            snake_setEventMobile()
+        }
+
         // --DESTROY
         function snake_destroy()
         {
-            event.remove('mouseDown', snake_mouseDown)
-            event.remove('resize', snake_resize)
+            event.event_remove('mouseDown', snake_mouseDown)
+            event.event_remove('resize', snake_resize)
 
             snake_destroyEventDesktop()
+            snake_destroyEventMobile()
         }
 
         function snake_destroyEventDesktop()
         {
-            event.remove('scroll', snake_scroll)
-            event.remove('mouseMove', snake_mouseMove)
+            event.event_remove('scroll', snake_scroll)
+            event.event_remove('mouseMove', snake_mouseMove)
         }
+
+        function snake_destroyEventMobile() { event.event_remove('touchMove', snake_touchMove) }
 
         // --COMMAND
         function snake_size(size)
         {
-            size = app.app_testDefault(size) ? _snake.blockSize : app.app_testNumber(size, 10, 70)
+            size = app.app_testDefault(size) ? _blockSize : app.app_testNumber(size, 10, 70)
 
             snake_BLOCKSIZE = size
             localStorage.setItem('snake_size', size)
@@ -253,7 +298,7 @@
         // --EVENTS
         async function snake_scroll()
         {
-            boundingClientRect = canvas.getBoundingClientRect()
+            canvas_updateClientRect()
 
             snake_move()
         }
@@ -268,12 +313,16 @@
 
         async function snake_mouseDown(e) // click pour reset apres un gameOver
         {
-            if (_gameover.on && e.target.classList.contains('snake-game'))
+            if (e.target.classList.contains('snake-game'))
             {
-                clientX = e.clientX
-                clientY = e.clientY
+                if (_gameover.on || _mobile.on)
+                {
+                    [clientX, clientY] = [e.clientX, e.clientY]
 
-                resetGame()
+                    snake_updateCoords()
+        
+                    _gameover.on ? snake_resetGame() : mobile_update()
+                }
             }
         }
 
@@ -283,26 +332,18 @@
     
             if (spring.spring_LOCK) spring.spring_mouseLeave()
             if (target && target.classList.contains('icon')) return
-            if (!_snake.invincible && !_gameover.on && _modes.challenge) _gameover.update(true)
         }
 
-        function snake_resize(mobile)
+        function snake_resize()
         {
+            if (!wwindow.window_MOBILE) app.app_FREEZE.set(false)
+
             snake_reset()
-
-            mobile ? snake_destroyEventDesktop() : snake_setEventDesktop()
         }
 
-        function snake_touchStart(e)
+        function snake_touchMove(x, y)
         {
-            
-        }
-
-        function snake_touchMove(e)
-        {
-            const touch = e.changedTouches[0]
-
-            ;[clientX, clientY] = [touch.clientX, touch.clientY]
+            [clientX, clientY] = [x, y]
 
             snake_move()
         }
@@ -313,7 +354,11 @@
             if (SNAKE_SNAKE[0][0] !== snake_X || SNAKE_SNAKE[0][1] !== snake_Y)
             {
                 if (snake_SCOPE) snake_updateInside()
-                else if (snake_OUTSIDE || snake_testOutside()) return false
+                else
+                {
+                    if (_challenge) return _gameover.update(true)
+                    if (snake_OUTSIDE || snake_testOutside()) return false
+                }
 
                 return true
             }
@@ -333,8 +378,8 @@
     
             if (X === SNAKE_APPLE[0] && Y === SNAKE_APPLE[1]) snake_update()
     
-            if (!_snake.invincible && snake_SCOPE && X === snake_X && Y === snake_Y)
-                _modes.challenge ? _gameover.update(true) : (SNAKE_SNAKE.pop(), snake_setScore())
+            if (!_invincible && snake_SCOPE && X === snake_X && Y === snake_Y)
+                _challenge ? _gameover.update(true) : (SNAKE_SNAKE.pop(), snake_setScore())
         }
 
         // --DRAW
@@ -468,8 +513,6 @@ class="snake-game"
 style:height="{height}px"
 style:margin="{snake_OFFSET_Y / 2}px {snake_OFFSET_X / 2}px"
 on:mouseleave={snake_mouseLeave}
-on:touchstart={snake_touchStart}
-on:touchmove={snake_touchMove}
 >
     <canvas
     style:width="{width}px"

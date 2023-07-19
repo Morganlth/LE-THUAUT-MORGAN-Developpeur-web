@@ -30,9 +30,9 @@ class SpringManager
         {
             const
             FUNC = this['spring_' + EVENT_NAME].bind(this),
-            INDEX = event.contain(EVENT_NAME, FUNC.name)
+            INDEX = event.event_contain(EVENT_NAME, FUNC.name)
 
-            if (INDEX === -1) event.add(EVENT_NAME, FUNC)
+            if (INDEX === -1) event.event_add(EVENT_NAME, FUNC)
         }
     }
 
@@ -65,9 +65,9 @@ class SpringManager
     // --DESTROY
     spring_destroy()
     {
-        event.remove('mouseMove', this.spring_mouseMove.bind(this))
-        event.remove('mouseDown', this.spring_mouseDown.bind(this))
-        event.remove('mouseUp', this.spring_mouseUp.bind(this))
+        event.event_remove('mouseMove', this.spring_mouseMove.bind(this))
+        event.event_remove('mouseDown', this.spring_mouseDown.bind(this))
+        event.event_remove('mouseUp', this.spring_mouseUp.bind(this))
     }
 
     // --COMMAND

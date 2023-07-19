@@ -68,6 +68,9 @@
 
     // #VARIABLES
 
+        // --EVENT-CONTEXT
+        let event_GRABBING = event.event_GRABBING
+    
         // --ELEMENT-MAIN
         let main_scrollTop = 0
 
@@ -87,7 +90,7 @@
         // --ELEMENT-DIE
         let
         die,
-        die_grab = event.grabbing,
+        die_grab,
         x = 0,
         y = 0,
         r = 0,
@@ -108,7 +111,7 @@
 
     // #REACTIVE
 
-    $: die_updateEvent($die_grab)
+    $: die_updateEvent($event_GRABBING)
 
     // #FUNCTIONS
 
@@ -140,9 +143,9 @@
             initY = boundingClientRect.top + r + main.scrollTop
         }
 
-        function setEvent() { event.add('mouseUp', die_mouseUp) }
+        function setEvent() { event.event_add('mouseUp', die_mouseUp) }
 
-        function die_setEventDesktop() { event.addSeveral({ scroll: die_scroll, mouseMove: die_mouseMove }) }
+        function die_setEventDesktop() { event.event_addSeveral({ scroll: die_scroll, mouseMove: die_mouseMove }) }
 
         // --GET
         function getNumber()
@@ -185,7 +188,8 @@
         function update(cursor, grab, userSelect)
         {
             cursor = cursor
-            event.grabbing.set(grab)
+            die_grab = grab
+            event.event_GRABBING.set(grab)
             document.body.style.userSelect = userSelect
         }
 
@@ -212,15 +216,15 @@
         // --DESTROY
         function destroy()
         {
-            event.remove('mouseUp', die_mouseUp)
+            event.event_remove('mouseUp', die_mouseUp)
 
             die_destroyEventDesktop()
         }
 
         function die_destroyEventDesktop()
         {
-            event.remove('scroll', die_scroll)
-            event.remove('mouseMove', die_mouseMove)
+            event.event_remove('scroll', die_scroll)
+            event.event_remove('mouseMove', die_mouseMove)
         }
 
         // --EVENTS
@@ -233,7 +237,7 @@
 
         async function die_mouseUp()
         {
-            if (event.grabbing)
+            if (die_grab)
             {
                 clearTimeout(timeout)
     

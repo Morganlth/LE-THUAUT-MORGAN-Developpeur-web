@@ -1,10 +1,12 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #EXPORT
+    // #EXPORTS
 
-        // --PROP
-        export let _iconColor
+        // --PROPS
+        export let
+        _translateY,
+        _iconColor
 
     // #IMPORTS
 
@@ -24,7 +26,9 @@
 
 <!-- #HTML -->
 
-<header>
+<header
+style:transform="translateY(-{_translateY ?? 0}%)"
+>
     <div
     data-sveltekit-reload
     >
@@ -87,6 +91,8 @@ lang="scss"
         padding-inline: 20px;
 
         box-sizing: border-box;
+
+        transition: transform .4s ease;
 
         div
         {

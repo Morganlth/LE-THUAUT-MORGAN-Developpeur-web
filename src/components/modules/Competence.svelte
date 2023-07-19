@@ -221,7 +221,7 @@
 
         function setCommand() { app.app_add('spaceDimension', spaceDimension, true) }
 
-        function setEvent() { event.add('scroll', competence_scroll) }
+        function setEvent() { event.event_add('scroll', competence_scroll) }
 
         function setRouter()
         {
@@ -233,7 +233,7 @@
         // --RESET
         function reset()
         {
-            event.remove('wheel', competence_wheel)
+            event.event_remove('wheel', competence_wheel)
     
             translateX = 0
             max = 0
@@ -262,8 +262,8 @@
         // --DESTROY
         function destroy()
         {
-            event.remove('scroll', competence_scroll)
-            event.remove('wheel', competence_wheel)
+            event.event_remove('scroll', competence_scroll)
+            event.event_remove('wheel', competence_wheel)
         }
 
         // --COMMAND
@@ -367,7 +367,7 @@
 
             tick().then(() => on
             ?   (setList.call(this),
-                event.add('wheel', competence_wheel))
+                event.event_add('wheel', competence_wheel))
             : update())
         }
 

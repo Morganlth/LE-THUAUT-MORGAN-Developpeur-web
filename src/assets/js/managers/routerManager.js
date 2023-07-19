@@ -4,9 +4,6 @@ class RouterManager
 {
     // #VARIABLES
 
-        // --ELEMENT-MAIN
-        main
-
         // --CONTEXT-ROUTER
         router_LAST = +new Date()
         router_TIMEOUT = null
@@ -15,24 +12,22 @@ class RouterManager
     // #FUNCTIONS
 
         // --SET
-        router_set(main, id)
+        router_set(id)
         {
-            this.main = main
-        
             this.router_setPage(id)
 
             this.router_setEvent()
         }
 
-        router_setEvent() { event.add('scroll', this.router_scroll.bind(this) )}
+        router_setEvent() { event.event_add('scroll', this.router_scroll.bind(this) )}
 
         router_setPage(id)
         {
-            const page = this.router_PAGES[id]
+            const PAGE = this.router_PAGES[id]
         
-            this.main.scrollTo({ top: page.start, behavior: 'instant' })
+            event.event_scrollTo(PAGE.start)
 
-            if (page.call) page.call()
+            if (PAGE.call) PAGE.call()
         }
 
         router_setSubPath(id, subPath) { this.router_PAGES[id].subPath = subPath ? '/' + subPath : undefined }
@@ -40,27 +35,25 @@ class RouterManager
         // --UPDATE
         router_update()
         {
-            const
-            pages = this.router_PAGES,
-            scrollTop = this.main.scrollTop
+            const PAGES = this.router_PAGES
 
-            for (let i = pages.length - 1; i >= 0; i--)
-                if (pages[i].start <= scrollTop) return history.pushState({}, '', location.origin + '/' + pages[i].name + (pages[i].subPath ?? ''))
+            for (let i = PAGES.length - 1; i >= 0; i--)
+                if (PAGES[i].start <= event.main_scrollTop) return history.pushState({}, '', location.origin + '/' + PAGES[i].name + (PAGES[i].subPath ?? ''))
         }
 
         // --DESTROY
-        router_destroy() { event.remove('scroll', this.router_scroll.bind(this)) }
+        router_destroy() { event.event_remove('scroll', this.router_scroll.bind(this)) }
 
         // --EVENT
         async router_scroll()
         {
-            const now = +new Date()
+            const NOW = +new Date()
 
             clearTimeout(this.router_TIMEOUT)
 
-            if (now > this.router_LAST + 1000)
+            if (NOW > this.router_LAST + 1000)
             {
-                this.router_LAST = now
+                this.router_LAST = NOW
 
                 this.router_update.call(this)
             }

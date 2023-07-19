@@ -59,8 +59,9 @@ context="module"
         // --SET
         function main_set()
         {
+            event.event_set(main)
             wwindow.window_set()
-            router.router_set(main, _page.id)
+            router.router_set(_page.id)
             spring.spring_set()
 
             main_setWrapper()
@@ -79,12 +80,12 @@ context="module"
 
         function main_setEvent()
         {
-            event.add('resize', main_resize)
+            event.event_add('resize', main_resize)
 
             if (!wwindow.window_testSmallScreen()) main_setEventDesktop()
         }
 
-        function main_setEventDesktop() { event.add('scroll', main_scroll) }
+        function main_setEventDesktop() { event.event_add('scroll', main_scroll) }
 
         // --DESTROY
         function main_destroy()
@@ -98,25 +99,24 @@ context="module"
 
         function main_destroyEvent()
         {
-            event.remove('resize', main_resize)
+            event.event_remove('resize', main_resize)
 
             main_destroyEventDesktop()
         }
 
-        function main_destroyEventDesktop() { event.remove('scroll', main_scroll) }
+        function main_destroyEventDesktop() { event.event_remove('scroll', main_scroll) }
 
         // --EVENTS
         async function main_scroll() { wrapper_TRANSLATEX = -(event.main_scrollTop < wrapper_MAX ? event.main_scrollTop : wrapper_MAX) }
 
         async function main_resize(smallScreen)
         {
-            console.log(wwindow.window_MOBILE)
             if (localStorage.getItem('spring') == 'true') spring.spring_update(!wwindow.window_MOBILE)
 
             if (smallScreen) main_destroyEventDesktop(), wrapper_TRANSLATEX = 0
             else
             {
-                if (event.contain('scroll', main_scroll.name) === -1) main_setEventDesktop()
+                if (event.event_contain('scroll', main_scroll.name) === -1) main_setEventDesktop()
 
                 main_setWrapper()
             }
@@ -133,12 +133,13 @@ context="module"
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main
 bind:this={main}
-on:scroll={event.scroll.bind(event)}
-on:wheel={event.wheel.bind(event)}
-on:mousemove={event.mouseMove.bind(event)}
-on:mousedown={event.mouseDown.bind(event)}
-on:mouseup={event.mouseUp.bind(event)}
-on:mouseleave={event.mouseUp.bind(event)}
+on:scroll={event.event_scroll.bind(event)}
+on:wheel={event.event_wheel.bind(event)}
+on:mousemove={event.event_mouseMove.bind(event)}
+on:mousedown={event.event_mouseDown.bind(event)}
+on:mouseup={event.event_mouseUp.bind(event)}
+on:mouseleave={event.event_mouseUp.bind(event)}
+on:touchmove|passive={event.event_touchMove.bind(event)}
 class:freeze={$main_FREEZE}
 >
     <div>

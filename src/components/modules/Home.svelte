@@ -67,11 +67,12 @@ id="home"
                 <section>
                     <nav>
                         <ul>
-                            {#each ['presentation', 'competences', 'projets'] as section, i}
+                            {#each ['presentation', 'competences', 'projets'] as section, id}
                                 <li>
                                     <a
-                                    href="{$page.url.origin}/{['presentation', 'competence', 'project'][i]}"
+                                    href="{$page.url.origin}/{['presentation', 'competence', 'project'][id]}"
                                     alt="LE THUAUT Morgan - {section}"
+                                    on:click|preventDefault={router.router_setPage.bind(router, id + 1)}
                                     >
                                     &nbsp; #{section}
                                     </a>

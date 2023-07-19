@@ -5,7 +5,7 @@ class AppManager
     // #VARIABLES
 
         // --APP-CONTEXT
-        app_FREEZE = false
+        app_FREEZE
         app_KEYWORDS = ['reset', 'success', 'error', 'fps', 'effect', 'eco']
         app_KEYSTORAGE = ['effect']
         app_COMMANDS = {}
@@ -38,7 +38,7 @@ class AppManager
                 presentationSnake: localStorage.getItem('presentationSnake')
             }
         }
-
+    
         // --RESET
         app_reset(view = false)
         {
