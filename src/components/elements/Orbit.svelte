@@ -11,16 +11,17 @@
         _r,
         _y,
         _title,
-        _onColor,
-        _offColor
+        _colors
 
         // --BINDS
-        export let on = false
+        export let
+        orbit_ON = false,
+        orbit_FOCUS = false
 
-        export function animate() { floating(Math.random()) }
-        export function clear() { clearInterval(interval), interval = null }
+        // BIND satellite_animationFloating
+        // BIND satellite_clear
 
-    // #IMPORT
+    // #IMPORTS
 
         // --SVELTE
         import { createEventDispatcher } from 'svelte'
@@ -36,91 +37,98 @@
         // --SVELTE
         const dispatch = createEventDispatcher()
 
-        // --DEFAULT
-        const
-        rad90 = 90 * Math.PI / 180,
-        rad45 = 45 * Math.PI / 180
+        // --ELEMENT-ORBIT
+        const [RAD_45, RAD_60, RAD_90, RAD_120] = [45 * Math.PI / 180, 60 * Math.PI / 180, 90 * Math.PI / 180, 120 * Math.PI / 180]
 
     // #VARIABLES
 
         // --ELEMENT-GRAVITY-AREA
-        let gravityArea
+        let gravityarea
 
         // --ELEMENT-SATELLITE
         let
         satellite,
-        translateX = 0,
-        translateZ = 0,
-        rotateY = 0,
-        forceX = 0,
-        forceY = 0,
-        last = +new Date(),
-        interval,
-        timeout
+        satellite_TRANSLATEX = 0,
+        satellite_TRANSLATEZ = 0,
+        satellite_ROTATEY = 0,
+        satellite_FORCEX = 0,
+        satellite_FORCEY = 0,
+        satellite_LAST = +new Date(),
+        satellite_INTERVAL,
+        satellite_TIMEOUT
 
     // #REACTIVE
 
-    $: update(_y)
+    $: satellite_update(_y)
 
-    $: rotateY += on ? -rad90 : rad90
+    $: satellite_ROTATEY += orbit_ON ? -RAD_90 : RAD_90
 
     // #FUNCTIONS
 
         // --UPDATE
-        function update(y)
+        function satellite_update(y)
         {
-            const angle = y * Math.PI + _offset
+            const ANGLE = y * Math.PI + _offset
 
-            translateX = _r * Math.cos(angle)
-            translateZ = _r * Math.sin(angle)            
+            satellite_TRANSLATEX = _r * Math.cos(ANGLE)
+            satellite_TRANSLATEZ = _r * Math.sin(ANGLE)            
+            satellite_ROTATEY = ANGLE
 
-            rotateY = angle
+            orbit_testFocus(ANGLE % (Math.PI * 2))
         }
 
         // --EVENTS
-        function gravity_mouseMove({clientX, clientY})
+        function gravityarea_mouseMove({clientX, clientY})
         {
-            const now = +new Date()
+            const NOW = +new Date()
 
-            clearTimeout(timeout)
+            clearTimeout(satellite_TIMEOUT)
 
-            if (now > last + 100)
+            if (NOW > satellite_LAST + 50)
             {
-                clear()
+                satellite_clear()
+                gravityarea_animationAttract(clientX, clientY)
 
-                gravityEffect(clientX, clientY)
-
-                last = now
+                satellite_LAST = NOW
             }
-            else timeout = setTimeout(() => { gravityEffect(clientX, clientY), animate() }, 300)
+            else satellite_TIMEOUT = setTimeout(gravityarea_animationAttract.bind(null, clientX, clientY), 200)
         }
 
-        function gravity_mouseLeave()
+        function gravityarea_mouseLeave()
         {
-            clearTimeout(timeout)
+            clearTimeout(satellite_TIMEOUT)
 
-            ;[forceX, forceY] = [0, 0]
+            ;[satellite_FORCEX, satellite_FORCEY] = [0, 0]
 
-            animate()
+            satellite_TIMEOUT = setTimeout(satellite_animationFloating.bind(null, .5), 200)
         }
 
         function satellite_click()
         {
-            on = !on
+            orbit_ON = !orbit_ON
 
-            dispatch('click', { id: _id, on: on })
+            dispatch('click', { id: _id, on: orbit_ON })
+        }
+
+        // --CLEAR
+        export function satellite_clear() { clearInterval(satellite_INTERVAL), satellite_INTERVAL = null }
+
+        // --TEST
+        function orbit_testFocus(a)
+        {
+            orbit_FOCUS = a > RAD_60 && a < RAD_120
         }
 
         // --ANIMATION
-        function floating(t)
+        export function satellite_animationFloating(a)
         {
-            if (interval) return
+            if (satellite_INTERVAL) return
 
-            let up = false
+            let t = a ?? Math.random(), up = false
     
-            interval = setInterval(() =>
+            satellite_INTERVAL = setInterval(() =>
             {
-                forceY = 10 * (Math.sin((t - 0.5) * Math.PI) + 1) - 10
+                satellite_FORCEY = 10 * (Math.sin((t - .5) * Math.PI) + 1) - 10
 
                 t += up ? -.05 : .05
 
@@ -129,18 +137,16 @@
             }, 100)
         }
 
-        function gravityEffect(clientX, clientY)
+        function gravityarea_animationAttract(clientX, clientY)
         {
             const
-            boundingClientRect = gravityArea.getBoundingClientRect(),
-            size = boundingClientRect.width / 2,
-            difX = clientX - (boundingClientRect.left + size),
-            difY = clientY - (boundingClientRect.top + size),
-            a = Math.atan(difY / difX),
-            r = Math.cos(rad45) * (size / Math.cos((rad90 - Math.abs(_rotate) - rad45)))
+            CLIENTRECT = gravityarea.getBoundingClientRect(),
+            SIZE = CLIENTRECT.width / 2,
+            [DIFX, DIFY] = [clientX - (CLIENTRECT.left + SIZE), clientY - (CLIENTRECT.top + SIZE)],
+            [ANGLE, RADIUS] = [Math.atan(DIFY / DIFX), Math.cos(RAD_45) * (SIZE / Math.cos((RAD_90 - Math.abs(_rotate) - RAD_45)))]
 
-            forceX = difX * (1 - Math.abs(difX) / (Math.cos(a) * r)) * .3
-            forceY = difY * (1 - Math.abs(difY) / Math.abs(Math.sin(a) * r)) * .3
+            satellite_FORCEX = DIFX * (1 - Math.abs(DIFX) / (Math.cos(ANGLE) * RADIUS)) * .3
+            satellite_FORCEY = DIFY * (1 - Math.abs(DIFY) / Math.abs(Math.sin(ANGLE) * RADIUS)) * .3
         }
 </script>
 
@@ -154,32 +160,33 @@ style:transform="rotate({_rotate}rad)"
     <!--deplacement de l'objet-->
     <button
     class="gravity-area"
-    style:transform="translateX({translateX}px) translateZ({translateZ}px)"
-    bind:this={gravityArea}
-    on:mousemove={gravity_mouseMove}
-    on:mouseleave={gravity_mouseLeave}
+    style:transform="translateX({satellite_TRANSLATEX}px) translateZ({satellite_TRANSLATEZ}px)"
+    bind:this={gravityarea}
+    on:mousemove={gravityarea_mouseMove}
+    on:mouseleave={gravityarea_mouseLeave}
     on:click={satellite_click}
     >
         <!--application des forces | -_rotate pour retrouver l'axe x-y horizontal-vertical-->
         <div
-        style:transform="rotate({-_rotate}rad) translate({forceX}px, {forceY}px)"
+        style:transform="rotate({-_rotate}rad) translate({satellite_FORCEX}px, {satellite_FORCEY}px)"
         >
             <!--rotation de l'objet | _rotate pour se replacer face a la trajectoire-->
             <div
             class="satellite"
             title={_title}
-            style:transform="rotate({_rotate}rad) rotateY({rotateY}rad)"
+            style:transform="rotate({_rotate}rad) rotateY({satellite_ROTATEY}rad)"
             bind:this={satellite}
             >
-                {#each [0, 1, 2, 3, 4, 5] as side}
+                {#each [0, 1, 2, 3, 4, 5] as id}
                     <div
                     class="side"
-                    style:border="solid 8px {on ? _onColor : _offColor}"
+                    style:border="solid 8px {orbit_ON ? _colors.on : _colors.off}"
+                    data-side-id={id}
                     >
                         <Icon
                         _size="30%"
                         _spring={false}
-                        _color={_onColor}
+                        _color={_colors.on}
                         >
                             <Logo />
                         </Icon>
@@ -199,16 +206,18 @@ lang="scss"
 
     @use 'sass:math';
 
-    @use '../../assets/scss/styles/flex.scss' as *;
-    @use '../../assets/scss/styles/position.scss' as *;
-    @use '../../assets/scss/styles/size.scss' as *;
-    @use '../../assets/scss/styles/cursor.scss' as *;
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/cursor' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #VARIABLE */
 
-    $size: 200px;
+    $size-min: 100px;
+    $size-max: 200px;
 
-    /* #GROUPS */
+    /* #ORBIT */
 
     .orbit
     {
@@ -225,8 +234,8 @@ lang="scss"
 
             transform-style: preserve-3d;
 
-            width: $size * 2;
-            height: $size * 2;
+            width: $size-min * 2;
+            height: $size-min * 2;
 
             background-color: transparent;
 
@@ -236,7 +245,7 @@ lang="scss"
 
             transition: transform .4s;
 
-            &>div { transition: transform .6s; }
+            &>div { transition: transform .5s; }
         }
 
         .satellite
@@ -246,8 +255,8 @@ lang="scss"
             transform-style: preserve-3d;
             transform-origin: center;
 
-            width: $size;
-            height: $size;
+            width: $size-min;
+            height: $size-min;
 
             transition: transform .6s;
 
@@ -258,15 +267,33 @@ lang="scss"
 
                 background-color: $dark;
 
-                /* box-shadow: 0 0 10px rgba($light, .1); */
                 box-sizing: border-box;
             }
-            .side:nth-child(1) { transform: translateZ(math.div($size, 2)); }
+            .side:nth-child(1) { transform: translateZ(math.div($size-min, 2)); }
             .side:nth-child(2) { transform: translateY(-150%) rotateX(-90deg); }
             .side:nth-child(3) { transform: translate(-50%, -200%) rotateY(90deg) scaleX(-1); }
             .side:nth-child(4) { transform: translateY(-250%) rotateX(90deg); }
             .side:nth-child(5) { transform: translate(50%, -400%) rotateY(-90deg); }
-            .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$size, 2)); }
+            .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$size-min, 2)); }
+        }
+
+        
+        @include media-min(768px)
+        {
+            .gravity-area
+            {
+                width: $size-max * 2;
+                height: $size-max * 2;
+            }
+
+            .satellite
+            {
+                width: $size-max;
+                height: $size-max;
+
+                .side:nth-child(1) { transform: translateZ(math.div($size-max, 2)); }
+                .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$size-max, 2)); }
+            }
         }
     }
 </style>

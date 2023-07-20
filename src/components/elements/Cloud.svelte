@@ -6,7 +6,7 @@
         // --PROPS
         export let
         _d,
-        _translate,
+        _translateX,
         _colors
 
     // #IMPORT
@@ -150,7 +150,7 @@
 
 <div
 class="cloud"
-style:transform="translateX(calc((100% - {_translate * speed}px) * {_d}))"
+style:transform="translateX(calc((100% - {_translateX * speed}px) * {_d}))"
 >
     <canvas
     style:transform="translate({translateX}px, {translateY}px)"

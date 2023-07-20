@@ -518,13 +518,6 @@ lang="scss"
             height: 200%;
         }
 
-        p
-        {
-            @include absolute;
-            @include p-interact;
-
-            bottom: 30px;
-            left: 3%;
-        }
+        &>p { @include p-info; }
     }
 </style>

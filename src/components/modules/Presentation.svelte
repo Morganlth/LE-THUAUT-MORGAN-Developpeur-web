@@ -143,6 +143,7 @@
         snake_INVINCIBLE = false,
         snake_MOBILE_GAME,
         snake_resetSize,
+        snake_resetGame,
         snake_updateEvent,
         snake_animation
 
@@ -163,7 +164,9 @@
         $: tag_update(snake_TAIL)
 
         // --ELEMENT-SNAKE
-        $: snake_updateEvent instanceof Function ? snake_updateEvent(!$event_GRABBING && snake_test()) : null // set default desktop event snake
+        $: snake_updateEvent instanceof Function && wwindow.window_MOBILE === false
+        ? snake_updateEvent(!$event_GRABBING && snake_test())
+        : null // set default desktop event snake
 
     // #FUNCTIONS
 
@@ -217,6 +220,22 @@
         function presentation_setItem(key, value) { localStorage.setItem('presentation_' + key, value) }
 
         function snake_setInvincibleTime() { setTimeout(() => snake_INVINCIBLE = false, 500) }
+
+        function gameover_setGame()
+        {
+            snake_resetSize(false)
+            snake_resetGame()
+            gameover_update(false)
+            snake_updateEvent(true)
+        }
+
+        function mobile_setGame()
+        {
+            snake_resetGame()
+            mobile_update(false)
+            mobile_updateGame(true)
+            snake_updateEvent(true)
+        }
 
         // --GET
         function presentation_getParam(name) { return PRESENTATION_PARAMS.find(p => p.name === name) }
@@ -322,7 +341,9 @@
     
             if (on) app.app_updateMode(false)
 
-            wwindow.window_MOBILE ? mobile_update(on) : snake_animation(on)
+            wwindow.window_MOBILE
+            ? (!TAG_MOBILE.on ? mobile_updateGame(false) : null, mobile_update(on))
+            : snake_animation(on)
         }
 
         function presentation_updateFps(on) { if (on) presentation_setFps() }
@@ -364,8 +385,6 @@
                     TAG_GAMEOVER.on = false,
                     await TAG_GAMEOVER.hide()
     
-                mobile_updateGame(!on)
-    
                 TAG_MOBILE.on = on
                 TAG_MOBILE[on ? 'show' : 'hide']()
             }
@@ -375,12 +394,15 @@
         {
             const START = presentation_getParam('snake').on && on
 
-            START
-            ? event.event_scrollTo(presentation[wwindow.window_testSmallScreen() ? 'offsetTop' : 'offsetLeft'])
-            : snake_updateEvent(false)
+            if (START)
+            {
+                if (presentation_$CHALLENGE) snake_resetSize(false)
+
+                event.event_scrollTo(presentation[wwindow.window_testSmallScreen() ? 'offsetTop' : 'offsetLeft'])
+            }
+            else snake_updateEvent(false)
 
             app.app_FREEZE.set(START)
-            snake_MOBILE_GAME = START
             snake_animation(START)
         }
 
@@ -418,6 +440,13 @@
         }
 
         // --EVENTS
+        async function presentation_click(e)
+        {
+            if (e.target.classList.contains('snake-game'))
+                if (TAG_GAMEOVER.on) gameover_setGame()
+                else if (TAG_MOBILE.on) mobile_setGame()
+        }
+
         async function presentation_click_param()
         {
             if (this !== 'fps')
@@ -442,9 +471,11 @@
             tag_reset()
             presentation_setRouter()
             presentation_updateText(presentation_$TEXT)
-            mobile_update(wwindow.window_MOBILE && presentation_$SNAKE)
 
             if (snake_test()) snake_updateEvent(true)
+            if (wwindow.window_MOBILE && !TAG_MOBILE.on) mobile_updateGame(false)
+
+            mobile_update(wwindow.window_MOBILE && presentation_$SNAKE)
         }
 
         async function options_click()
@@ -470,7 +501,11 @@
             if (snake_test()) snake_updateEvent(true)
         }
 
-        async function mobile_click() { mobile_update(presentation_$SNAKE) }
+        async function mobile_click()
+        {
+            mobile_update(presentation_$SNAKE)
+            mobile_updateGame(false)
+        }
 
         // --ROUTER-CALL
         function presentation_call()
@@ -496,7 +531,7 @@
             return coord
         }
 
-        function snake_test() { return presentation_$SNAKE && !TAG_GAMEOVER.on }
+        function snake_test() { return presentation_$SNAKE && !TAG_GAMEOVER.on && !TAG_GAMEOVER.on && (wwindow.window_MOBILE ? !TAG_MOBILE.on : true) }
 
         // --UTILS
         function tag_showAll()
@@ -552,9 +587,11 @@
 
 <!-- #HTML -->
 
+<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 <div
 id="presentation"
 bind:this={presentation}
+on:click={presentation_click}
 >
     <div
     class="tag-container"
@@ -642,13 +679,13 @@ bind:this={presentation}
     <Snake
     _challenge={presentation_$CHALLENGE}
     _gameover={{ on: TAG_GAMEOVER.on, update: gameover_update }}
-    _mobile={{ on: TAG_MOBILE.on, update: mobile_update }}
     _invincible={snake_INVINCIBLE}
     _blockSize={PRESENTATION_BLOCKSIZE}
     {_colors}
     bind:snake_SCORE={snake_SCORE}
     bind:snake_TAIL={snake_TAIL}
     bind:snake_resetSize={snake_resetSize}
+    bind:snake_resetGame={snake_resetGame}
     bind:snake_updateEvent={snake_updateEvent}
     bind:snake_animation={snake_animation}
     />
@@ -684,7 +721,7 @@ bind:this={presentation}
                 </Icon>
             </Cell>
 
-            {#if snake_MOBILE_GAME}
+            {#if wwindow.window_MOBILE && !TAG_MOBILE.on}
                 <Cell
                 _style="border: none; cursor: pointer"
                 on:click={mobile_click}

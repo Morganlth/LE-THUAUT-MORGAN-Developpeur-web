@@ -6,7 +6,11 @@
         // --PROP
         export let _colors
         
-    // #IMPORT
+    // #IMPORTS
+
+        // --JS
+        import { rgba } from '../../assets/js/utils/color'
+        import { drawCircle } from '../../assets/js/utils/canvas'
 
         // --SVELTE
         import { onMount } from 'svelte'
@@ -14,7 +18,8 @@
 
     // #CONSTANTE
 
-    const auraRadius = 10
+        // --ELEMENT-MOON
+        const MOON_AURA = 10
 
     // #VARIABLES
 
@@ -22,27 +27,30 @@
         let
         canvas,
         context,
-        size
+        canvas_SIZE
 
     // #FUNCTIONS
 
         // --SET
-        function set()
+        function moon_set()
         {
-            size = Math.min(window.innerWidth, window.innerHeight) * .95
+            canvas_set()
 
-            canvas.width = size
-            canvas.height = size
+            canvas_draw()
+        }
+
+        function canvas_set()
+        {
+            canvas_SIZE = Math.min(window.innerWidth, window.innerHeight) * .95
+
+            canvas.width = canvas_SIZE
+            canvas.height = canvas_SIZE
 
             context = canvas.getContext('2d')
-
-            draw()
         }
 
         // --GET
-        function getRGB(color) { return color.match(/\w\w/g).map(x => parseInt(x, 16)) }
-
-        function getBackground()
+        function moon_getBackground()
         {
             return new Promise(resolve =>
             {
@@ -55,67 +63,52 @@
         }
 
         // --DRAW-CLEAR
-        async function draw()
+        async function canvas_draw()
         {
-            const
-            [r, g, b] = getRGB(_colors.light),
-            radius = size / 2,
-            img = await getBackground()
+            const [COLOR, RADIUS, IMG] = [rgba(_colors.light, .1), canvas_SIZE / 2, await moon_getBackground()]
 
-            drawAura(radius, r, g, b)
-            drawMoon(radius, img)
-            drawCrescent(radius, r, g, b)
+            canvas_drawAura(RADIUS, COLOR)
+            canvas_drawMoon(RADIUS, IMG)
+            canvas_drawCrescent(RADIUS, COLOR)
         }
 
-        function drawAura(radius, r, g, b)
+        function canvas_drawAura(radius, color)
         {
-            context.fillStyle = `rgba(${r}, ${g}, ${b}, .1)`
-            drawCircle(radius, radius, radius)
+            context.fillStyle = color
+            drawCircle(context, radius, radius, radius)
             context.clip()
             context.save()
         }
 
-        function drawMoon(radius, img)
+        function canvas_drawMoon(radius, img)
         {
-            const [r, g, b] = getRGB(_colors.dark)
-    
-            context.fillStyle = `rgba(${r}, ${g}, ${b}, .7)`
-            drawCircle(radius, radius, radius - auraRadius)
+            context.fillStyle = rgba(_colors.dark, .7)
+            drawCircle(context, radius, radius, radius - MOON_AURA)
             context.clip()
-            context.drawImage(img, 0, 0, size, size)
+            context.drawImage(img, 0, 0, canvas_SIZE, canvas_SIZE)
             context.fill()
             context.restore()
         }
 
-        function drawCrescent(radius, r, g, b)
+        function canvas_drawCrescent(radius, color)
         {
-            const
-            radius_3_4 = radius * .75,
-            size_3_4 = size * .75
+            const [RADIUS_3_4, SIZE_3_4] = [radius * .75, canvas_SIZE * .75]
 
             context.fillStyle = _colors.dark
             context.globalCompositeOperation = 'destination-out'
-            drawCircle(size_3_4, radius, radius_3_4)
-            context.fillStyle = `rgba(${r}, ${g}, ${b}, .1)`
+            drawCircle(context, SIZE_3_4, radius, RADIUS_3_4)
+            context.fillStyle = color
             context.globalCompositeOperation = 'source-over'
             context.fill()
 
             context.fillStyle = _colors.dark
             context.globalCompositeOperation = 'destination-out'
-            drawCircle(size_3_4, radius, radius_3_4 - auraRadius)
-        }
-
-        function drawCircle(x, y, r)
-        {
-            context.beginPath()
-            context.arc(x, y, r, 0, 2 * Math.PI)
-            context.fill()
-            context.closePath()
+            drawCircle(context, SIZE_3_4, radius, RADIUS_3_4 - MOON_AURA)
         }
 
     // #CYCLE
 
-    onMount(set)
+    onMount(moon_set)
 </script>
 
 <!-- #HTML -->
@@ -123,10 +116,49 @@
 <div
 class="moon"
 >
+    <p>LES HOMMES AURONT TOUJOURS LE DROIT DE REVER</p>
+
     <canvas
-    style:width="{size}px"
-    style:height="{size}px"
+    style:width="{canvas_SIZE}px"
+    style:height="{canvas_SIZE}px"
     bind:this={canvas}
     >
     </canvas>
 </div>
+
+<!-- #STYLE -->
+
+<style
+lang="scss"
+>
+    /* #USES */
+
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/font' as *;
+
+    /* #MOON */
+
+    .moon
+    {
+        @include relative;
+
+        p
+        {
+            @include absolute;
+            @include p-content;
+
+            top: 0%;
+            left: 20%;
+
+            z-index: -1;
+
+            width: 30%;
+
+            color: $secondary;
+            writing-mode: vertical-lr;
+        }
+
+        canvas { mix-blend-mode: color; }
+    }
+</style>

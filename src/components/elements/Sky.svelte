@@ -5,7 +5,7 @@
 
         // --PROPS
         export let
-        _translate = 0,
+        _translateX = 0,
         _colors
 
     // #IMPORTS
@@ -27,7 +27,7 @@ class="sky"
     {#each directions as d}
         <Cloud
         _d={d}
-        _translate={_translate}
+        _translateX={_translateX}
         {_colors}
         />
     {/each}

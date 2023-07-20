@@ -4,6 +4,7 @@
 
 @use '../../../../static/variables' as *;
 
+@use './position' as *;
 @use './media' as *;
 
 // DESIRED FONT SIZE - 12 - 18 - 24 - 36 - 48 - 60 - 72
@@ -95,6 +96,15 @@ $h-1-sizes: (375px: 36px, 425px: 46px, 768px: 60px, 1024px: 72px, 1440px: 86px);
 
     @include media-min(425px) { font-size: 18px; }
     @include media-min(768px) { font-size: 24px; }
+}
+
+@mixin p-info
+{
+    @include absolute;
+    @include p-interact;
+
+    bottom: 30px;
+    left: 3%;
 }
 
 

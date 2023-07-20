@@ -7,7 +7,6 @@
         export let
         _challenge,
         _gameover,
-        _mobile,
         _invincible,
         _blockSize,
         _colors
@@ -18,6 +17,7 @@
         snake_TAIL = [0, 0]
 
         // BIND snake_resetSize
+        // BIND snake_resetGame
         // BIND snake_animation
 
     // #IMPORTS
@@ -183,15 +183,10 @@
             }
         }
     
-        function snake_resetGame() /* reset game over */
+        export function snake_resetGame() // reset game over
         {
-            snake_resetSize(false)
             snake_moveTo()
             snake_setApple()
-
-            _gameover.update(false)
-
-            snake_updateEvent(true)
         }
     
         // --UPDATE
@@ -241,8 +236,9 @@
         {
             if (!snake_MOBILE) snake_destroyEventDesktop()
 
-            if (!on) snake_destroyEventMobile()
-            else if (!_mobile.on) snake_setEventMobile()
+            on
+            ? (snake_setEventMobile(), canvas_updateClientRect())
+            : snake_destroyEventMobile()
         }
 
         function snake_updateInside()
@@ -252,18 +248,6 @@
         }
 
         function canvas_updateClientRect() { clientRect = canvas.getBoundingClientRect() }
-
-        function mobile_update()
-        {
-            snake_ON = true
-    
-            snake_moveTo()
-
-            _mobile.update(false)
-
-            canvas_updateClientRect()
-            snake_setEventMobile()
-        }
 
         // --DESTROY
         function snake_destroy()
@@ -305,25 +289,16 @@
 
         async function snake_mouseMove(x, y)
         {
-            clientX = x
-            clientY = y
+            [clientX, clientY] = [x, y]
 
             snake_move()
         }
 
-        async function snake_mouseDown(e) // click pour reset apres un gameOver
+        async function snake_mouseDown(e)
         {
-            if (e.target.classList.contains('snake-game'))
-            {
-                if (_gameover.on || _mobile.on)
-                {
-                    [clientX, clientY] = [e.clientX, e.clientY]
+            [clientX, clientY] = [e.clientX, e.clientY]
 
-                    snake_updateCoords()
-        
-                    _gameover.on ? snake_resetGame() : mobile_update()
-                }
-            }
+            snake_updateCoords()
         }
 
         function snake_mouseLeave(e)
