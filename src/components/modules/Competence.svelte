@@ -8,9 +8,11 @@
 
     // #IMPORTS
 
+        // --JS
+        import { rgba } from '../../assets/js/utils/color'
+
         // --CONTEXTS
-        import { app, router } from '../field/Main.svelte'
-        import { event } from '../field/Main.svelte'
+        import { app, event, router } from '../field/Main.svelte'
 
         // --SVELTE
         import { onMount, onDestroy, tick } from 'svelte'
@@ -23,28 +25,28 @@
 
     // #CONSTANTES
 
-    const duration = 900
+        // --ELEMENT-COMPETENCE
+        const COMPETENCE_DURATION = 900
 
-        // --TO-ITERATE
-        const orbits =
+        // --ELEMENT-ORBIT
+        const ORBIT_ORBITS =
         [
             {
                 props: { _id: 0, _rotate: -50 * Math.PI / 180, _offset: 0 },
-                title: ['FORME', 'STYLE'],
-                type: 'FRONT',
+                title: ['FRONT', 'FORME - STYLE'],
                 content:
                 [
                     'découper, assembler et intégrer tous les éléments d’une maquette graphique en HTML5 et CSS',
                     'ajouter du contenu audio et vidéo en HTML5',
                     'animer les pages web avec CSS3',
                     'construire un projet impliquant SCSS et SASS'
-                ]
+                ],
+                elements: {}
             }
         ,
             {
                 props: { _id: 1, _rotate: 80 * Math.PI / 180, _offset: 4.71 },
-                title: ['LOGIQUE', 'JAVASCRIPT'],
-                type: 'FRONT',
+                title: ['FRONT', 'JAVASCRIPT'],
                 content:
                 [
                     'faire réagir la page web en fonction des actions de l’utilisateur en JavaScript',
@@ -55,13 +57,13 @@
                     'construire des algorithmes',
                     'utiliser le framework React',
                     'développer un projet sous Svelte'
-                ]
+                ],
+                elements: {}
             }
         ,
             {
                 props: { _id: 2, _rotate: 40 * Math.PI / 180, _offset: 3.14 },
-                title: ['CÔTÉ', 'SERVER'],
-                type: 'BACK',
+                title: ['BACK', 'NODE SERVER'],
                 content:
                 [
                     'créer un nouveau projet NodeJS impliquant diverses dépendances (Express, MongoDB, jsonwebtoken...)',
@@ -69,13 +71,13 @@
                     'créer, gérer et afficher le contenu d’une base de données',
                     'créer des API (REST)',
                     'construire un projet avec SvelteKit'
-                ]
+                ],
+                elements: {}
             }
         ,
             {
                 props: { _id: 3, _rotate: 10 * Math.PI / 180, _offset: 1.57 },
-                title: ['ADAPTABILITÉ', 'RÉFÉRENCEMENT'],
-                type: 'FRONT',
+                title: ['ADAPTABILITÉ - RÉFÉRENCEMENT'],
                 content:
                 [
                     'appliquer les standards du web et les normes en vigueur',
@@ -84,146 +86,133 @@
                     'améliorer les performances et optimiser une page web',
                     'appliquer les Schema.org',
                     'utiliser les balises meta OPEN GRAPH des réseaux sociaux (og, twitter)'
-                ]
+                ],
+                elements: {}
             }
         ]
 
     // #VARIABLES
 
-        // --ELEMENT-MAIN
-        let main
-
         // --ELEMENT-COMPETENCE
         let
         competence,
-        offsetTop,
-        height
-
-        // --ELEMENT-SPACE
-        let
-        ratio = 1,
-        translateY = 0
+        competence_OFFSETTOP,
+        competence_HEIGHT,
+        competence_LAST = +new Date(),
+        competence_TIMEOUT
 
         // --ELEMENT-CONTENT
         let
-        max = 0,
-        translateX = 0
+        content_MAX = 0,
+        content_TRANSLATEX = 0
+
+        // --ELEMENT-SPACE
+        let
+        space_RATIO = 1,
+        space_TRANSLATEY = 0
 
         // --ELEMENT-ORBIT
         let
-        target = null,
-        animate = false,
-        r,
-        y,
-        [red, green, blue] = _colors.light.match(/\w\w/g).map(x => parseInt(x, 16)),
-        onColor = _colors.light,
-        offColor = `rgba(${red}, ${green}, ${blue}, .1)`
+        orbit_TARGET,
+        orbit_ANIMATE = false,
+        orbit_RADIUS,
+        orbit_Y,
+        orbit_COLORS = { on: _colors.light, off: rgba(_colors.light, .1) }
 
         // --ELEMENT-LAND
         let
         land,
-        show,
-        resolution
+        land_START,
+        land_END
 
         // --ELEMENT-SCENE
-        let scaleScene = 0
+        let scene_SCALE = 0
 
         // --ELEMENT-DIE
-        let number = 6
+        let die_NUMBER = 6
 
         // --ELEMENT-SKY
-        let translate = 0
-
-        // --EVENT
-        let
-        last = +new Date(),
-        timeout
+        let sky_TRANSLATEX = 0
+        
 
     // #REACTIVE
 
-    $: scaleSpace = number / 6 * ratio
+            // --ELEMENT-SPACE
+            $: space_SCALE = die_NUMBER / 6 * space_RATIO
 
-    $: updateOrbits(animate)
+            // --ELEMENT-ORBIT
+            $: orbit_animation(orbit_ANIMATE)
 
     // #FUNCTIONS
 
         // --SET
-        function set()
+        function competence_set()
         {
-            setMain()
-            setCompetence()
-            setOrbit()
-            setLand()
-            setCommand()
-            setEvent()
-            setRouter()
+            competence_OFFSETTOP = competence.getBoundingClientRect().top
+            competence_HEIGHT = competence.offsetHeight + window.innerHeight / 2
+
+            orbit_set()
+            land_set()
+            competence_setCommand()
+            competence_setEvent()
+            competence_setRouter()
         }
 
-        function setMain() { main = document.querySelector('main') }
-
-        function setCompetence()
+        function orbit_set()
         {
-            const innerHeight = window.innerHeight
-
-            offsetTop = main.scrollTop + competence.getBoundingClientRect().top
-            height = competence.offsetHeight + innerHeight / 2
+            orbit_RADIUS = window.innerWidth / 2
+            orbit_Y = 1 /* set orbits positions */
         }
 
-        function setOrbit()
+        function land_set()
         {
-            r = window.innerWidth / 2
-            y = 1 /* set orbits positions */
+            land_START = land.offsetTop - window.innerHeight * .7
+            land_END = land.scrollHeight + land_START - window.innerHeight
         }
 
-        function setLand()
+        function content_setSubtitle(orbit) { orbit.subtitle = [...orbit.elements.subtitle.querySelectorAll('.char')] }
+
+        function content_setLetters(orbit)
         {
-            show = land.offsetTop - window.innerHeight * .7
-            resolution = land.scrollHeight + show - window.innerHeight
+            const LETTERS = [...orbit.elements.title.querySelectorAll('span')]
+
+            orbit.letters = []
+
+            for (let i = 0; i < LETTERS.length; i++)
+                orbit.letters[i] =
+                [
+                    LETTERS[i],
+                    window.innerWidth / 3 * (Math.round(Math.random()) ? 1 : -1),
+                    window.innerHeight / 3 * (Math.round(Math.random()) ? 1 : -1),
+                    window.innerHeight * (Math.round(Math.random()) ? 1 : -1)
+                ]
         }
 
-        function setLetters()
-        {
-            const children = [...this.elementTitle.querySelectorAll('span')]
-
-            this.letters = []
-
-            for (let i = 0; i < children.length; i++)
-            {
-                this.letters[i] =
-                {
-                    letter: children[i],
-                    translateX: window.innerWidth / 3 * (Math.round(Math.random()) ? 1 : -1),
-                    translateY: window.innerHeight / 3 * (Math.round(Math.random()) ? 1 : -1),
-                    translateZ: window.innerHeight * (Math.round(Math.random()) ? 1 : -1)
-                }
-            }
-        }
-
-        function setList()
+        function orbit_setList(orbit)
         {
             const
-            lis = [...this.list.children],
-            width = window.innerWidth
+            WIDTH = window.innerWidth,
+            LIS = [...orbit.elements.list.children]
 
-            this.listDatas = []
+            orbit.elements.lis = []
 
-            for (let i = 0; i < this.content.length; i++)
+            for (let i = 0; i < orbit.content.length; i++)
             {
-                const
-                translateX = Math.random() * width + width,
-                speed = Math.random() * 1.5 + .8
+                const [TRANSLATEX, SPEED] = [Math.random() * WIDTH + WIDTH, Math.random() * 1.5 + .8]
 
-                this.listDatas[i] = { translateX: translateX, speed: speed }
+                orbit.elements.lis[i] = { translateX: TRANSLATEX, speed: SPEED }
 
-                max = Math.max(max, (translateX + width + lis[i].offsetWidth + 50) / speed)
+                content_MAX = Math.max(content_MAX, (TRANSLATEX + WIDTH + LIS[i].offsetWidth + 100) / SPEED)
             }
         }
 
-        function setCommand() { app.app_add('spaceDimension', spaceDimension, true) }
+        function competence_setCommand() { app.app_add('space_dimension', space_dimension, true) }
 
-        function setEvent() { event.event_add('scroll', competence_scroll) }
+        function competence_setEvent() { event.event_add('scroll', competence_scroll) }
 
-        function setRouter()
+        function competence_setEventDesktop() { event.event_add('wheel', competence_wheel) }
+
+        function competence_setRouter()
         {
             const start = competence.parentNode.offsetTop
     
@@ -231,50 +220,68 @@
         }
 
         // --RESET
-        function reset()
+        function competence_reset()
         {
-            event.event_remove('wheel', competence_wheel)
+            competence_destroyEventDesktop()
     
-            translateX = 0
-            max = 0
+            content_MAX = 0
+            content_TRANSLATEX = 0
         }
 
         // --UPDATE
-        function update()
+        function competence_update()
         {
-            const gap = main.scrollTop - offsetTop
-            
-            ;[ratio, translateY, scaleScene] = gap >= show ? [.3, -100, 1] : [1, 0, 1.5]
+            const GAP = event.main_scrollTop - competence_OFFSETTOP
     
-            ;[y, animate] = gap > 0 ?
-                gap < height
-                ? [gap / height * 5, true]
-                : [5, false]
-            : [0, false]
-    
-            translate = gap > resolution ? gap - resolution : 0
+            ;[space_RATIO, space_TRANSLATEY, scene_SCALE, orbit_Y, orbit_ANIMATE] = GAP > 0
+            ?   GAP < competence_HEIGHT
+                ? [...(GAP >= land_START
+                    ? [.3, -100, 1]
+                    : [1, 0, 1.5])
+                  , GAP / competence_HEIGHT * 5, true]
+                : [.3, -100, 1, 5, false]
+            : [1, 0, 1.5, 0, false]
+
+            sky_TRANSLATEX = GAP > land_END ? GAP - land_END : 0
         }
 
-        function updateOrbits(animate) { if (competence) for (const orbit of orbits) orbit[animate ? 'animate' : 'clear']() }
+        function orbit_update(on)
+        {
+            on ? (app.app_FREEZE.set(true), space_RATIO = .3) : (app.app_FREEZE.set(false), space_RATIO = 1)
 
-        function updateLetter(letter, x, y, z) { letter.style.transform = `translate3d(${x ?? 0}px, ${y ?? 0}px, ${z ?? 0}px)` }
+            tick().then(() => on
+            ? (orbit_setList(ORBIT_ORBITS[orbit_TARGET]), competence_setEventDesktop())
+            : competence_update())
+        }
+
+        function orbit_updateLetter(e, x, y, z) { e.style.transform = `translate3d(${x ?? 0}px, ${y ?? 0}px, ${z ?? 0}px)` }
+
+        function orbit_updateSubtitle(orbit, i, unwind)
+        {
+            const LETTER = orbit.subtitle[i]
+            
+            unwind ? LETTER.textContent = LETTER.dataset.char : LETTER.innerHTML = '&nbsp;'
+        }
 
         // --DESTROY
-        function destroy()
+        function competence_destroy()
         {
             event.event_remove('scroll', competence_scroll)
-            event.event_remove('wheel', competence_wheel)
+           
+            competence_destroyEventDesktop()
         }
 
+        function competence_destroyEventDesktop() { event.event_remove('wheel', competence_wheel) }
+
         // --COMMAND
-        function spaceDimension(n)
+        function space_dimension(n)
         {
             n = app.app_testDefault(n) ? 6 : app.app_testNumber(n, 1, 6)
 
-            number = n
-            localStorage.setItem('spaceDimension', n)
+            die_NUMBER = n
+            localStorage.setItem('space_dimension', n)
     
-            app.app_success('spaceDimension ' + n)
+            app.app_success('space dimension - ' + n)
         }
 
         // --EVENTS
@@ -282,121 +289,115 @@
         {
             const now = +new Date()
 
-            clearTimeout(timeout)
+            clearTimeout(competence_TIMEOUT)
 
-            if (now > last + 100) update(), last = now
-            else timeout = setTimeout(update, 50)
+            if (now > competence_LAST + 100) competence_update(), competence_LAST = now
+            else competence_TIMEOUT = setTimeout(competence_update, 50)
         }
 
         async function competence_wheel(deltaY)
         {
-            y += deltaY > 0 ? .05 : -.05
+            orbit_Y += deltaY > 0 ? .05 : -.05
 
-            translateX += deltaY
+            content_TRANSLATEX += deltaY
 
-            if (translateX > max || translateX < 0) reset(), orbit_click({ detail: { id: null } })
+            if (content_TRANSLATEX > content_MAX || content_TRANSLATEX < 0) orbit_click({ detail: { id: undefined } })
         }
 
         function orbit_click({detail})
         {
-            reset()
+            competence_reset()
 
-            if (target !== null && target !== detail.id) orbits[target].on = false
+            if (orbit_TARGET != undefined && orbit_TARGET !== detail.id) ORBIT_ORBITS[orbit_TARGET].on = false
 
-            target = detail.id
+            orbit_TARGET = detail.id
     
-            tipping.call(orbits[target], detail.on)
+            orbit_update(detail.on)
+        }
+
+        // --CLEAR
+        function content_clearAnimation(orbit) { cancelAnimationFrame(orbit.frameId) }
+
+        // --TEST
+        function orbit_testEnd(orbit, end, unwind)
+        {
+            return unwind
+            ? ++end >= orbit.subtitle.length
+                ? orbit.subtitle.length - 1
+                : end
+            : --end < 0
+                ? 0
+                : end
         }
 
         // --TRANSITION
-        function fade()
-        {
-            return {
-                duration: duration,
-                css: (t) => `opacity: ${t}`
-            }
-        }
+        function orbit_fade() { return { duration: COMPETENCE_DURATION, css: (t) => `opacity: ${t}` } }
 
         // --ANIMATIONS
-        async function gather()
-        {
-            setLetters.call(this)
+        function orbit_animation(animate) { if (competence) for (const ORBIT of ORBIT_ORBITS) ORBIT[animate ? 'animation' : 'clear']() }
 
-            for (const l of this.letters)
-            {
-                updateLetter(l.letter, l.translateX, l.translateY, l.translateZ)
-                requestAnimationFrame(() => updateLetter(l.letter))
-            }
+        async function content_animationLetterGather(orbit)
+        {
+            for (const LETTER of orbit.letters)
+                orbit_updateLetter(...LETTER),
+                requestAnimationFrame(() => orbit_updateLetter(LETTER[0]))
         }
 
-        async function writingAnimation(start, end, i, j, unwind)
+        async function content_animationWriting(orbit, start, end, i, j, unwind)
         {
-            this.frameId = requestAnimationFrame(() =>
+            orbit.frameId = requestAnimationFrame(() =>
             {
                 for (let u = start; unwind ? u < end : u > end; unwind ? u++ : u--)
-                    this.subtitleLetters[u].textContent = [' ', unwind ? '>' : '<'][Math.floor(Math.random() * 2)]
+                    orbit.subtitle[u].textContent = [' ', unwind ? '>' : '<'][Math.floor(Math.random() * 2)]
 
                 if (++i === 10)
-                {
-                    i = 0
-
-                    if (unwind) { if (++end >= this.subtitleLetters.length) end = this.subtitleLetters.length-1 }
-                    else { if (--end < 0) end = 0 }
-                }
+                    i = 0, end = orbit_testEnd(orbit, end, unwind)
                 if (++j === 16)
                 {
-                    const letter = this.subtitleLetters[start]
-            
-                    unwind ? letter.textContent = letter.dataset.char : letter.innerHTML = '&nbsp;'
+                    j = 0
+
+                    orbit_updateSubtitle(orbit, start, unwind)
 
                     if ((unwind ? start++ : start--) === end) return
-        
-                    j = 0
                 }
 
-                writingAnimation.call(this, start, end, i, j, unwind)
+                content_animationWriting(orbit, start, end, i, j, unwind)
             })
         }
 
-        async function shatter() { for (const l of this.letters) updateLetter(l.letter, l.translateX, l.translateY, l.translateZ) }
+        async function content_animationShatter(orbit) { for (const LETTER of orbit.letters) orbit_updateLetter(...LETTER) }
 
-        // --UTILS
-        function tipping(on)
+        // --INTRO-OUTRO
+        function content_introstart()
         {
-            on ? (app.app_FREEZE.set(true), ratio = .3) : (app.app_FREEZE.set(false), ratio = 1)
+            content_setSubtitle(this)
+            content_setLetters(this)
 
-            tick().then(() => on
-            ?   (setList.call(this),
-                event.event_add('wheel', competence_wheel))
-            : update())
+            content_clearAnimation(this)
+
+            content_animationLetterGather(this)
+            content_animationWriting(this, 0, 1, 0, 0, true)
         }
 
-        function introstart()
+        function content_outrostart()
         {
-            gather.call(this)
-
-            cancelAnimationFrame(this.frameId)
-
-            this.subtitleLetters = [...this.elementSubtitle.querySelectorAll('.char')]
-
-            writingAnimation.call(this, 0, 1, 0, 0, true)
-        }
-
-        function outrostart()
-        {
-            shatter.call(this)
-
-            cancelAnimationFrame(this.frameId)
-
-            const length = this.subtitleLetters.length
+            const LENGTH = this.subtitle.length
     
-            writingAnimation.call(this, length - 1, length - 2, 0, 0, false)
+            content_clearAnimation(this)
+
+            content_animationShatter(this)
+            content_animationWriting(this, LENGTH - 1, LENGTH - 2, 0, 0, false)
+        }
+
+        function orbit_introstart()
+        {
+            content_animationWriting(this, 0, 1, 0, 0, true)
         }
 
     // #CYCLES
 
-    onMount(set)
-    onDestroy(destroy)
+    onMount(competence_set)
+    onDestroy(competence_destroy)
 </script>
 
 <!-- #HTML -->
@@ -409,25 +410,25 @@ bind:this={competence}
     class="track"
     >
         <div
-        style:--duration="{duration}ms"
+        style:--duration="{COMPETENCE_DURATION}ms"
         >
-            {#each orbits as orbit}
+            {#each ORBIT_ORBITS as orbit}
                 {#if orbit.on}
                     <div
                     class="content"
-                    transition:fade
-                    on:introstart={introstart.bind(orbit)}
-                    on:outrostart={outrostart.bind(orbit)}
+                    transition:orbit_fade
+                    on:introstart={content_introstart.bind(orbit)}
+                    on:outrostart={content_outrostart.bind(orbit)}
                     >
                         <section>
                             <h2
-                            bind:this={orbit.elementTitle}
+                            bind:this={orbit.elements.title}
                             >
                                 {#each orbit.title as title}
                                     <div>
                                         {#each title as char}
                                             <span
-                                            style:transition="transform {Math.random() * duration / 2 + duration / 2}ms"
+                                            style:transition="transform {Math.random() * COMPETENCE_DURATION / 2 + COMPETENCE_DURATION / 2}ms"
                                             >
                                                 {char}
                                             </span>
@@ -437,9 +438,9 @@ bind:this={competence}
                             </h2>
 
                             <p
-                            bind:this={orbit.elementSubtitle}
+                            bind:this={orbit.elements.subtitle}
                             >
-                                {#each (orbit.type + ' . ' + orbit.title.toString().replaceAll(',', ' ')) as char}
+                                {#each (orbit.title[0] + (orbit.title.length > 1 ? ' . ' + orbit.title.slice(1).toString().replaceAll(',', ' ') : '')) as char}
                                     <span
                                     class:char={char !== ' '}
                                     data-char={char}
@@ -452,13 +453,13 @@ bind:this={competence}
 
                         <div>
                             <ul
-                            bind:this={orbit.list}
+                            bind:this={orbit.elements.list}
                             >
                                 {#each orbit.content as content, i}
                                     <li
-                                    style:transform="translateX({orbit.listDatas
-                                    ? orbit.listDatas[i].translateX - translateX * orbit.listDatas[i].speed
-                                    : -translateX}px)"
+                                    style:transform="translateX({orbit.elements.lis
+                                    ? orbit.elements.lis[i].translateX - content_TRANSLATEX * orbit.elements.lis[i].speed
+                                    : -content_TRANSLATEX}px)"
                                     >
                                         <p>{content}</p>
                                     </li>
@@ -472,27 +473,44 @@ bind:this={competence}
             <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
             <div
             class="space"
-            style:transform="scale({scaleSpace}) translateY({translateY}%)"
+            style:transform="scale({space_SCALE}) translateY({space_TRANSLATEY}%)"
             >
                 <Moon
                 {_colors}
                 />
 
-                {#each orbits as orbit}
+                {#each ORBIT_ORBITS as orbit}
+                    {#if orbit.focus}
+                        <p
+                        class="orbit-theme"
+                        >
+                            {#each (orbit.title[0] + (orbit.title.length > 1 ? ' . ' + orbit.title.slice(1).toString().replaceAll(',', ' ') : '')) as char}
+                                <span
+                                class:char={char !== ' '}
+                                data-char={char}
+                                >
+                                    &nbsp;
+                                </span>
+                            {/each}
+                        </p>
+                    {/if}
+
                     <Orbit
                     {...orbit.props}
-                    _r={r}
-                    _y={y}
+                    _r={orbit_RADIUS}
+                    _y={orbit_Y}
                     _title={orbit.title.toString().replaceAll(',', ' ')}
-                    _onColor={onColor}
-                    _offColor={offColor}
-                    bind:on={orbit.on}
-                    bind:animate={orbit.animate}
-                    bind:clear={orbit.clear}
+                    _colors={orbit_COLORS}
+                    bind:orbit_ON={orbit.on}
+                    bind:orbit_FOCUS={orbit.focus}
+                    bind:satellite_animationFloating={orbit.animation}
+                    bind:satellite_clear={orbit.clear}
                     on:click={orbit_click}
                     />
                 {/each}
             </div>
+
+            <p>COMPÉTENCES</p>
         </div>
     </div>
 
@@ -501,13 +519,13 @@ bind:this={competence}
     bind:this={land}
     >
         <Scene
-        _scale={scaleScene}
+        _scale={scene_SCALE}
         {_colors}
-        bind:number={number}
+        bind:number={die_NUMBER}
         />
 
         <Sky
-        _translate={translate}
+        _translateX={sky_TRANSLATEX}
         {_colors}
         />
     </div>
@@ -521,13 +539,13 @@ lang="scss"
 >
     /* #USES */
 
-    @use '../../assets/scss/styles/flex.scss' as *;
-    @use '../../assets/scss/styles/position.scss' as *;
-    @use '../../assets/scss/styles/size.scss' as *;
-    @use '../../assets/scss/styles/font.scss' as *;
-    @use '../../assets/scss/styles/cursor.scss' as *;
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/font' as *;
+    @use '../../assets/scss/styles/cursor' as *;
 
-    /* #GROUPS */
+    /* #COMPETENCE */
 
     #competence
     {
@@ -549,10 +567,12 @@ lang="scss"
             &
             >div
             {
-                @include sticky(true);
+                @include sticky;
                 @include any-w;
 
                 height: 100vh;
+
+                &>p { @include p-info; }
             }
 
             &::after
@@ -576,6 +596,17 @@ lang="scss"
             transform-style: preserve-3d;
 
             transition: transform var(--duration);
+
+            .orbit-theme
+            {
+                @include absolute;
+                @include p-content;
+
+                top: 50%;
+                left: 50%;
+
+                color: $secondary;
+            }
         }
 
         .content
