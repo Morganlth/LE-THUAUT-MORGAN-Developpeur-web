@@ -13,12 +13,6 @@
 
     // #IMPORTS
 
-        // --CONTEXT
-        import { event } from '../field/Main.svelte'
-
-        // --SVELTE
-        import { onMount, onDestroy } from 'svelte'
-
         // --COMPONENT-ELEMENTS
         import Decor from './Decor.svelte'
         import Die from './Die.svelte'
@@ -26,32 +20,7 @@
     // #VARIABLES
 
         // --ELEMENT-SCENE
-        let
-        scene,
-        offsetTop
-
-    // #FUNCTIONS
-
-        // --SET
-        function set()
-        {
-            offsetTop = scene.offsetTop
-
-            setEvent()
-        }
-
-        function setEvent() { event.event_add('scroll', scene_scroll) }
-
-        // --DESTROY
-        function destroy() { event.event_remove('scroll', scene_scroll) }
-
-        // --EVENT
-        async function scene_scroll() { offsetTop = scene.offsetTop }
-
-    // #CYCLES
-
-    onMount(set)
-    onDestroy(destroy)
+        let scene
 </script>
 
 <!-- #HTML -->
@@ -69,12 +38,12 @@ bind:this={scene}
     class="content"
     >
         <Die
-        _offsetTop={offsetTop}
+        _scene={scene}
         _color={_colors.light}
         bind:number={number}
         />
 
-        <p>CE DÉ NE SERT ABSOLUMENT A RIEN. (EN COURS DE DÉVELOPPEMENT)</p>
+        <p>CE DÉ NE SERT ABSOLUMENT A RIEN. <br> (EN COURS DE DÉVELOPPEMENT)</p>
     </div>
 </div>
 
@@ -85,12 +54,12 @@ lang="scss"
 >
     /* #USES */
 
-    @use '../../assets/scss/styles/flex.scss' as *;
-    @use '../../assets/scss/styles/position.scss' as *;
-    @use '../../assets/scss/styles/size.scss' as *;
-    @use '../../assets/scss/styles/font.scss' as *;
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/font' as *;
 
-    /* #GROUPS */
+    /* #SCENE */
 
     .scene
     {
@@ -120,6 +89,8 @@ lang="scss"
 
                 margin: 30px 0;
                 padding: 15px 0;
+
+                text-align: center;
             }
         }
     }

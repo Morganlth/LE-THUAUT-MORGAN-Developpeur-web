@@ -9,6 +9,7 @@ class WindowManager
         window_TIMEOUT
         window_RESIZE
         window_MOBILE
+        window_TOUCHSCREEN
 
     // #CONSTRUCTOR
 
@@ -36,11 +37,11 @@ class WindowManager
 
             now > this.window_LAST + 2000
             ? this.window_call(now)
-            : this.window_TIMEOUT = setTimeout(this.window_call.bind(this), 100)
+            : this.window_TIMEOUT = setTimeout(this.window_call.bind(this), 500)
         }
 
         // --TESTS
-        window_testMobile() { return navigator.maxTouchPoints > 0 }
+        window_testMobile() { return this.window_TOUCHSCREEN || navigator.maxTouchPoints > 0 && /(Android|iPhone)/i.test(navigator.userAgent) }
 
         window_testSmallScreen() { return window.innerWidth < 768 }
 

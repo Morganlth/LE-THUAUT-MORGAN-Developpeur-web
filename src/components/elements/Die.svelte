@@ -5,7 +5,7 @@
 
         // --PROPS
         export let
-        _offsetTop,
+        _scene,
         _color
 
         // --BIND
@@ -14,10 +14,10 @@
     // #IMPORTS
 
         // --CONTEXTS
-        import { event, wwindow, spring } from '../field/Main.svelte'
+        import { app, event, wwindow, spring } from '../field/Main.svelte'
 
         // --SVELTE
-        import { onMount, onDestroy } from 'svelte'    
+        import { onMount, onDestroy, tick } from 'svelte'    
     
         // --COMPONENT-COVER
         import Icon from '../covers/Icon.svelte'
@@ -27,196 +27,190 @@
 
     // #CONSTANTES
 
-    const
-    gravity = 7,
-    modelX = [1, 4, 6, 2],
-    modelY = [1, 3, 6, 5],
-    modelZ = [2, 3, 4, 5],
-    sides =
-    [
+        // --ELEMENT-DIE
+        const
+        DIE_GRAVITY = 7,
+        DIE_MODELX = [1, 4, 6, 2],
+        DIE_MODELY = [1, 3, 6, 5],
+        DIE_MODELZ = [2, 3, 4, 5],
+        DIE_SIDES =
         [
-            null, null, null,
-            null, true, null,
-            null, null, null
-        ],
-        [
-            true, null, null,
-            null, null, null,
-            null, null, true
-        ],
-        [
-            true, null, null,
-            null, true, null,
-            null, null, true
-        ],
-        [
-            true, null, true,
-            null, null, null,
-            true, null, true
-        ],
-        [
-            true, null, true,
-            null, true, null,
-            true, null, true
-        ],
-        [
-            true, true, true,
-            null, null, null,
-            true, true, true
+            [
+                null, null, null,
+                null, true, null,
+                null, null, null
+            ],
+            [
+                true, null, null,
+                null, null, null,
+                null, null, true
+            ],
+            [
+                true, null, null,
+                null, true, null,
+                null, null, true
+            ],
+            [
+                true, null, true,
+                null, null, null,
+                true, null, true
+            ],
+            [
+                true, null, true,
+                null, true, null,
+                true, null, true
+            ],
+            [
+                true, true, true,
+                null, null, null,
+                true, true, true
+            ]
         ]
-    ]
 
     // #VARIABLES
-
-        // --EVENT-CONTEXT
-        let event_GRABBING = event.event_GRABBING
     
         // --ELEMENT-MAIN
         let main_scrollTop = 0
 
-        // --GLOBALS
-        let
-        delay = 50,
-        rotateDelay = 0,
-        last = +new Date(),
-        cursor = 'grab',
-        timeout,
-        launchedInterval = null,
-        rotateInterval = null
-    
-        // --MEMORIES
-        let lastOffsetTop = 0
+        // --ELEMENT-SCENE
+        let scene_LASTOFFSETTOP = 0
 
         // --ELEMENT-DIE
         let
         die,
-        die_grab,
-        x = 0,
-        y = 0,
-        r = 0,
-        vX = 0,
-        vY = 0,
-        maxX,
-        maxY,
-        initX,
-        initY,
-        translateX = 0,
-        translateY = 0
+        die_MOBILE,
+        die_DELAY = 50,
+        die_LAST = +new Date(),
+        die_TIMEOUT,
+        die_LAUNCHEDINTERVAL,
+        die_ROTATEINTERVAL,
+        die_CURSOR = 'grab',
+        die_GRAB,
+        die_X,
+        die_Y,
+        die_VX,
+        die_VY,
+        die_MAX,
+        die_INITX,
+        die_INITY,
+        die_TRANSLATEX,
+        die_TRANSLATEY
 
         // --ELEMENT-DIE-3D
         let
-        rotateX = 0,
-        rotateY = -20,
-        rotateZ = 0
-
-    // #REACTIVE
-
-    $: die_updateEvent($event_GRABBING)
+        die3d_ROTATEX,
+        die3d_ROTATEY,
+        die3d_ROTATEZ,
+        die3d_ROTATEDELAY = 0
 
     // #FUNCTIONS
 
         // --SET
-        function set()
+        function die_set()
         {
-            // setMain()
-            setVar()
-            setEvent()
+            die_resetPosition()
+
+            die_setVar()
+            die_setEvent()
         }
 
-        // function setMain()
-        // {
-        //     main = document.querySelector('main')
-        // }
-
-        function setVar()
+        function die_setVar()
         {
-            const
-            main = document.querySelector('main'),
-            boundingClientRect = die.getBoundingClientRect()
+            const RADIUS = die.offsetWidth / 2, MAIN = (event.main ? event.main : document.querySelector('main'))
     
-            r = die.offsetWidth / 2
+            let { top, left } = die.getBoundingClientRect()
     
-            maxX = window.innerWidth
-            maxY = main.scrollHeight
-
-            initX = boundingClientRect.left + r
-            initY = boundingClientRect.top + r + main.scrollTop
+            die_MAX = MAIN.scrollHeight
+            die_INITX = left + RADIUS
+            die_INITY = top + RADIUS + MAIN.scrollTop - (_scene ? _scene.offsetTop : 0)
         }
 
-        function setEvent() { event.event_add('mouseUp', die_mouseUp) }
+        function die_setEvent() { event.event_add('resize', die_resize) }
 
-        function die_setEventDesktop() { event.event_addSeveral({ scroll: die_scroll, mouseMove: die_mouseMove }) }
-
-        // --GET
-        function getNumber()
+        function die_setEventDesktop()
         {
-            const // position du dé en x, y, z
-            posX = Math.abs(rotateX / 90),
-            posY = Math.abs(rotateY / 90),
-            posZ = Math.abs(rotateZ / 90)
+            event.event_addSeveral({ scroll: die_scroll, mouseMove: die_mouseMove, mouseUp: die_mouseUp })
 
-            let n = modelX[posX] // recupère le premier nombre parmis les possibilité en x
+            die_MOBILE = false
+        }
+
+        function die_setEventMobile()
+        {
+            event.event_add('touchMove', die_touchMove)
+
+            die_MOBILE = true
+        }
+
+        function die_setNumber()
+        {
+            const [POSX, POSY, POSZ] = [Math.abs(die3d_ROTATEX / 90), Math.abs(die3d_ROTATEY / 90), Math.abs(die3d_ROTATEZ / 90)] // position du dé en x, y, z
+
+            let n = DIE_MODELX[POSX] // recupère le premier nombre parmis les possibilité en x
 
             // verifie si le nombre existe sur les models y et z, puis effectue les rotations suivante en modifiant le nombre
-            if (posY && modelY.includes(n)) n = modelY[(modelY.indexOf(n) + posY) % 4]
-            if (posZ && modelZ.includes(n)) n = modelZ[(modelZ.indexOf(n) + posZ) % 4]
+            if (POSY && DIE_MODELY.includes(n)) n = DIE_MODELY[(DIE_MODELY.indexOf(n) + POSY) % 4]
+            if (POSZ && DIE_MODELZ.includes(n)) n = DIE_MODELZ[(DIE_MODELZ.indexOf(n) + POSZ) % 4]
 
             number = n
         }
 
         // --RESET
-        function reset(xNow, yNow)
+        function die_reset(xNow, yNow)
         {
-            rotateDelay = delay
-            x = xNow
-            y = yNow
-            vX = 0
-            vY = 0
-            rotateX %= 360
-            rotateY %= 360
-            rotateZ %= 360
+            die3d_ROTATEDELAY = die_DELAY
+            die_X = xNow
+            die_Y = yNow
+            die_VX = 0
+            die_VY = 0
+    
+            die3d_ROTATEX %= 360
+            die3d_ROTATEY %= 360
+            die3d_ROTATEZ %= 360
+        }
+
+        function die_resetPosition()
+        {
+            die_TRANSLATEX = 0
+            die_TRANSLATEY = 0
+
+            die3d_ROTATEX = 0
+            die3d_ROTATEY = -20
+            die3d_ROTATEZ = 0
         }
 
         // --UPDATE
-        function die_updateEvent(on)
+        function die_update(cursor, grab, userSelect)
         {
-            if (wwindow.window_MOBILE === false)
-                on ? die_setEventDesktop() : die_destroyEventDesktop(),
-                main_scrollTop = event.main_scrollTop
-        }
-
-        function update(cursor, grab, userSelect)
-        {
-            cursor = cursor
-            die_grab = grab
+            die_CURSOR = cursor
+            die_GRAB = grab
             event.event_GRABBING.set(grab)
             document.body.style.userSelect = userSelect
         }
 
-        function updatePosition(xNow, yNow)
+        function die_updatePosition(clientX, clientY)
         {
-            vX = Math.floor(xNow - x) / gravity
-            vY = Math.floor(yNow - y) / gravity
-            x = xNow
-            y = yNow
+            die_VX = Math.floor(clientX - die_X) / DIE_GRAVITY
+            die_VY = Math.floor(clientY - die_Y) / DIE_GRAVITY
+            die_X = clientX
+            die_Y = clientY
         }
 
-        function updateTranslate(xNow, yNow)
+        function die_updateTranslate(xNow, yNow)
         {
-            translateX = xNow ?? x
-            translateY = yNow ?? y
+            die_TRANSLATEX = xNow ?? die_X
+            die_TRANSLATEY = yNow ?? die_Y
         }
 
-        function updateRotate()
+        function die3d_updateRotate()
         {
-            rotateX = Math.floor(y * 360 / initY)
-            rotateY = Math.floor(x * 360 / initX)
+            die3d_ROTATEX = Math.floor(die_Y * 360 / die_INITY)
+            die3d_ROTATEY = Math.floor(die_X * 360 / die_INITX)
         }
 
         // --DESTROY
-        function destroy()
+        function die_destroy()
         {
-            event.event_remove('mouseUp', die_mouseUp)
+            event.event_remove('resize', die_resize)
 
             die_destroyEventDesktop()
         }
@@ -225,126 +219,181 @@
         {
             event.event_remove('scroll', die_scroll)
             event.event_remove('mouseMove', die_mouseMove)
+            event.event_remove('mouseUp', die_mouseUp)
         }
+
+        function die_destroyEventMobile() { event.event_remove('touchMove', die_touchMove) }
 
         // --EVENTS
         async function die_mouseDown()
         {
-            // clear()
+            main_scrollTop = event.main_scrollTop
 
-            update('grabbing', true, 'none')
+            die_clear()
+
+            die_update('grabbing', true, 'none')
+
+            wwindow.window_MOBILE ? die_setEventMobile() : die_setEventDesktop()
         }
 
         async function die_mouseUp()
         {
-            if (die_grab)
+            if (die_GRAB)
             {
-                clearTimeout(timeout)
+                clearTimeout(die_TIMEOUT)
     
-                update('grab', false, 'auto')
+                die_update('grab', false, 'auto')
 
-                if (!launchedInterval && (Math.abs(vX) > gravity || Math.abs(vY) > gravity)) launched()
+                die_MOBILE ? die_destroyEventMobile() : die_destroyEventDesktop()
+
+                if (!die_LAUNCHEDINTERVAL && (Math.abs(die_VX) > DIE_GRAVITY || Math.abs(die_VY) > DIE_GRAVITY)) die_launched()
             }
         }
 
         async function die_scroll()
         {
-            if (lastOffsetTop === _offsetTop) y += event.main_scrollTop - main_scrollTop
+            if (scene_LASTOFFSETTOP === _scene.offsetTop) die_Y += event.main_scrollTop - main_scrollTop
 
-            delay = 0
+            die_DELAY = 0
     
-            updateTranslate()
-            updateRotate()
+            die_updateTranslate()
+            die3d_updateRotate()
         
             main_scrollTop = event.main_scrollTop
-            lastOffsetTop = _offsetTop
+            scene_LASTOFFSETTOP = _scene.offsetTop
         }
 
-        async function die_mouseMove(xNow, yNow)
+        async function die_mouseMove(clientX, clientY)
         {
-            const now = +new Date()
+            const NOW = +new Date()
 
-            clearTimeout(timeout)
+            clearTimeout(die_TIMEOUT)
     
-            now > last + delay ? move(xNow, yNow, now) : timeout = setTimeout(() => move(xNow, yNow, now), delay)
+            NOW > die_LAST + die_DELAY
+            ? die_move(clientX, clientY, NOW)
+            : die_TIMEOUT = setTimeout(die_move.bind(null, clientX, clientY, NOW), die_DELAY)
+        }
+
+        async function die_touchMove(clientX, clientY)
+        {
+            const NOW = +new Date()
+
+            clearTimeout(die_TIMEOUT)
+    
+            NOW > die_LAST + die_DELAY
+            ? die_move(clientX, clientY, NOW)
+            : die_TIMEOUT = setTimeout(die_move.bind(null, clientX, clientY, NOW), die_DELAY)
+        }
+
+        async function die_touchStart()
+        {
+            app.app_FREEZE.set(true)
+
+            die_mouseDown()
+        }
+
+        async function die_touchEnd()
+        {
+            app.app_FREEZE.set(false)
+
+            die_mouseUp()
+        }
+
+        async function die_resize()
+        {
+            die3d_ROTATEDELAY = (die_DELAY = 0)
+    
+            die_resetPosition()
+            
+            tick().then(() =>
+            {
+                die_setVar()
+
+                die3d_ROTATEDELAY = (die_DELAY = 50)
+            })
+        }
+
+        // --CLEAR
+        function die_clear()
+        {
+            clearInterval(die_ROTATEINTERVAL)
+            clearInterval(die_LAUNCHEDINTERVAL)
+            die_LAUNCHEDINTERVAL = null
         }
 
         // --UTIL
-        function move(xNow, yNow, now)
+        function die_move(clientX, clientY, now)
         {
-            delay = 50
+            die_DELAY = 50
 
-            xNow -= initX
-            yNow += main_scrollTop - (initY + _offsetTop)
+            clientX -= die_INITX
+            clientY += main_scrollTop - (die_INITY + _scene.offsetTop)
             
-            updatePosition(xNow, yNow)
-            updateTranslate()
-            updateRotate()
+            die_updatePosition(clientX, clientY)
+            die_updateTranslate()
+            die3d_updateRotate()
 
-            last = now
+            die_LAST = now
         }
 
-        function launched()
+        function die_launched()
         {
-            const smaller = y < 0
+            const SMALLER = die_Y < 0
 
             let
             t = 0,
-            xNow = x,
-            yNow = y,
-            g = gravity * (smaller ? -1 : 1)
+            xNow = die_X,
+            yNow = die_Y,
+            g = DIE_GRAVITY * (SMALLER ? -1 : 1)
 
-            launchedInterval = setInterval(() =>
+            die_LAUNCHEDINTERVAL = setInterval(() =>
             {
-                xNow += vX
-                yNow = Math.floor(y + vY * t - 0.5 * g * t * t)
+                xNow += die_VX
+                yNow = Math.floor(die_Y + die_VY * t - 0.5 * g * t * t)
         
-                if (xNow < -initX || xNow > initX)
+                if (xNow < -die_INITX || xNow > die_INITX)
                 {
-                    xNow = (xNow < 0 ? -initX : initX)
-                    vX = -vX / 2
+                    xNow = (xNow < 0 ? -die_INITX : die_INITX)
+                    die_VX = -die_VX / 2
                 }
-                if (smaller ? yNow >= 0 : yNow <= 0)
+                if (SMALLER ? yNow >= 0 : yNow <= 0)
                 {
                     if (yNow < 0) yNow = 0
-                    else if (yNow > maxY) yNow = maxY
+                    else if (yNow > die_MAX) yNow = die_MAX
         
-                    clear()
-                    reset(xNow, yNow)
-                    getNumber()
+                    die_clear()
+                    die_reset(xNow, yNow)
+                    die_setNumber()
                 }
 
-                updateTranslate(xNow, yNow)
+                die_updateTranslate(xNow, yNow)
 
                 t++
-            }, delay)
+            }, die_DELAY)
 
-            rotateRandom()
+            die3d_rotateRandom()
         }
 
-        function clear()
+        function die3d_rotateRandom()
         {
-            clearInterval(rotateInterval)
-            clearInterval(launchedInterval)
-            launchedInterval = null
-        }
+            die3d_ROTATEDELAY = 180 - die_VX - die_VY
+            die3d_ROTATEX = Math.floor(Math.random() * 4) * 90
+            die3d_ROTATEY = Math.floor(Math.random() * 4) * 90
+            die3d_ROTATEZ = Math.floor(Math.random() * 4) * 90
 
-        function rotateRandom()
-        {
-            rotateDelay = 180 - vX - vY
-            rotateX = Math.floor(Math.random() * 4) * 90
-            rotateY = Math.floor(Math.random() * 4) * 90
-            rotateZ = Math.floor(Math.random() * 4) * 90
-
-            rotateInterval = setInterval(() =>
-            Math.round(Math.random()) ? rotateX += 90 : Math.round(Math.random()) ? rotateY += 90 : rotateZ += 90,
-            rotateDelay)
+            die_ROTATEINTERVAL = setInterval(() =>
+                Math.round(Math.random())
+                ? die3d_ROTATEX += 90
+                : Math.round(Math.random())
+                    ? die3d_ROTATEY += 90
+                    : die3d_ROTATEZ += 90,
+            die3d_ROTATEDELAY)
         }
 
     // #CYCLES
 
-    onMount(set)
-    onDestroy(destroy)
+    onMount(die_set)
+    onDestroy(die_destroy)
 </script>
 
 <!-- #HTML -->
@@ -352,20 +401,22 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
 class="die"
-style:transform="translateX({translateX}px) translateY({translateY}px)"
-style:transition="transform {delay}ms"
-style:cursor={cursor}
+style:transform="translateX({die_TRANSLATEX}px) translateY({die_TRANSLATEY}px)"
+style:transition="transform {die_DELAY}ms"
+style:cursor={die_CURSOR}
 bind:this={die}
 on:mousedown={die_mouseDown}
 on:mouseenter={spring.spring_mouseEnter.bind(spring)}
 on:mouseleave={spring.spring_mouseLeave.bind(spring)}
+on:touchstart={die_touchStart}
+on:touchend={die_touchEnd}
 >
     <div
     class="die-3d"
-    style:transform="rotateX({rotateX}deg) rotateY({rotateY}deg) rotateZ({rotateZ}deg)"
-    style:transition="transform {rotateDelay}ms"
+    style:transform="rotateX({die3d_ROTATEX}deg) rotateY({die3d_ROTATEY}deg) rotateZ({die3d_ROTATEZ}deg)"
+    style:transition="transform {die3d_ROTATEDELAY}ms"
     >
-        {#each sides as side}
+        {#each DIE_SIDES as side}
             <div
             class="side"
             >
@@ -393,12 +444,13 @@ lang="scss"
 >
     /* #USE */
 
-    @use '../../assets/scss/styles/grid.scss' as *;
-    @use '../../assets/scss/styles/flex.scss' as *;
-    @use '../../assets/scss/styles/size.scss' as *;
-    @use '../../assets/scss/styles/cursor.scss' as *;
+    @use '../../assets/scss/styles/grid' as *;
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/cursor' as *;
 
-    /* #GROUPS */
+    /* #DIE */
+
     .die
     {
         perspective: 500px;

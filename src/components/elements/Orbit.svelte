@@ -114,10 +114,7 @@
         export function satellite_clear() { clearInterval(satellite_INTERVAL), satellite_INTERVAL = null }
 
         // --TEST
-        function orbit_testFocus(a)
-        {
-            orbit_FOCUS = a > RAD_60 && a < RAD_120
-        }
+        function orbit_testFocus(a) { orbit_FOCUS = a > RAD_60 && a < RAD_120 }
 
         // --ANIMATION
         export function satellite_animationFloating(a)
@@ -214,8 +211,9 @@ lang="scss"
 
     /* #VARIABLE */
 
-    $size-min: 100px;
-    $size-max: 200px;
+    $size-cube-0: 100px;
+    $size-cube-1: 150px;
+    $size-cube-2: 200px;
 
     /* #ORBIT */
 
@@ -234,8 +232,8 @@ lang="scss"
 
             transform-style: preserve-3d;
 
-            width: $size-min * 2;
-            height: $size-min * 2;
+            width: $size-cube-0 * 2;
+            height: $size-cube-0 * 2;
 
             background-color: transparent;
 
@@ -255,8 +253,8 @@ lang="scss"
             transform-style: preserve-3d;
             transform-origin: center;
 
-            width: $size-min;
-            height: $size-min;
+            width: $size-cube-0;
+            height: $size-cube-0;
 
             transition: transform .6s;
 
@@ -269,12 +267,12 @@ lang="scss"
 
                 box-sizing: border-box;
             }
-            .side:nth-child(1) { transform: translateZ(math.div($size-min, 2)); }
+            .side:nth-child(1) { transform: translateZ(math.div($size-cube-0, 2)); }
             .side:nth-child(2) { transform: translateY(-150%) rotateX(-90deg); }
             .side:nth-child(3) { transform: translate(-50%, -200%) rotateY(90deg) scaleX(-1); }
             .side:nth-child(4) { transform: translateY(-250%) rotateX(90deg); }
             .side:nth-child(5) { transform: translate(50%, -400%) rotateY(-90deg); }
-            .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$size-min, 2)); }
+            .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$size-cube-0, 2)); }
         }
 
         
@@ -282,17 +280,34 @@ lang="scss"
         {
             .gravity-area
             {
-                width: $size-max * 2;
-                height: $size-max * 2;
+                width: $size-cube-1 * 2;
+                height: $size-cube-1 * 2;
             }
 
             .satellite
             {
-                width: $size-max;
-                height: $size-max;
+                width: $size-cube-1;
+                height: $size-cube-1;
 
-                .side:nth-child(1) { transform: translateZ(math.div($size-max, 2)); }
-                .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$size-max, 2)); }
+                .side:nth-child(1) { transform: translateZ(math.div($size-cube-1, 2)); }
+                .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$size-cube-1, 2)); }
+            }
+        }
+        @include media-min(1024px)
+        {
+            .gravity-area
+            {
+                width: $size-cube-2 * 2;
+                height: $size-cube-2 * 2;
+            }
+
+            .satellite
+            {
+                width: $size-cube-2;
+                height: $size-cube-2;
+
+                .side:nth-child(1) { transform: translateZ(math.div($size-cube-2, 2)); }
+                .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$size-cube-2, 2)); }
             }
         }
     }

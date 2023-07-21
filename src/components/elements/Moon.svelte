@@ -12,8 +12,11 @@
         import { rgba } from '../../assets/js/utils/color'
         import { drawCircle } from '../../assets/js/utils/canvas'
 
+        // --CONTEXT
+        import { event } from '../field/Main.svelte'
+
         // --SVELTE
-        import { onMount } from 'svelte'
+        import { onMount, onDestroy } from 'svelte'
         import { page } from '$app/stores'
 
     // #CONSTANTE
@@ -34,10 +37,12 @@
         // --SET
         function moon_set()
         {
-            canvas_set()
-
-            canvas_draw()
+            moon_reset()
+            
+            moon_setEvent()
         }
+
+        function moon_setEvent() { event.event_add('resize', moon_resize) }
 
         function canvas_set()
         {
@@ -46,7 +51,7 @@
             canvas.width = canvas_SIZE
             canvas.height = canvas_SIZE
 
-            context = canvas.getContext('2d')
+            context = context ?? canvas.getContext('2d')
         }
 
         // --GET
@@ -62,7 +67,21 @@
             })
         }
 
-        // --DRAW-CLEAR
+        // --RESET
+        function moon_reset()
+        {
+            canvas_set()
+
+            canvas_draw()
+        }
+
+        // --DESTROY
+        function moon_destroy() { event.event_remove('resize', moon_resize) }
+
+        // --EVENT
+        async function moon_resize() { moon_reset() }
+
+        // --DRAW
         async function canvas_draw()
         {
             const [COLOR, RADIUS, IMG] = [rgba(_colors.light, .1), canvas_SIZE / 2, await moon_getBackground()]
@@ -106,9 +125,10 @@
             drawCircle(context, SIZE_3_4, radius, RADIUS_3_4 - MOON_AURA)
         }
 
-    // #CYCLE
+    // #CYCLES
 
     onMount(moon_set)
+    onDestroy(moon_destroy)
 </script>
 
 <!-- #HTML -->
@@ -116,14 +136,17 @@
 <div
 class="moon"
 >
-    <p>LES HOMMES AURONT TOUJOURS LE DROIT DE REVER</p>
-
     <canvas
     style:width="{canvas_SIZE}px"
     style:height="{canvas_SIZE}px"
     bind:this={canvas}
     >
     </canvas>
+
+    <div>
+        <p>C'EST AU-DELA DES LIMITES HUMAINES,</p>
+        <p>QUE LE TEMPS PARAIT SI PRÉCIEUX</p>
+    </div>
 </div>
 
 <!-- #STYLE -->
@@ -133,9 +156,11 @@ lang="scss"
 >
     /* #USES */
 
+    @use '../../assets/scss/styles/flex' as *;
     @use '../../assets/scss/styles/position' as *;
     @use '../../assets/scss/styles/size' as *;
     @use '../../assets/scss/styles/font' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #MOON */
 
@@ -143,22 +168,28 @@ lang="scss"
     {
         @include relative;
 
-        p
+        &>div
         {
+            @include flex;
             @include absolute;
-            @include p-content;
+
+            flex-direction: row-reverse;
 
             top: 0%;
             left: 20%;
 
-            z-index: -1;
+            p
+            {
+                @include p-content;
+    
+                color: $s-light;
+                line-height: 1.5;
+                writing-mode: vertical-lr;
+                white-space: nowrap;
+                user-select: none;
 
-            width: 30%;
-
-            color: $secondary;
-            writing-mode: vertical-lr;
+                @include media-max(false, 649px) { font-size: 18px; }
+            }
         }
-
-        canvas { mix-blend-mode: color; }
     }
 </style>

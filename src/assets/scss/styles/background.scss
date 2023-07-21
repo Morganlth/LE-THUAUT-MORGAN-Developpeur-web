@@ -75,7 +75,7 @@
 
 @mixin neon
 {
-    &::after
+    &::before
     {
         @include xy-start(true);
         @include any-h;

@@ -8,15 +8,22 @@
         _scale,
         _colors
 
-    // #IMPORT
+    // #IMPORTS
+
+        // --JS
+        import { drawTriangle } from '../../assets/js/utils/canvas'
+        import { rgb } from '../../assets/js/utils/color'
+
+        // --CONTEXTS
+        import { event, wwindow } from '../field/Main.svelte'
 
         // --SVELTE
-        import { onMount } from 'svelte'
+        import { onMount, onDestroy } from 'svelte'
 
-    // #CONSTANTES
+    // #CONSTANTE
 
-        // --COLOR
-        const [r, g, b] = _colors.sLight.match(/\w\w/g).map(x => parseInt(x, 16))
+        // --ELEMENT-DECOR
+        const COLOR = rgb(_colors.sLight)
 
     // #VARIABLES
 
@@ -24,70 +31,75 @@
         let
         canvas,
         context,
-        width,
-        height
+        canvas_WIDTH,
+        canvas_HEIGHT
 
     // #FUNCTIONS
 
         // --SET
-        function set()
+        function decor_set()
         {
-            width = window.innerWidth
-            height = window.innerHeight
-    
-            canvas.width = width
-            canvas.height = height
+            decor_setEvent()
 
-            context = canvas.getContext('2d')
+            canvas_set()
+    
+            if (!wwindow.window_testSmallScreen()) canvas_draw()
+        }
+
+        function decor_setEvent() { event.event_add('resize', decor_resize) }
+
+        function canvas_set()
+        {
+            canvas.width = (canvas_WIDTH = window.innerWidth)
+            canvas.height = (canvas_HEIGHT = window.innerHeight)
+
+            context = context ?? canvas.getContext('2d')
             context.lineWidth = 2
             context.strokeStyle = _colors.sDark
             context.fillStyle = _colors.sLight
+        }
 
-            draw()
-            // console.log()
+        // --DESTROY
+        function decor_destroy() { event.event_remove('resize', decor_resize) }
+
+        // --EVENT
+        function decor_resize(smallScreen)
+        {
+            if (canvas_WIDTH < window.innerWidth && !smallScreen)
+                canvas_set(),
+                canvas_draw()
         }
 
         // --DRAW
-        function draw()
+        function canvas_draw()
         {
-            generateMontain()
-            generateForest()
+            decor_generateMontain()
+            decor_generateForest()
         }
 
-        function drawMontain(left, y, small)
+        function canvas_drawMontain(left, y, small)
         {
             const
-            x = Math.random() * width * .4 + (left ? -width * .1 : width * .7),
-            w = (Math.random() * width * .3 + width * .2) / (small ? 3 : 1),
-            h = (Math.random() * height * .25 + height * .2) / (small ? 3 : 1),
-            s = x + Math.random() * width * .05 * (left ? -1 : 1)
+            X = Math.random() * canvas_WIDTH * .4 + (left ? -canvas_WIDTH * .1 : canvas_WIDTH * .7),
+            W = (Math.random() * canvas_WIDTH * .3 + canvas_WIDTH * .2) / (small ? 3 : 1),
+            H = (Math.random() * canvas_HEIGHT * .25 + canvas_HEIGHT * .2) / (small ? 3 : 1),
+            S = X + Math.random() * canvas_WIDTH * .05 * (left ? -1 : 1)
     
-            drawTriangle(x, y, w, h, s)
+            drawTriangle(context, X, y, W, H, S)
         }
 
-        function drawTriangle(x, y, w, h, s)
-        {
-            context.beginPath()
-            context.moveTo(x - w / 2, y)
-            context.lineTo(s, y - h)
-            context.lineTo(x + w / 2, y)
-            context.fill()
-            context.stroke()
-            context.closePath()
-        }
-
-        function drawTree(left, y)
+        function canvas_drawTree(left, y)
         {
             const
-            x = Math.random() * width * .4 + (left ? -width * .03 : width * .63),
-            w = Math.random() * width * .01 + width * .04,
-            h = Math.random() * height * .05 + height * .15
+            X = Math.random() * canvas_WIDTH * .4 + (left ? -canvas_WIDTH * .03 : canvas_WIDTH * .63),
+            W = Math.random() * canvas_WIDTH * .01 + canvas_WIDTH* .04,
+            H = Math.random() * canvas_HEIGHT * .05 + canvas_HEIGHT * .15
 
-            drawFoliage(x, y, w, h)
-            drawTrunk(x, y)
+            canvas_drawFoliage(X, y, W, H)
+            canvas_drawTrunk(X, y)
         }
 
-        function drawFoliage(x, y, w, h)
+        function canvas_drawFoliage(x, y, w, h)
         {
             context.beginPath()
             context.moveTo(x - w / 2, y)
@@ -95,62 +107,63 @@
             context.lineTo(x + w / 2, y)
             context.fillStyle = _colors.secondary
             context.fill()
-            context.fillStyle = `rgba(${r}, ${g}, ${b}, .3)`
+            context.fillStyle = `rgba(${COLOR}, .3)`
             context.fill()
             context.stroke()
             context.closePath()
         }
 
-        function drawTrunk(x, y)
+        function canvas_drawTrunk(x, y)
         {
-            const h_01 = height * .01
+            const H_MUL_01 = canvas_HEIGHT * .01
     
-            context.fillStyle = `rgba(${r}, ${g}, ${b}, .6)`
+            context.fillStyle = `rgba(${COLOR}, .6)`
             context.beginPath()
-            context.rect(x - 5, y, 10, Math.random() * h_01 + h_01)
+            context.rect(x - 5, y, 10, Math.random() * H_MUL_01 + H_MUL_01)
             context.fill()
             context.closePath()
         }
 
         // --GENERATE
-        function generateMontain()
+        function decor_generateMontain()
         {
-            let y = Math.random() * height * .03 + height * .6
+            let y = Math.random() * canvas_HEIGHT * .03 + canvas_HEIGHT * .6
 
             for (let i = 0; i < 8; i++)
             {
-                if (i === 4) y = Math.random() * height * .03  + height * .6
+                if (i === 4) y = Math.random() * canvas_HEIGHT * .03  + canvas_HEIGHT * .6
                 
-                y += Math.random() * height * .03
+                y += Math.random() * canvas_HEIGHT * .03
 
-                drawMontain(i < 4, y)
+                canvas_drawMontain(i < 4, y)
             }
 
-            y = height * .7
+            y = canvas_HEIGHT * .7
 
-            for (let i = 0; i < 4; i++) drawMontain(i < 2, y, true)
+            for (let i = 0; i < 4; i++) canvas_drawMontain(i < 2, y, true)
         }
 
-        function generateForest()
+        function decor_generateForest()
         {
-            const max = Math.floor(Math.random() * 7) + 7
+            const MAX = Math.floor(Math.random() * 7) + 7
         
-            let y = Math.random() * height * .03 + height * .75
+            let y = Math.random() * canvas_HEIGHT * .03 + canvas_HEIGHT * .75
         
-            for (let i = 0; i < max * 2; i++)
+            for (let i = 0; i < MAX * 2; i++)
             {
-                if (i === max) y = Math.random() * height * .03 + height * .75
+                if (i === MAX) y = Math.random() * canvas_HEIGHT * .03 + canvas_HEIGHT * .75
                 
-                y += Math.random() * height * .2 / max
+                y += Math.random() * canvas_HEIGHT * .2 / MAX
 
-                drawTree(i < max, y)
+                canvas_drawTree(i < MAX, y)
             }
         }
     
 
-    // #CYCLE
+    // #CYCLES
 
-    onMount(set)
+    onMount(decor_set)
+    onDestroy(decor_destroy)
 </script>
 
 <!-- #HTML -->
@@ -163,12 +176,11 @@ style:transform="scale({_scale})"
     class="background"
     >
         <div></div>
-        <div></div>
     </div>
 
     <canvas
-    style:width="{width}px"
-    style:height="{height}px"
+    style:width="{canvas_WIDTH}px"
+    style:height="{canvas_HEIGHT}px"
     bind:this={canvas}
     >
     </canvas>
@@ -181,31 +193,24 @@ lang="scss"
 >
     /* #USES */
 
-    @use '../../assets/scss/styles/position.scss' as *;
-    @use '../../assets/scss/styles/size.scss' as *;
-    @use '../../assets/scss/styles/background.scss' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/background' as *;
 
-    /* #GROUPS */
+    /* #DECOR */
 
     .decor
     {
+        @include relative;
         @include any;
-
+    
         transition: transform 1s;
 
         .background
         {
-            @include absolute;
-            @include any;
+            @include neon;
 
-            z-index: -1;
-
-            div:nth-child(1)
-            {
-                @include neon;
-            }
-
-            div:nth-child(2)
+            div
             {
                 @include absolute;
                 @include any-w;
@@ -253,6 +258,16 @@ lang="scss"
                     background: linear-gradient(0deg, transparent 0%, $dark 20% 80%, transparent 100%);
                 }
             }
+        }
+        
+        canvas
+        {
+            @include absolute;
+
+            bottom: 0;
+            left: 50%;
+
+            transform: translateX(-50%);
         }
     }
 </style>

@@ -131,8 +131,9 @@
         // --ELEMENT-TAG
         let
         tag_CONTAINER,
-        tag_Z = 0,
         tag_CHARGED = false,
+        tag_FONTCHARGED = false,
+        tag_Z = 0,
         tag_INDEX = 0,
         tag_SAVE = -1
 
@@ -141,7 +142,6 @@
         snake_SCORE,
         snake_TAIL = [0, 0],
         snake_INVINCIBLE = false,
-        snake_MOBILE_GAME,
         snake_resetSize,
         snake_resetGame,
         snake_updateEvent,
@@ -164,8 +164,8 @@
         $: tag_update(snake_TAIL)
 
         // --ELEMENT-SNAKE
-        $: snake_updateEvent instanceof Function && wwindow.window_MOBILE === false
-        ? snake_updateEvent(!$event_GRABBING && snake_test())
+        $: snake_updateEvent instanceof Function && tag_CHARGED
+        ? snake_updateEvent(!$event_GRABBING && snake_test(), $event_GRABBING)
         : null // set default desktop event snake
 
     // #FUNCTIONS
@@ -184,12 +184,14 @@
         {
             document.fonts.ready.then(() =>
             {
-                tag_CHARGED = true
+                tag_FONTCHARGED = true
 
                 tick().then(() =>
                 {
                     if (wwindow.window_MOBILE) mobile_update(presentation_$SNAKE)
                     if (presentation_$TEXT && !presentation_$SNAKE) tag_showAll()
+
+                    tag_CHARGED = true
                 })
             })
         }
@@ -325,7 +327,7 @@
 
         function presentation_updateText(on)
         {
-            if (tag_CHARGED)
+            if (tag_FONTCHARGED)
             {
                 on
                 ? presentation_$SNAKE
@@ -337,7 +339,7 @@
 
         function presentation_updateSnake(on)
         {
-            if (presentation_$TEXT && tag_CHARGED) on ? (tag_hideAll(), tag_restore()) : tag_showAll()
+            if (presentation_$TEXT && tag_FONTCHARGED) on ? (tag_hideAll(), tag_restore()) : tag_showAll()
     
             if (on) app.app_updateMode(false)
 
@@ -350,7 +352,7 @@
 
         function tag_update([x, y])
         {
-            if (presentation_$TEXT && tag_CHARGED)
+            if (presentation_$TEXT && tag_FONTCHARGED)
             {
                 if (tag_INDEX === TAG_ELEMENTS.length) tag_INDEX = 0
                 if (tag_SAVE > -1) TAG_ELEMENTS[tag_SAVE].hide()
@@ -378,7 +380,7 @@
 
         async function mobile_update(on)
         {
-            if (tag_CHARGED)
+            if (tag_FONTCHARGED)
             {
                 if (on && tag_SAVE > -1) await TAG_ELEMENTS[tag_SAVE].hide()
                 if (on && TAG_GAMEOVER.on)
@@ -402,7 +404,6 @@
             }
             else snake_updateEvent(false)
 
-            app.app_FREEZE.set(START)
             snake_animation(START)
         }
 
@@ -490,9 +491,9 @@
 
         async function options_mouseLeave(e)
         {
-            const target = e.relatedTarget
+            const TARGET = e.relatedTarget
 
-            if (!target || target.classList.contains('icon')) return
+            if (!TARGET || TARGET.classList.contains('icon')) return
         
             snake_setInvincibleTime()
 
@@ -501,7 +502,7 @@
             if (snake_test()) snake_updateEvent(true)
         }
 
-        async function mobile_click()
+        async function mobile_clickCross()
         {
             mobile_update(presentation_$SNAKE)
             mobile_updateGame(false)
@@ -608,7 +609,7 @@ on:click={presentation_click}
             </span>
         {/if}
 
-        {#if tag_CHARGED}
+        {#if tag_FONTCHARGED}
             {#each TAG_ELEMENTS as tag}
                 <Tag
                 _blockSize={PRESENTATION_BLOCKSIZE}
@@ -724,7 +725,7 @@ on:click={presentation_click}
             {#if wwindow.window_MOBILE && !TAG_MOBILE.on}
                 <Cell
                 _style="border: none; cursor: pointer"
-                on:click={mobile_click}
+                on:click={mobile_clickCross}
                 >
                     <Icon
                     _size="18px"

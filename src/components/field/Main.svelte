@@ -119,6 +119,17 @@ context="module"
                 if (event.event_contain('scroll', main_scroll.name) === -1) main_setEventDesktop()
 
                 main_setWrapper()
+                main_scroll()
+            }
+        }
+
+        async function main_touchStart()
+        {
+            if (!wwindow.window_TOUCHSCREEN)
+            {
+                wwindow.window_TOUCHSCREEN = true
+
+                if (!wwindow.window_MOBILE) wwindow.window_resize()
             }
         }
 
@@ -140,6 +151,7 @@ on:mousedown={event.event_mouseDown.bind(event)}
 on:mouseup={event.event_mouseUp.bind(event)}
 on:mouseleave={event.event_mouseUp.bind(event)}
 on:touchmove|passive={event.event_touchMove.bind(event)}
+on:touchstart={main_touchStart}
 class:freeze={$main_FREEZE}
 >
     <div>

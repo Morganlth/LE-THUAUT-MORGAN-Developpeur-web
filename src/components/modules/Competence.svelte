@@ -12,7 +12,7 @@
         import { rgba } from '../../assets/js/utils/color'
 
         // --CONTEXTS
-        import { app, event, router } from '../field/Main.svelte'
+        import { app, event, wwindow, router } from '../field/Main.svelte'
 
         // --SVELTE
         import { onMount, onDestroy, tick } from 'svelte'
@@ -34,20 +34,21 @@
             {
                 props: { _id: 0, _rotate: -50 * Math.PI / 180, _offset: 0 },
                 title: ['FRONT', 'FORME - STYLE'],
-                content:
+                texts:
                 [
                     'découper, assembler et intégrer tous les éléments d’une maquette graphique en HTML5 et CSS',
                     'ajouter du contenu audio et vidéo en HTML5',
                     'animer les pages web avec CSS3',
                     'construire un projet impliquant SCSS et SASS'
                 ],
-                elements: {}
+                thematic: { elements: {} },
+                content: { elements: {} }
             }
         ,
             {
                 props: { _id: 1, _rotate: 80 * Math.PI / 180, _offset: 4.71 },
                 title: ['FRONT', 'JAVASCRIPT'],
-                content:
+                texts:
                 [
                     'faire réagir la page web en fonction des actions de l’utilisateur en JavaScript',
                     'se connecter à un service web pour exploiter des données tierces (API)',
@@ -58,13 +59,14 @@
                     'utiliser le framework React',
                     'développer un projet sous Svelte'
                 ],
-                elements: {}
+                thematic: { elements: {} },
+                content: { elements: {} }
             }
         ,
             {
                 props: { _id: 2, _rotate: 40 * Math.PI / 180, _offset: 3.14 },
                 title: ['BACK', 'NODE SERVER'],
-                content:
+                texts:
                 [
                     'créer un nouveau projet NodeJS impliquant diverses dépendances (Express, MongoDB, jsonwebtoken...)',
                     'gérer les comptes utilisateurs',
@@ -72,13 +74,14 @@
                     'créer des API (REST)',
                     'construire un projet avec SvelteKit'
                 ],
-                elements: {}
+                thematic: { elements: {} },
+                content: { elements: {} }
             }
         ,
             {
                 props: { _id: 3, _rotate: 10 * Math.PI / 180, _offset: 1.57 },
-                title: ['ADAPTABILITÉ - RÉFÉRENCEMENT'],
-                content:
+                title: ['ADAPTABILITÉ', 'RÉFÉRENCEMENT'],
+                texts:
                 [
                     'appliquer les standards du web et les normes en vigueur',
                     'construire un site web fluide s’adaptant à tout type d’écran (web, smartphone et tablette)',
@@ -87,7 +90,8 @@
                     'appliquer les Schema.org',
                     'utiliser les balises meta OPEN GRAPH des réseaux sociaux (og, twitter)'
                 ],
-                elements: {}
+                thematic: { elements: {} },
+                content: { elements: {} }
             }
         ]
 
@@ -99,12 +103,16 @@
         competence_OFFSETTOP,
         competence_HEIGHT,
         competence_LAST = +new Date(),
-        competence_TIMEOUT
+        competence_TIMEOUT,
+        competence_MOBILE
 
         // --ELEMENT-CONTENT
         let
         content_MAX = 0,
-        content_TRANSLATEX = 0
+        content_TRANSLATEX = 0,
+        content_LASTX = null,
+        content_LAST = +new Date(),
+        content_TIMEOUT
 
         // --ELEMENT-SPACE
         let
@@ -148,69 +156,34 @@
         // --SET
         function competence_set()
         {
-            competence_OFFSETTOP = competence.getBoundingClientRect().top
-            competence_HEIGHT = competence.offsetHeight + window.innerHeight / 2
-
-            orbit_set()
-            land_set()
+            competence_reset()
+    
             competence_setCommand()
             competence_setEvent()
             competence_setRouter()
         }
 
-        function orbit_set()
-        {
-            orbit_RADIUS = window.innerWidth / 2
-            orbit_Y = 1 /* set orbits positions */
-        }
-
-        function land_set()
-        {
-            land_START = land.offsetTop - window.innerHeight * .7
-            land_END = land.scrollHeight + land_START - window.innerHeight
-        }
-
-        function content_setSubtitle(orbit) { orbit.subtitle = [...orbit.elements.subtitle.querySelectorAll('.char')] }
-
-        function content_setLetters(orbit)
-        {
-            const LETTERS = [...orbit.elements.title.querySelectorAll('span')]
-
-            orbit.letters = []
-
-            for (let i = 0; i < LETTERS.length; i++)
-                orbit.letters[i] =
-                [
-                    LETTERS[i],
-                    window.innerWidth / 3 * (Math.round(Math.random()) ? 1 : -1),
-                    window.innerHeight / 3 * (Math.round(Math.random()) ? 1 : -1),
-                    window.innerHeight * (Math.round(Math.random()) ? 1 : -1)
-                ]
-        }
-
-        function orbit_setList(orbit)
-        {
-            const
-            WIDTH = window.innerWidth,
-            LIS = [...orbit.elements.list.children]
-
-            orbit.elements.lis = []
-
-            for (let i = 0; i < orbit.content.length; i++)
-            {
-                const [TRANSLATEX, SPEED] = [Math.random() * WIDTH + WIDTH, Math.random() * 1.5 + .8]
-
-                orbit.elements.lis[i] = { translateX: TRANSLATEX, speed: SPEED }
-
-                content_MAX = Math.max(content_MAX, (TRANSLATEX + WIDTH + LIS[i].offsetWidth + 100) / SPEED)
-            }
-        }
-
         function competence_setCommand() { app.app_add('space_dimension', space_dimension, true) }
 
-        function competence_setEvent() { event.event_add('scroll', competence_scroll) }
+        function competence_setEvent()
+        {
+            event.event_add('scroll', competence_scroll)
+            event.event_add('resize', competence_resize)
+        }
 
-        function competence_setEventDesktop() { event.event_add('wheel', competence_wheel) }
+        function competence_setEventDesktop()
+        {
+            event.event_add('wheel', competence_wheel)
+
+            competence_MOBILE = false
+        }
+
+        function competence_setEventMobile()
+        {
+            event.event_add('touchMove', competence_touchMove)
+    
+            competence_MOBILE = true
+        }
 
         function competence_setRouter()
         {
@@ -219,11 +192,66 @@
             router.router_add(2, 'competence', start)
         }
 
+        function orbit_set()
+        {
+            orbit_RADIUS = Math.max(window.innerWidth / 2, window.innerHeight / 2)
+            orbit_Y = .01 /* set orbits positions */
+        }
+
+        function land_set()
+        {
+            land_START = land.offsetTop - window.innerHeight * .7
+            land_END = land.scrollHeight + land_START - window.innerHeight
+        }
+
+        function content_setSubtitle() { this.subtitle = [...this.elements.subtitle.querySelectorAll('.char')] }
+
+        function content_setLetters()
+        {
+            const LETTERS = [...this.elements.title.querySelectorAll('span')]
+
+            this.letters = []
+
+            for (let i = 0; i < LETTERS.length; i++)
+                this.letters[i] =
+                [
+                    LETTERS[i],
+                    window.innerWidth / 3 * (Math.round(Math.random()) ? 1 : -1),
+                    window.innerHeight / 3 * (Math.round(Math.random()) ? 1 : -1),
+                    window.innerHeight * (Math.round(Math.random()) ? 1 : -1)
+                ]
+        }
+
+        function orbit_setList()
+        {
+            const
+            WIDTH = window.innerWidth,
+            LIS = [...this.elements.list.children]
+
+            this.elements.lis = []
+
+            for (let i = 0; i < ORBIT_ORBITS[orbit_TARGET].texts.length; i++)
+            {
+                const [TRANSLATEX, SPEED] = [Math.random() * WIDTH + WIDTH, Math.random() * 1.5 + .8]
+
+                this.elements.lis[i] = { translateX: TRANSLATEX, speed: SPEED }
+
+                content_MAX = Math.max(content_MAX, (TRANSLATEX + WIDTH + LIS[i].offsetWidth + 100) / SPEED)
+            }
+        }
+
         // --RESET
         function competence_reset()
         {
-            competence_destroyEventDesktop()
-    
+            competence_OFFSETTOP = competence.getBoundingClientRect().top + document.querySelector('main').scrollTop
+            competence_HEIGHT = competence.offsetHeight + window.innerHeight / 2
+
+            orbit_set()
+            land_set()
+        }
+
+        function content_reset()
+        {
             content_MAX = 0
             content_TRANSLATEX = 0
         }
@@ -250,28 +278,59 @@
             on ? (app.app_FREEZE.set(true), space_RATIO = .3) : (app.app_FREEZE.set(false), space_RATIO = 1)
 
             tick().then(() => on
-            ? (orbit_setList(ORBIT_ORBITS[orbit_TARGET]), competence_setEventDesktop())
+            ? (orbit_setList.call(ORBIT_ORBITS[orbit_TARGET].content),
+                wwindow.window_MOBILE
+                ? competence_setEventMobile()
+                : competence_setEventDesktop())
             : competence_update())
         }
 
         function orbit_updateLetter(e, x, y, z) { e.style.transform = `translate3d(${x ?? 0}px, ${y ?? 0}px, ${z ?? 0}px)` }
 
-        function orbit_updateSubtitle(orbit, i, unwind)
+        function orbit_updateSubtitle(i, unwind)
         {
-            const LETTER = orbit.subtitle[i]
+            const LETTER = this.subtitle[i]
             
             unwind ? LETTER.textContent = LETTER.dataset.char : LETTER.innerHTML = '&nbsp;'
+        }
+
+        function content_update(value)
+        {
+            orbit_Y += value > 0 ? .05 : -.05
+
+            content_TRANSLATEX += value
+
+            if (content_TRANSLATEX > content_MAX || content_TRANSLATEX < 0) content_destroy()
+        }
+
+        function content_updateMobile(now, clientX)
+        {
+            content_update(content_LASTX - clientX)
+
+            content_LASTX = clientX
+            content_LAST = now
         }
 
         // --DESTROY
         function competence_destroy()
         {
             event.event_remove('scroll', competence_scroll)
+            event.event_remove('resize', competence_resize)
            
             competence_destroyEventDesktop()
+            competence_destroyEventMobile()
         }
 
         function competence_destroyEventDesktop() { event.event_remove('wheel', competence_wheel) }
+
+        function competence_destroyEventMobile() { event.event_remove('touchMove', competence_touchMove) }
+
+        function content_destroy()
+        {
+            competence_MOBILE ? competence_destroyEventMobile() : competence_destroyEventDesktop()
+    
+            orbit_click({ detail: { id: null } })
+        }
 
         // --COMMAND
         function space_dimension(n)
@@ -292,38 +351,51 @@
             clearTimeout(competence_TIMEOUT)
 
             if (now > competence_LAST + 100) competence_update(), competence_LAST = now
-            else competence_TIMEOUT = setTimeout(competence_update, 50)
+            else competence_TIMEOUT = setTimeout(competence_update, 100)
         }
 
-        async function competence_wheel(deltaY)
+        async function competence_wheel(deltaY) { content_update(deltaY) }
+
+        async function competence_touchMove(clientX)
         {
-            orbit_Y += deltaY > 0 ? .05 : -.05
+            const NOW = +new Date()
 
-            content_TRANSLATEX += deltaY
+            clearTimeout(content_TIMEOUT)
+    
+            NOW > content_LAST + 100
+            ? content_updateMobile(NOW, clientX)
+            : content_TIMEOUT = setTimeout(content_updateMobile.bind(null, NOW, clientX), 100)
+        }
 
-            if (content_TRANSLATEX > content_MAX || content_TRANSLATEX < 0) orbit_click({ detail: { id: undefined } })
+        async function competence_touchStart(e) { if (orbit_TARGET != undefined) content_LASTX = e.changedTouches[0].clientX }
+
+        async function competence_resize()
+        {
+            competence_reset()
+
+            if (orbit_TARGET != undefined) content_destroy()
         }
 
         function orbit_click({detail})
         {
-            competence_reset()
+            content_reset()
 
             if (orbit_TARGET != undefined && orbit_TARGET !== detail.id) ORBIT_ORBITS[orbit_TARGET].on = false
 
-            orbit_TARGET = detail.id
+            orbit_TARGET = detail.on ? detail.id : null
     
             orbit_update(detail.on)
         }
 
         // --CLEAR
-        function content_clearAnimation(orbit) { cancelAnimationFrame(orbit.frameId) }
+        function content_clearAnimation(frameId) { cancelAnimationFrame(frameId) }
 
         // --TEST
-        function orbit_testEnd(orbit, end, unwind)
+        function content_testEnd(end, unwind)
         {
             return unwind
-            ? ++end >= orbit.subtitle.length
-                ? orbit.subtitle.length - 1
+            ? ++end >= this.subtitle.length
+                ? this.subtitle.length - 1
                 : end
             : --end < 0
                 ? 0
@@ -331,67 +403,67 @@
         }
 
         // --TRANSITION
-        function orbit_fade() { return { duration: COMPETENCE_DURATION, css: (t) => `opacity: ${t}` } }
+        function content_fade() { return { duration: COMPETENCE_DURATION, css: (t) => `opacity: ${t}` } }
 
         // --ANIMATIONS
         function orbit_animation(animate) { if (competence) for (const ORBIT of ORBIT_ORBITS) ORBIT[animate ? 'animation' : 'clear']() }
 
-        async function content_animationLetterGather(orbit)
+        async function content_animationLetterGather()
         {
-            for (const LETTER of orbit.letters)
+            for (const LETTER of this.letters)
                 orbit_updateLetter(...LETTER),
                 requestAnimationFrame(() => orbit_updateLetter(LETTER[0]))
         }
 
-        async function content_animationWriting(orbit, start, end, i, j, unwind)
+        async function content_animationWriting(start, end, i, j, unwind)
         {
-            orbit.frameId = requestAnimationFrame(() =>
+            this.frameId = requestAnimationFrame(() =>
             {
                 for (let u = start; unwind ? u < end : u > end; unwind ? u++ : u--)
-                    orbit.subtitle[u].textContent = [' ', unwind ? '>' : '<'][Math.floor(Math.random() * 2)]
+                    this.subtitle[u].textContent = [' ', unwind ? '>' : '<'][Math.floor(Math.random() * 2)]
 
-                if (++i === 10)
-                    i = 0, end = orbit_testEnd(orbit, end, unwind)
-                if (++j === 16)
+                if (++i === 8)
+                    i = 0, end = content_testEnd.call(this, end, unwind)
+                if (++j === 14)
                 {
                     j = 0
 
-                    orbit_updateSubtitle(orbit, start, unwind)
+                    orbit_updateSubtitle.call(this, start, unwind)
 
                     if ((unwind ? start++ : start--) === end) return
                 }
 
-                content_animationWriting(orbit, start, end, i, j, unwind)
+                content_animationWriting.call(this, start, end, i, j, unwind)
             })
         }
 
-        async function content_animationShatter(orbit) { for (const LETTER of orbit.letters) orbit_updateLetter(...LETTER) }
+        async function content_animationShatter() { for (const LETTER of this.letters) orbit_updateLetter(...LETTER) }
 
         // --INTRO-OUTRO
         function content_introstart()
         {
-            content_setSubtitle(this)
-            content_setLetters(this)
+            content_setSubtitle.call(this)
 
-            content_clearAnimation(this)
+            content_clearAnimation(this.frameId)
 
-            content_animationLetterGather(this)
-            content_animationWriting(this, 0, 1, 0, 0, true)
+            if (orbit_TARGET != undefined)
+                content_setLetters.call(this),
+                content_animationLetterGather.call(this)
+
+            content_animationWriting.call(this, 0, 1, 0, 0, true)
         }
 
         function content_outrostart()
         {
+            if (!this.subtitle) return
+
             const LENGTH = this.subtitle.length
     
-            content_clearAnimation(this)
+            content_clearAnimation(this.frameId)
 
-            content_animationShatter(this)
-            content_animationWriting(this, LENGTH - 1, LENGTH - 2, 0, 0, false)
-        }
+            if (this.letters) content_animationShatter.call(this)
 
-        function orbit_introstart()
-        {
-            content_animationWriting(this, 0, 1, 0, 0, true)
+            content_animationWriting.call(this, LENGTH - 1, LENGTH - 2, 0, 0, false)
         }
 
     // #CYCLES
@@ -405,6 +477,7 @@
 <div
 id="competence"
 bind:this={competence}
+on:touchstart={competence_touchStart}
 >
     <div
     class="track"
@@ -416,13 +489,13 @@ bind:this={competence}
                 {#if orbit.on}
                     <div
                     class="content"
-                    transition:orbit_fade
-                    on:introstart={content_introstart.bind(orbit)}
-                    on:outrostart={content_outrostart.bind(orbit)}
+                    transition:content_fade
+                    on:introstart={content_introstart.bind(orbit.content)}
+                    on:outrostart={content_outrostart.bind(orbit.content)}
                     >
                         <section>
                             <h2
-                            bind:this={orbit.elements.title}
+                            bind:this={orbit.content.elements.title}
                             >
                                 {#each orbit.title as title}
                                     <div>
@@ -438,27 +511,25 @@ bind:this={competence}
                             </h2>
 
                             <p
-                            bind:this={orbit.elements.subtitle}
+                            bind:this={orbit.content.elements.subtitle}
                             >
                                 {#each (orbit.title[0] + (orbit.title.length > 1 ? ' . ' + orbit.title.slice(1).toString().replaceAll(',', ' ') : '')) as char}
                                     <span
                                     class:char={char !== ' '}
                                     data-char={char}
-                                    >
-                                        &nbsp;
-                                    </span>
+                                    >&nbsp;</span>
                                 {/each}
                             </p>
                         </section>
 
                         <div>
                             <ul
-                            bind:this={orbit.elements.list}
+                            bind:this={orbit.content.elements.list}
                             >
-                                {#each orbit.content as content, i}
+                                {#each orbit.texts as content, i}
                                     <li
-                                    style:transform="translateX({orbit.elements.lis
-                                    ? orbit.elements.lis[i].translateX - content_TRANSLATEX * orbit.elements.lis[i].speed
+                                    style:transform="translateX({orbit.content.elements.lis
+                                    ? orbit.content.elements.lis[i].translateX - content_TRANSLATEX * orbit.content.elements.lis[i].speed
                                     : -content_TRANSLATEX}px)"
                                     >
                                         <p>{content}</p>
@@ -467,6 +538,23 @@ bind:this={competence}
                             </ul>
                         </div>
                     </div>
+                {/if}
+
+                {#if orbit.focus && space_RATIO === 1}
+                    <p
+                    class="thematic"
+                    bind:this={orbit.thematic.elements.subtitle}
+                    transition:content_fade
+                    on:introstart={content_introstart.bind(orbit.thematic)}
+                    on:outrostart={content_outrostart.bind(orbit.thematic)}
+                    >
+                        {#each (orbit.title[0] + (orbit.title.length > 1 ? ' . ' + orbit.title.slice(1).toString().replaceAll(',', ' ') : '')) as char}
+                            <span
+                            class:char={char !== ' '}
+                            data-char={char}
+                            >&nbsp;</span>
+                        {/each}
+                    </p>
                 {/if}
             {/each}
 
@@ -480,21 +568,6 @@ bind:this={competence}
                 />
 
                 {#each ORBIT_ORBITS as orbit}
-                    {#if orbit.focus}
-                        <p
-                        class="orbit-theme"
-                        >
-                            {#each (orbit.title[0] + (orbit.title.length > 1 ? ' . ' + orbit.title.slice(1).toString().replaceAll(',', ' ') : '')) as char}
-                                <span
-                                class:char={char !== ' '}
-                                data-char={char}
-                                >
-                                    &nbsp;
-                                </span>
-                            {/each}
-                        </p>
-                    {/if}
-
                     <Orbit
                     {...orbit.props}
                     _r={orbit_RADIUS}
@@ -510,7 +583,11 @@ bind:this={competence}
                 {/each}
             </div>
 
-            <p>COMPÉTENCES</p>
+            <p
+            class="section-info"
+            >
+                COMPÉTENCES
+            </p>
         </div>
     </div>
 
@@ -544,6 +621,7 @@ lang="scss"
     @use '../../assets/scss/styles/size' as *;
     @use '../../assets/scss/styles/font' as *;
     @use '../../assets/scss/styles/cursor' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #COMPETENCE */
 
@@ -572,7 +650,7 @@ lang="scss"
 
                 height: 100vh;
 
-                &>p { @include p-info; }
+                .section-info { @include p-info; }
             }
 
             &::after
@@ -596,17 +674,6 @@ lang="scss"
             transform-style: preserve-3d;
 
             transition: transform var(--duration);
-
-            .orbit-theme
-            {
-                @include absolute;
-                @include p-content;
-
-                top: 50%;
-                left: 50%;
-
-                color: $secondary;
-            }
         }
 
         .content
@@ -627,7 +694,7 @@ lang="scss"
 
                 h2
                 {
-                    @include h-(rgba($light, .1), 190px, 190px);
+                    @include h-(rgba($light, .1), 90px, .9);
 
                     perspective: 100vh;
 
@@ -639,6 +706,8 @@ lang="scss"
 
                         transform-style: preserve-3d;
                     }
+
+                    @include media-min(768px, 768px) { @include h-(rgba($light, .1), 190px, 1); }
                 }
 
                 p
@@ -660,8 +729,6 @@ lang="scss"
 
                 z-index: 1;
 
-                transform: translateX(100%);
-
                 ul
                 {
                     @include flex;
@@ -669,6 +736,8 @@ lang="scss"
                     @include any;
 
                     justify-content: space-between;
+
+                    transform: translateX(100%);
 
                     padding: 120px 0;
 
@@ -699,9 +768,25 @@ lang="scss"
             }
         }
 
+        .thematic
+        {
+            @include absolute;
+            @include p-content;
+            @include no-event;
+
+            top: 50%;
+            left: 50%;
+
+            z-index: 1;
+
+            color: $primary;
+            user-select: none;
+        }
+
         .land
         {
             @include absolute;
+            @include any-w;
 
             bottom: 0;
             left: 0;

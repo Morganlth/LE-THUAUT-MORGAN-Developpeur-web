@@ -211,14 +211,16 @@
             snake_SCOPE = snake_X >= 0 && snake_X < columns - 1 && snake_Y >= 0 && snake_Y < rows - 1
         }
     
-        export function snake_updateEvent(on)
+        export function snake_updateEvent(on, grab)
         {
             const MOBILE = wwindow.window_MOBILE
+
+            console.log(snake_ON + ' - ' + on + ' -- -- ' + MOBILE + ' - ' + snake_MOBILE)
 
             if (on !== snake_ON || MOBILE !== snake_MOBILE)
                 MOBILE === false
                 ? snake_updateDesktop(on)
-                : snake_updateMobile(on),
+                : snake_updateMobile(on, grab),
                 snake_ON = on,
                 snake_MOBILE = MOBILE
         }
@@ -228,16 +230,18 @@
             if (snake_MOBILE) snake_destroyEventMobile()
     
             on
-            ? (snake_setEventDesktop(), canvas_updateClientRect())
+            ? snake_setEventDesktop()
             : snake_destroyEventDesktop()
         }
 
-        function snake_updateMobile(on)
+        function snake_updateMobile(on, grab)
         {
             if (!snake_MOBILE) snake_destroyEventDesktop()
 
+            if (!grab) app.app_FREEZE.set(on)
+
             on
-            ? (snake_setEventMobile(), canvas_updateClientRect())
+            ? (snake_setEventMobile(), setTimeout(canvas_updateClientRect, 50))
             : snake_destroyEventMobile()
         }
 
