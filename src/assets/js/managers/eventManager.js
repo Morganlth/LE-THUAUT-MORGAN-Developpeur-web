@@ -19,6 +19,7 @@ class EventManager
         event_MOUSEFRAME
         event_TOUCHFRAME
         event_GRABBING
+        event_SNAKE_MOBILE_START_GAME
 
         // --ELEMENT-MAIN
         main
@@ -26,7 +27,12 @@ class EventManager
 
     // #CONSTRUCTOR
 
-    constructor() { this.event_GRABBING = writable(false) }
+    constructor()
+    {
+        this.event_GRABBING = writable(false)
+
+        this.event_SNAKE_MOBILE_START_GAME = false
+    }
 
     // #FUNCTIONS
 

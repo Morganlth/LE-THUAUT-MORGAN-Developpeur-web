@@ -35,6 +35,7 @@
 
         // --ELEMENT-PRESENTATION
         const
+        PRESENTATION_ID = 1,
         PRESENTATION_BLOCKSIZE = 40,
         PRESENTATION_PARAMS =
         [
@@ -165,7 +166,7 @@
 
         // --ELEMENT-SNAKE
         $: snake_updateEvent instanceof Function && tag_CHARGED
-        ? snake_updateEvent(!$event_GRABBING && snake_test(), $event_GRABBING)
+        ? snake_updateEvent(!$event_GRABBING && snake_test())
         : null // set default desktop event snake
 
     // #FUNCTIONS
@@ -205,12 +206,7 @@
 
         function presentation_setEvent() { event.event_add('resize', presentation_resize) }
 
-        function presentation_setRouter()
-        {
-            const START = presentation[wwindow.window_testSmallScreen() ? 'offsetTop' : 'offsetLeft']
-
-            router.router_add(1, 'presentation', START, presentation_call)
-        }
+        function presentation_setRouter() { router.router_add(PRESENTATION_ID, 'presentation', presentation_getOffset(), presentation_call) }
 
         async function presentation_setFps()
         {
@@ -234,12 +230,14 @@
         function mobile_setGame()
         {
             snake_resetGame()
-            mobile_update(false)
             mobile_updateGame(true)
+            mobile_update(false)
             snake_updateEvent(true)
         }
 
         // --GET
+        function presentation_getOffset() { return presentation[wwindow.window_testSmallScreen() ? 'offsetTop' : 'offsetLeft'] }
+
         function presentation_getParam(name) { return PRESENTATION_PARAMS.find(p => p.name === name) }
 
         function presentation_getMode(text, snake)
@@ -272,6 +270,8 @@
         // --RESET
         function tag_reset()
         {
+            if (!tag_FONTCHARGED) return
+
             TAG_GAMEOVER.reset()
             TAG_MOBILE.reset()
     
@@ -384,6 +384,7 @@
             {
                 if (on && tag_SAVE > -1) await TAG_ELEMENTS[tag_SAVE].hide()
                 if (on && TAG_GAMEOVER.on)
+                    snake_resetSize(false),
                     TAG_GAMEOVER.on = false,
                     await TAG_GAMEOVER.hide()
     
@@ -396,14 +397,12 @@
         {
             const START = presentation_getParam('snake').on && on
 
-            if (START)
-            {
-                if (presentation_$CHALLENGE) snake_resetSize(false)
+            START
+            ? event.event_scrollTo(presentation_getOffset())
+            : snake_updateEvent(false)
 
-                event.event_scrollTo(presentation[wwindow.window_testSmallScreen() ? 'offsetTop' : 'offsetLeft'])
-            }
-            else snake_updateEvent(false)
-
+            event.event_SNAKE_MOBILE_START_GAME = START
+            app.app_FREEZE.set(START)
             snake_animation(START)
         }
 
@@ -469,8 +468,10 @@
 
         async function presentation_resize()
         {
+            router.router_updatePageStart(PRESENTATION_ID, presentation_getOffset())
+
             tag_reset()
-            presentation_setRouter()
+
             presentation_updateText(presentation_$TEXT)
 
             if (snake_test()) snake_updateEvent(true)
@@ -504,18 +505,15 @@
 
         async function mobile_clickCross()
         {
-            mobile_update(presentation_$SNAKE)
             mobile_updateGame(false)
+            mobile_update(presentation_$SNAKE)
         }
 
         // --ROUTER-CALL
         function presentation_call()
         {
-            setTimeout(() =>
-            {
-                if (presentation_$SNAKE && wwindow.window_MOBILE === false && event.event_contain('scroll', 'snake_scroll') > -1)
-                    event.event_MANAGER.scroll.find(f => f.name === 'snake_scroll')()
-            }, 50)
+            if (presentation_$SNAKE && wwindow.window_MOBILE === false && event.event_contain('scroll', 'snake_scroll') > -1)
+                event.event_MANAGER.scroll.find(f => f.name === 'snake_scroll')()
         }
 
         // --TESTS
@@ -535,10 +533,7 @@
         function snake_test() { return presentation_$SNAKE && !TAG_GAMEOVER.on && !TAG_GAMEOVER.on && (wwindow.window_MOBILE ? !TAG_MOBILE.on : true) }
 
         // --UTILS
-        function tag_showAll()
-        {
-            wwindow.window_MOBILE ? tag_showAllMobile() : tag_showAllDesktop()
-        }
+        function tag_showAll() { wwindow.window_MOBILE ? tag_showAllMobile() : tag_showAllDesktop() }
 
         function tag_showAllDesktop()
         {
@@ -722,7 +717,7 @@ on:click={presentation_click}
                 </Icon>
             </Cell>
 
-            {#if wwindow.window_MOBILE && !TAG_MOBILE.on}
+            {#if wwindow.window_MOBILE && presentation_$SNAKE && !TAG_MOBILE.on }
                 <Cell
                 _style="border: none; cursor: pointer"
                 on:click={mobile_clickCross}

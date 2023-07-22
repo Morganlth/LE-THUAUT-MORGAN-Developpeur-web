@@ -179,6 +179,8 @@
         }
 
         // --UPDATE
+        function app_updateFreeze(on) { if (!event.event_SNAKE_MOBILE_START_GAME) app.app_FREEZE.set(on) }
+
         function die_update(cursor, grab, userSelect)
         {
             die_CURSOR = cursor
@@ -287,14 +289,14 @@
 
         async function die_touchStart()
         {
-            app.app_FREEZE.set(true)
+            app_updateFreeze(true)
 
             die_mouseDown()
         }
 
         async function die_touchEnd()
         {
-            app.app_FREEZE.set(false)
+            app_updateFreeze(false)
 
             die_mouseUp()
         }

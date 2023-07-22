@@ -10,13 +10,52 @@
 
     // #IMPORTS
 
+        // --CONTEXTS
+        import { event, wwindow } from '../field/Main.svelte'
+
+        // --SVELTE
+        import { onMount, onDestroy } from 'svelte'
+
         // --COMPONENT-ELEMENT
         import Cloud from './Cloud.svelte'
 
     // #CONSTANTE
 
-        // --TO-ITERATE
-        const directions = [1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1]
+        // --ELEMENT-CLOUD
+        const CLOUDS = []
+
+    // #FUNCTIONS
+
+        // --SET
+        function sky_set()
+        {
+            sky_setEvent()
+
+            cloud_update(wwindow.window_testSmallScreen())
+        }
+
+        function sky_setEvent() { event.event_add('resize', sky_resize) }
+
+        // --UPDATE
+        function cloud_update(smallScreen)
+        {
+            const MAX = 30, COUNT = smallScreen ? 10 : MAX
+    
+            if (CLOUDS.length === MAX) return
+
+            for (let i = CLOUDS.length; i < COUNT; i++) CLOUDS.push(i % 2 === 0 ? -1 : 1)
+        }
+
+        // --DESTROY
+        function sky_destroy() { event.event_remove('resize', sky_resize) }
+
+        // --EVENT
+        function sky_resize(smallScreen) { cloud_update(smallScreen) }
+
+    // #CYCLES
+
+    onMount(sky_set)
+    onDestroy(sky_destroy)
 </script>
 
 <!-- #HTML -->
@@ -24,9 +63,9 @@
 <div
 class="sky"
 >
-    {#each directions as d}
+    {#each CLOUDS as direction}
         <Cloud
-        _d={d}
+        _direction={direction}
         _translateX={_translateX}
         {_colors}
         />
@@ -40,11 +79,11 @@ lang="scss"
 >
     /* #USES */
 
-    @use '../../assets/scss/styles/position.scss' as *;
-    @use '../../assets/scss/styles/size.scss' as *;
-    @use '../../assets/scss/styles/cursor.scss' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/cursor' as *;
 
-    /* #GROUP */
+    /* #SKY */
 
     .sky
     {

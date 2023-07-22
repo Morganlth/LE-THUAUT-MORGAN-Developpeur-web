@@ -29,9 +29,15 @@
         import Logo from '../icons/Logo.svelte'
         import Mouse from '../icons/Mouse.svelte'
 
-    // #ROUTER
+    // #CONSTANTE
 
-    router.router_add(0, 'home', 0)
+        // --ELEMENT-HOME
+        const HOME_ID = 0
+
+    // #FUNCTION
+
+        // --SET
+        ;(function router_set() { router.router_add(HOME_ID, 'home', 0) })()
 </script>
 
 <!-- #HTML -->
@@ -329,7 +335,7 @@ lang="scss"
     
             width: 50%;
     
-            padding-block: 20px;
+            padding-block: 30px;
             padding-left: 2.5%;
 
             .me { @include any-h; }

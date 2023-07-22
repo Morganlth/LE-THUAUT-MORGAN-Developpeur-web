@@ -9,11 +9,12 @@
         _colors
 
     // #IMPORTS
+    
+        // --JS
+        import { rgb } from '../../assets/js/utils/color'
 
         // --CONTEXTS
-        import { app } from '../field/Main.svelte'
-        import { event } from '../field/Main.svelte'
-        import { router } from '../field/Main.svelte'
+        import { app, event, wwindow, router } from '../field/Main.svelte'
 
         // --SVELTE
         import { onMount, onDestroy } from 'svelte'
@@ -27,9 +28,15 @@
         import Card from '../elements/Card.svelte'
 
     // #CONSTANTE
+
+        // --ELEMENT-PROJECT
+        const PROJECT_ID = 3
+
+        // --ELEMENT-CANVAS
+        const CANVAS_PARTICLES = []
     
-        // --TO-ITERATE
-        const cards =
+        // --ELEMENT-CARD
+        const CARD_CARDS =
         [
             {
                 component: Booki,
@@ -51,8 +58,8 @@
                 {
                     src: '/src/assets/images/projects/sophiebluel/logo/sophie-bluel.svg',
                     alt: 'projet Sophie Bluel / JavaScript OpenClassrooms',
-                    width: '50%',
-                    height: 'auto'
+                    width: null,
+                    height: '100%'
                 }
             },
             {
@@ -63,241 +70,258 @@
                 {
                     src: '/src/assets/images/projects/ninacarducci/logo/nina-carducci.svg',
                     alt: 'projet Nina Carducci / Optimisation OpenClassrooms',
-                    width: '50%',
-                    height: 'auto'
+                    width: null,
+                    height: '100%'
                 }
             },
-            {}, {}, {}, {}, {}, {}, {}]
+            {}, {}, {}, {}, {}, {}, {}
+        ]
 
     // #VARIABLES
 
-        // --GLOBAL
-        let
-        frameId = null,
-        size,
-        sizeBy2,
-        offsetTop,
-        last = +new Date(),
-        timeout = null
-
         // --ELEMENT-PROJECT
-        let project
+        let
+        project,
+        project_OFFSETTOP
 
         // --ELEMENT-CANVAS
         let
         canvas,
         context,
-        particles,
-        [r, g, b] = _colors.dark.match(/\w\w/g).map(x => parseInt(x, 16)),
-        a = 1,
-        s = 1,
-        angle = 0
+        canvas_SIZE,
+        canvas_SIZE_DIV_2,
+        canvas_BACKGROUNDCOLOR = rgb(_colors.dark),
+        canvas_ALPHA = 1,
+        canvas_SPEED = 1,
+        canvas_ANGLE = 0,
+        canvas_FRAMEID,
+        canvas_LAST = +new Date(),
+        canvas_TIMEOUT
+
+        // --ELEMENT-CONTAINER
+        let
+        container_OVERFLOWX,
+        container_OVERFLOWY
 
         // --ELEMENT-TRACK
         let
         track,
-        rotate,
-        translateX,
-        translateY,
-        overflowX,
-        overflowY
+        track_ROTATE,
+        track_TRANSLATEX,
+        track_TRANSLATEY
 
         // --ELEMENT-CARD-CONTAINER
         let
-        cardWidth,
-        cardHeight,
-        radius,
-        translateZ,
-        rotateY = 0,
-        target = 0,
-        cardTimeout
+        cardcontainer_WIDTH,
+        cardcontainer_HEIGHT,
+        cardcontainer_RADIUS,
+        cardcontainer_TRANSLATEZ,
+        cardcontainer_ROTATEY = 0
+
+        // --ELEMENT-CARD
+        let
+        card_TARGET = 0,
+        card_TIMEOUT
 
     // #FUNCTIONS
 
 // canvas animation inspired from : https://codepen.io/chriscourses/pen/poyEEojs
 
         // --SET
-        function set()
+        function project_set()
         {
-            setVar()
-            setCanvas()
-            setTrack()
-            setCardContainer()
-            setEvent()
-            setRouter()
+            project_setVar()
+            project_setEvent()
+            project_setRouter()
+            project_setChildren()
+
+            canvas_setParticles()
+            cardcontainer_setDecagon()
         }
 
-        function setVar()
+        function project_setVar()
         {
-            const
-            width = window.innerWidth,
-            height = window.innerHeight
+            const [WIDTH, HEIGHT] = [window.innerWidth, window.innerHeight]
+
+            project_OFFSETTOP = project.offsetTop + HEIGHT
     
-            size = Math.sqrt(width * width + height * height)
-            sizeBy2 = size / 2
-
-            offsetTop = project.offsetTop + height
+            canvas_SIZE = Math.sqrt(WIDTH * WIDTH + HEIGHT * HEIGHT)
+            canvas_SIZE_DIV_2 = canvas_SIZE / 2
         }
 
-        function setCanvas()
+        function project_setEvent() { event.event_addSeveral({ wheel: project_wheel, resize: project_resize }) }
+
+        function project_setRouter()
         {
-            canvas.width = size
-            canvas.height = size
-    
-            context = canvas.getContext('2d')
-            context.shadowBlur = 16
-            
-            setParticles()
-        }
-
-        function setParticles()
-        {
-            particles = []
-
-            for (let i = 0; i < 100; i++)
-            {
-                const
-                x = Math.random() * size - sizeBy2,
-                y = Math.random() * size - sizeBy2,
-                r = Math.random() * 5 + 3,
-                c = _colors[Math.round(Math.random()) ? 'primary' : 'secondary']
-            
-                particles.push({ x: x, y: y, r: r, c: c })
-            }
-        }
-
-        function setTrack()
-        {
-            rotate = Math.atan(window.innerHeight / window.innerWidth) / Math.PI * 180
-            translateX = (size - window.innerWidth) / 2
-            translateY = -50
-        }
-
-        function setCardContainer()
-        {
-            cardWidth = window.innerWidth * .52
-            cardHeight = window.innerHeight * .5
-
-            radius = cardWidth / 2 / Math.tan(18 * Math.PI / 180)
-            translateZ = radius
-
-            setDecagon()
-        }
-
-        function setDecagon()
-        {
-            let [tZ, tX, rY] = [-radius, 0, 0]
-
-            for (let i = 0; i < cards.length; i++)
-            {
-                if (i)
-                {
-                    tX -= cardWidth - Math.cos(rY * Math.PI / 180) * cardWidth
-                    tZ -= Math.sin(rY * Math.PI / 180) * cardWidth
-                    rY -= 36
-                }
-        
-                cards[i] = { ...cards[i], translateX: tX, translateZ: tZ, rotateY: rY }
-            }
-        }
-
-        function setEvent() { event.event_add('wheel', project_wheel) }
-
-        function setRouter()
-        {
-            router.router_add(3, 'project', offsetTop, project_call)
+            router.router_add(PROJECT_ID, 'project', project_OFFSETTOP, project_call)
 
             if (_subPath)
-                for (let i = 0; i < cards.length; i++)
-                    if (cards[i].subPath === _subPath)
+                for (let i = 0; i < CARD_CARDS.length; i++)
+                    if (CARD_CARDS[i].subPath === _subPath)
                     {
-                        target = i
-                        rotateY += 36 * i
+                        card_TARGET = i
+                        cardcontainer_ROTATEY += 36 * i
                         
                         return card_click({ detail: { id: i, on: true }})
                     }
         }
 
-        // --UPDATE
-        function update(on)
+        function project_setChildren()
         {
-            cards[target].on = on
-            cards[target].update(on)
+            canvas_set()
+            track_set()
+            cardcontainer_set()
+        }
 
-           router.router_setSubPath(3, on ? cards[target].subPath : null)
-           router.router_update()
+        function canvas_set()
+        {
+            canvas.width = canvas_SIZE
+            canvas.height = canvas_SIZE
+    
+            context = context ?? canvas.getContext('2d')
+            context.shadowBlur = 16
+        }
+
+        function track_set(smallScreen)
+        {
+            [track_ROTATE, track_TRANSLATEX, track_TRANSLATEY] = smallScreen ??  wwindow.window_testSmallScreen()
+            ? [0, 0, 0]
+            : [Math.atan(window.innerHeight / window.innerWidth) / Math.PI * 180, (canvas_SIZE - window.innerWidth) / 2, -50]
+        }
+
+        function cardcontainer_set()
+        {
+            cardcontainer_WIDTH = window.innerWidth * .52
+            cardcontainer_HEIGHT = window.innerHeight * .5
+
+            cardcontainer_RADIUS = cardcontainer_WIDTH / 2 / Math.tan(18 * Math.PI / 180)
+            cardcontainer_TRANSLATEZ = cardcontainer_RADIUS
+        }
+
+        function canvas_setParticles()
+        {
+            for (let i = 0; i < 100; i++)
+            {
+                const
+                X = Math.random() * canvas_SIZE - canvas_SIZE_DIV_2,
+                Y = Math.random() * canvas_SIZE - canvas_SIZE_DIV_2,
+                R = Math.random() * 5 + 3,
+                C = _colors[Math.round(Math.random()) ? 'primary' : 'secondary']
+            
+                CANVAS_PARTICLES[i] = { x: X, y: Y, r: R, c: C }
+            }
+        }
+
+        function cardcontainer_setDecagon()
+        {
+            let [tZ, tX, rY] = [-cardcontainer_RADIUS, 0, 0]
+
+            for (let i = 0; i < CARD_CARDS.length; i++)
+            {
+                if (i)
+                    tX -= cardcontainer_WIDTH - Math.cos(rY * Math.PI / 180) * cardcontainer_WIDTH,
+                    tZ -= Math.sin(rY * Math.PI / 180) * cardcontainer_WIDTH,
+                    rY -= 36
+        
+                CARD_CARDS[i] = { ...CARD_CARDS[i], translateX: tX, translateZ: tZ, rotateY: rY }
+            }
+        }
+
+        // --RESET
+        function cardcontainer_reset() { cardcontainer_ROTATEY %= 360 }
+
+        // --UPDATE
+        function project_update(on)
+        {
+            CARD_CARDS[card_TARGET].on = on
+            CARD_CARDS[card_TARGET].update(on)
+
+            router.router_setSubPath(3, on ? CARD_CARDS[card_TARGET].subPath : null)
+            router.router_update()
         }
 
         // --DESTROY
-        function destroy()
+        function project_destroy()
         {
-            destroyEvent()
-            destroyFrame()
+            project_destroyEvent()
+            project_destroyFrame()
         }
 
-        function destroyEvent() { event.event_remove('wheel', project_wheel) }
-
-        function destroyFrame()
+        function project_destroyEvent()
         {
-            if (frameId)
-            {
-                cancelAnimationFrame(frameId)
-                frameId = null
+            event.event_remove('wheel', project_wheel)
+            event.event_remove('resize', project_resize)
+        }
 
-                if (rotateY >= 360) rotateY %= 360
+        function project_destroyFrame()
+        {
+            if (canvas_FRAMEID)
+            {
+                cancelAnimationFrame(canvas_FRAMEID)
+                canvas_FRAMEID = null
             }
         }
 
         // --EVENTS
         async function project_wheel(deltaY)
         {
-            if (event.main_scrollTop >= offsetTop - size)
+            if (event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE)
             {
-                if (!frameId) animate()
+                if (!canvas_FRAMEID) canvas_animation()
 
-                if (deltaY > 0 && event.main_scrollTop >= offsetTop) move()
+                if (deltaY > 0 && event.main_scrollTop >= project_OFFSETTOP) cardcontainer_move()
             }
-            else destroyFrame()
+            else project_destroyFrame(), cardcontainer_reset()
+        }
+
+        async function project_resize()
+        {
+            project_setVar()
+            project_setChildren()
+            canvas_setParticles()
+            cardcontainer_setDecagon()
+
+            router.router_updatePageStart(PROJECT_ID, project_OFFSETTOP)
         }
 
         function card_click({detail})
         {
-            if (detail.id === target)
+            if (detail.id === card_TARGET)
             {
-                clearTimeout(cardTimeout)
+                clearTimeout(card_TIMEOUT)
     
                 app.app_FREEZE.set(detail.on)
 
-                ;(detail.on ? show : hidden)()
+                detail.on ? card_show() : card_hide()
             }
         }
 
         // --ROUTER-CALL
-        function project_call() { project_wheel(true, event.main_scrollTop) }
+        function project_call() { project_wheel() }
 
         // --DRAW
-        function draw()
+        function canvas_draw()
         {
-            drawBackground()
+            canvas_drawBackground()
 
             context.save()
-            context.translate(sizeBy2, sizeBy2)
-            context.rotate(angle += (0.001 * s))
+            context.translate(canvas_SIZE_DIV_2, canvas_SIZE_DIV_2)
+            context.rotate(canvas_ANGLE += (0.001 * canvas_SPEED))
 
-            for (let i = 0; i < particles.length; i++) drawParticle.call(particles[i])
+            for (let i = 0; i < CANVAS_PARTICLES.length; i++) canvas_drawParticle.call(CANVAS_PARTICLES[i])
 
             context.restore()
 
-            if (angle >= 2 * Math.PI) angle = 0
+            if (canvas_ANGLE >= 2 * Math.PI) canvas_ANGLE = 0
         }
 
-        function drawBackground()
+        function canvas_drawBackground()
         {
-            context.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`
-            context.fillRect(0, 0, size, size)
+            context.fillStyle = `rgba(${canvas_BACKGROUNDCOLOR}, ${canvas_ALPHA})`
+            context.fillRect(0, 0, canvas_SIZE, canvas_SIZE)
         }
 
-        function drawParticle()
+        function canvas_drawParticle()
         {
             context.beginPath()
             context.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false)
@@ -308,66 +332,66 @@
         }
 
         // --ANIMATION
-        function animate()
+        function canvas_animation()
         {
-            frameId = requestAnimationFrame(animate)
+            canvas_FRAMEID = requestAnimationFrame(canvas_animation)
            
-            draw()
+            canvas_draw()
 
-            if (timeout)
+            if (canvas_TIMEOUT)
             {
-                if (a > 0.05) a -= 0.01
-                if (s < 5) s += 0.05
+                if (canvas_ALPHA > 0.05) canvas_ALPHA -= 0.01
+                if (canvas_SPEED < 5) canvas_SPEED += 0.05
             }
             else
             {
-                if (a < 1) a += 0.0005
-                if (s > 1) s -= 0.05
+                if (canvas_ALPHA < 1) canvas_ALPHA += 0.0005
+                if (canvas_SPEED > 1) canvas_SPEED -= 0.05
             }
         }
 
-        // --ACTIONS
-        function move()
+        // --UTILS
+        function cardcontainer_move()
         {
-            const now = +new Date()
+            const NOW = +new Date()
 
-            if (now > last + 200)
+            if (NOW > canvas_LAST + 200)
             {
-                last = now
-                rotateY += 36
-                target = rotateY / 36 % 10
+                canvas_LAST = NOW
+                cardcontainer_ROTATEY += 36
+                card_TARGET = cardcontainer_ROTATEY / 36 % 10
 
-                clearTimeout(timeout), timeout = setTimeout(() => timeout = null, 400)
+                clearTimeout(canvas_TIMEOUT), canvas_TIMEOUT = setTimeout(() => canvas_TIMEOUT = null, 400)
             }
         }
 
-        function show()
+        function card_show()
         {
-            destroyEvent()
+            project_destroyEvent()
 
-            ;[rotate, translateX, translateY] = [0, 0, 0]
+            ;[track_ROTATE, track_TRANSLATEX, track_TRANSLATEY] = [0, 0, 0]
 
-            cardTimeout = setTimeout(() =>
+            card_TIMEOUT = setTimeout(() =>
             {
-                [translateZ, overflowX, overflowY] = [1, 'hidden', 'scroll']
+                [cardcontainer_TRANSLATEZ, container_OVERFLOWX, container_OVERFLOWY] = [1, 'hidden', 'scroll']
     
-                update(true)
+                project_update(true)
             }, 400)
         }
 
-        function hidden()
+        function card_hide()
         {
-            [translateZ, overflowX, overflowY] = [radius, 'visible', 'visible']
+            [cardcontainer_TRANSLATEZ, container_OVERFLOWX, container_OVERFLOWY] = [cardcontainer_RADIUS, 'visible', 'visible']
 
-            update(false)
+            project_update(false)
     
-            cardTimeout = setTimeout(() => { setTrack(), setEvent() }, 400)
+            card_TIMEOUT = setTimeout(() => { track_set(), project_setEvent() }, 400)
         }
 
     // #CYCLES
 
-    onMount(set)
-    onDestroy(destroy)
+    onMount(project_set)
+    onDestroy(project_destroy)
 </script>
 
 <!-- #HTML -->
@@ -377,40 +401,40 @@ id="project"
 bind:this={project}
 >
     <canvas
-    style:width="{size}px"
-    style:height="{size}px"
+    style:width="{canvas_SIZE}px"
+    style:height="{canvas_SIZE}px"
     bind:this={canvas}
     >
     </canvas>
 
     <div
     class="container"
-    style:overflow="{overflowX ?? 'visible'} {overflowY ?? 'visible'}"
+    style:overflow="{container_OVERFLOWX ?? 'visible'} {container_OVERFLOWY ?? 'visible'}"
     >
         <div
         class="track"
-        style:perspective="{radius ?? 0}px"
-        style:transform="rotate({rotate ?? 0}deg) translate({translateX ?? 0}px, {translateY ?? 0}%)"
-        style:overflow={overflowX ?? 'visible'}
+        style:perspective="{cardcontainer_RADIUS ?? 0}px"
+        style:transform="rotate({track_ROTATE ?? 0}deg) translate({track_TRANSLATEX ?? 0}px, {track_TRANSLATEY ?? 0}%)"
+        style:overflow={container_OVERFLOWX ?? 'visible'}
         bind:this={track}
         >
             <!-- le décalage avec le 'padding-right' est important pour etre centré par rapport aux cotés, ne pas utiliser 'border-box' sur cet element -->
             <div
             class="card-container"
-            style:transform="translateZ({translateZ ?? 0}px) rotateY({rotateY ?? 0}deg)"
-            style:width="{cardWidth ?? 0}px"
-            style:height="{cardHeight ?? 0}px"
+            style:transform="translateZ({cardcontainer_TRANSLATEZ ?? 0}px) rotateY({cardcontainer_ROTATEY ?? 0}deg)"
+            style:width="{cardcontainer_WIDTH ?? 0}px"
+            style:height="{cardcontainer_HEIGHT ?? 0}px"
             >
-                {#each cards as card, i}
+                {#each CARD_CARDS as card, i}
                     <Card
                     _id={i}
                     _translateX={card.translateX}
                     _translateZ={card.translateZ}
                     _rotateY={card.rotateY}
-                    _radius={radius}
+                    _radius={cardcontainer_RADIUS}
                     _desc={card.desc}
                     _img={card.img}
-                    bind:update={card.update}
+                    bind:card_update={card.update}
                     on:click={card_click}
                     />
                 {/each}
@@ -420,7 +444,7 @@ bind:this={project}
         <div
         class="content"
         >
-            {#each cards as card}
+            {#each CARD_CARDS as card}
                 {#if card.on && card.component}
                     <svelte:component
                     this={card.component}
@@ -441,13 +465,13 @@ lang="scss"
 >
     /* #USES */
 
-    @use '../../assets/scss/styles/flex.scss' as *;
-    @use '../../assets/scss/styles/position.scss' as *;
-    @use '../../assets/scss/styles/size.scss' as *;
-    @use '../../assets/scss/styles/font.scss' as *;
-    @use '../../assets/scss/styles/cursor.scss' as *;
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/font' as *;
+    @use '../../assets/scss/styles/cursor' as *;
 
-    /* #GROUPS */
+    /* #PROJECT */
 
     #project
     {

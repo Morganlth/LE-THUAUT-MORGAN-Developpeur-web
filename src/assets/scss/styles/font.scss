@@ -98,13 +98,15 @@ $h-1-sizes: (375px: 36px, 425px: 46px, 768px: 60px, 1024px: 72px, 1440px: 86px);
     @include media-min(768px) { font-size: 24px; }
 }
 
-@mixin p-info
+@mixin p-info($position: bottom)
 {
     @include absolute;
     @include p-interact;
 
-    bottom: 30px;
-    left: 3%;
+    #{$position}: 20px;
+    left: max(3%, 20px);
+
+    @include media-min(768px) { #{$position}: 30px; }
 }
 
 

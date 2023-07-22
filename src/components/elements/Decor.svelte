@@ -63,7 +63,7 @@
         function decor_destroy() { event.event_remove('resize', decor_resize) }
 
         // --EVENT
-        function decor_resize(smallScreen)
+        async function decor_resize(smallScreen)
         {
             if (canvas_WIDTH < window.innerWidth && !smallScreen)
                 canvas_set(),

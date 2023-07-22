@@ -75,7 +75,6 @@ context="module"
         {
             app.app_add('app', () => console.log(app))
             app.app_add('event', () => console.log(event))
-            app.app_add('router', () => console.log(router))
         }
 
         function main_setEvent()

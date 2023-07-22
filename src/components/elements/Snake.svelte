@@ -39,8 +39,8 @@
 
         // --ELEMENT-WINDOW
         let
-        clientX,
-        clientY
+        window_CLIENTX,
+        window_CLIENTY
 
         // --ELEMENT-SNAKE
         let
@@ -108,11 +108,7 @@
 
         function snake_setCommand() { app.app_add('snake_size', snake_size, true) }
 
-        function snake_setEvent()
-        {
-            event.event_add('mouseDown', snake_mouseDown)
-            event.event_add('resize', snake_resize)
-        }
+        function snake_setEvent() { event.event_add('resize', snake_resize) }
 
         function snake_setEventDesktop() { event.event_addSeveral({ scroll: snake_scroll, mouseMove: snake_mouseMove }) }
 
@@ -205,22 +201,20 @@
 
         function snake_updateCoords()
         {
-            snake_X = Math.floor((clientX - clientRect.left) / snake_BLOCKSIZE)
-            snake_Y = Math.floor((clientY - clientRect.top) / snake_BLOCKSIZE)
+            snake_X = Math.floor((window_CLIENTX - clientRect.left) / snake_BLOCKSIZE)
+            snake_Y = Math.floor((window_CLIENTY - clientRect.top) / snake_BLOCKSIZE)
 
             snake_SCOPE = snake_X >= 0 && snake_X < columns - 1 && snake_Y >= 0 && snake_Y < rows - 1
         }
     
-        export function snake_updateEvent(on, grab)
+        export function snake_updateEvent(on)
         {
             const MOBILE = wwindow.window_MOBILE
-
-            console.log(snake_ON + ' - ' + on + ' -- -- ' + MOBILE + ' - ' + snake_MOBILE)
 
             if (on !== snake_ON || MOBILE !== snake_MOBILE)
                 MOBILE === false
                 ? snake_updateDesktop(on)
-                : snake_updateMobile(on, grab),
+                : snake_updateMobile(on),
                 snake_ON = on,
                 snake_MOBILE = MOBILE
         }
@@ -234,11 +228,9 @@
             : snake_destroyEventDesktop()
         }
 
-        function snake_updateMobile(on, grab)
+        function snake_updateMobile(on)
         {
             if (!snake_MOBILE) snake_destroyEventDesktop()
-
-            if (!grab) app.app_FREEZE.set(on)
 
             on
             ? (snake_setEventMobile(), setTimeout(canvas_updateClientRect, 50))
@@ -256,7 +248,6 @@
         // --DESTROY
         function snake_destroy()
         {
-            event.event_remove('mouseDown', snake_mouseDown)
             event.event_remove('resize', snake_resize)
 
             snake_destroyEventDesktop()
@@ -291,18 +282,11 @@
             snake_move()
         }
 
-        async function snake_mouseMove(x, y)
+        async function snake_mouseMove(clientX, clientY)
         {
-            [clientX, clientY] = [x, y]
+            [window_CLIENTX, window_CLIENTY] = [clientX, clientY]
 
             snake_move()
-        }
-
-        async function snake_mouseDown(e)
-        {
-            [clientX, clientY] = [e.clientX, e.clientY]
-
-            snake_updateCoords()
         }
 
         function snake_mouseLeave(e)
@@ -313,18 +297,25 @@
             if (target && target.classList.contains('icon')) return
         }
 
-        function snake_resize()
+        async function snake_resize()
         {
             if (!wwindow.window_MOBILE) app.app_FREEZE.set(false)
 
             snake_reset()
         }
 
-        function snake_touchMove(x, y)
-        {
-            [clientX, clientY] = [x, y]
+        async function snake_touchMove(clientX, clientY) { snake_mouseMove(clientX, clientY) }
 
-            snake_move()
+        async function snake_touchStart(e)
+        {
+            if (snake_ON) return
+
+            const TOUCH = e.changedTouches[0]
+    
+            ;[window_CLIENTX, window_CLIENTY] = [TOUCH.clientX, TOUCH.clientY]
+
+            canvas_updateClientRect()
+            snake_updateCoords()
         }
 
         // --TEST
@@ -469,6 +460,8 @@
         {
             const [GAPX, GAPY] = [snake_X - SNAKE_SNAKE[0][0], snake_Y - SNAKE_SNAKE[0][1]]
 
+            // console.log(snake_X + ' - ' + snake_Y + ' ---- ' + GAPX + ' - ' + GAPY)
+
             for (let i = 0; i < SNAKE_SNAKE.length; i++)
             {
                 const BLOCK = SNAKE_SNAKE[i]
@@ -492,6 +485,7 @@ class="snake-game"
 style:height="{height}px"
 style:margin="{snake_OFFSET_Y / 2}px {snake_OFFSET_X / 2}px"
 on:mouseleave={snake_mouseLeave}
+on:touchstart={snake_touchStart}
 >
     <canvas
     style:width="{width}px"

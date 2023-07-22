@@ -10,10 +10,16 @@ class WindowManager
         window_RESIZE
         window_MOBILE
         window_TOUCHSCREEN
+        window_FORMAT
 
     // #CONSTRUCTOR
 
-    constructor() { this.window_RESIZE = this.window_resize.bind(this) }
+    constructor()
+    {
+        this.window_RESIZE = this.window_resize.bind(this)
+
+        this.window_FORMAT = 'auto'
+    }
 
     // #FUNCTIONS
 
@@ -23,10 +29,28 @@ class WindowManager
             this.window_MOBILE = this.window_testMobile()
 
             window.addEventListener('resize', this.window_RESIZE)
+
+            this.window_setCommand()
         }
+
+        window_setCommand() { app.app_add('format', this.window_format.bind(this), true)}
 
         // --DESTROY
         window_destroy() { try { window.removeEventListener('resize', this.window_RESIZE) } catch {} }
+
+        // --COMMAND
+        window_format(value)
+        {
+            value = app.app_testDefault(value) ? 'auto' : this.window_testFormat(value)
+
+            if (this.window_FORMAT !== value)
+                this.window_FORMAT = value,
+                this.window_call()
+
+            localStorage.setItem('format', value)
+
+            app.app_success('format - ' + value)
+        }
 
         // --EVENT
         window_resize()
@@ -41,9 +65,24 @@ class WindowManager
         }
 
         // --TESTS
-        window_testMobile() { return this.window_TOUCHSCREEN || navigator.maxTouchPoints > 0 && /(Android|iPhone)/i.test(navigator.userAgent) }
+        window_testMobile()
+        {
+            return (
+                this.window_FORMAT === 'mobile'
+                || this.window_FORMAT === 'auto'
+                && (this.window_TOUCHSCREEN
+                    || navigator.maxTouchPoints > 0 && /(Android|iPhone)/i.test(navigator.userAgent))
+            )
+        }
 
         window_testSmallScreen() { return window.innerWidth < 768 }
+
+        window_testFormat(value)
+        {
+            return ['auto', 'mobile', 'desktop'].includes(value)
+            ? value
+            : app.app_error('La valeur doit être "auto", "mobile" ou "desktop"', 'TypeError')
+        }
 
         // --UTIL
         window_call(now)
@@ -57,9 +96,10 @@ class WindowManager
         }
 }
 
-// #IMPORT
+// #IMPORTS
 
-    // --CONTEXT
+    // --CONTEXTS
+    import app from './appManager'
     import event from './eventManager'
 
 // #EXPORT

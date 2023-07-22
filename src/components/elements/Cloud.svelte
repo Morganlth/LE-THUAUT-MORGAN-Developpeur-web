@@ -5,157 +5,146 @@
 
         // --PROPS
         export let
-        _d,
+        _direction,
         _translateX,
         _colors
 
-    // #IMPORT
+    // #IMPORTS
+
+        // --JS
+        import { drawCircle, drawEllipse } from '../../assets/js/utils/canvas'
+
+        // --CONTEXT
+        import { event } from '../field/Main.svelte'
 
         // --SVELTE
-        import { onMount } from 'svelte'
+        import { onMount, onDestroy } from 'svelte'
 
     // #CONSTANTE
 
-        // --GLOBAL
-        const speed = Math.random() + .4
+        // --ELEMENT-CLOUD
+        const CLOUD_SPEED = Math.random() + .4
 
     // #VARIABLES
+
+        // --ELEMENT-CLOUD
+        let
+        cloud_A, // semi-major axis
+        cloud_B, // semi-small axis
+        cloud_X,
+        cloud_Y
 
         // --ELEMENT-CANVAS
         let
         canvas,
         context,
-        width,
-        height,
-        a,
-        b,
-        x,
-        y,
-        translateX,
-        translateY
+        canvas_WIDTH,
+        canvas_HEIGHT,
+        canvas_TRANSLATEX,
+        canvas_TRANSLATEY
 
     // #FUNCTIONS
 
         // --SET
-        function set()
+        function cloud_set()
         {
-            setVar()
-            setCanvas()
-            setPosition()
-
-            // width = window.innerWidth
-            // height = window.innerHeight
+            cloud_setVar()
+            cloud_setEvent()
     
-            // console.log()
-            draw()
+            canvas_set()
+            canvas_setPosition()
+            canvas_draw()
         }
 
-        function setVar()
+        function cloud_setVar()
         {
-            a = Math.floor(Math.random() * 150) + 150
-            b = Math.floor(Math.random() * 30) + 20
+            cloud_A = Math.floor(Math.random() * 150) + 150
+            cloud_B = Math.floor(Math.random() * 30) + 20
 
-            width = a * 2 + 320
-            height = b * 2 + 320
+            canvas_WIDTH = cloud_A * 2 + 320
+            canvas_HEIGHT = cloud_B * 2 + 320
 
-            x = width / 2
-            y = height / 2
-
-            // x = Math.random() * (width - 2 * a) + a
-            // y = Math.random() * (height - 360) + 180
+            cloud_X = canvas_WIDTH / 2
+            cloud_Y = canvas_HEIGHT / 2
         }
 
-        function setCanvas()
+        function cloud_setEvent() { event.event_add('resize', cloud_resize) }
+
+        function canvas_set()
         {
-            canvas.width = width
-            canvas.height = height
+            canvas.width = canvas_WIDTH
+            canvas.height = canvas_HEIGHT
 
             context = canvas.getContext('2d')
         }
 
-        function setPosition()
+        function canvas_setPosition()
         {
-            translateX = Math.random() * (window.innerWidth + width) - width
-            translateY = Math.random() * window.innerHeight
+            canvas_TRANSLATEX = Math.random() * (window.innerWidth + canvas_WIDTH) - canvas_WIDTH
+            canvas_TRANSLATEY = Math.random() * window.innerHeight
         }
+
+        // --GET
+        function canvas_getCircleGap(d) { return (Math.random() * 1 + 1) * d }
+
+        // --DESTROY
+        function cloud_destroy() { event.event_remove('resize', cloud_resize) }
+
+        // --EVENT
+        async function cloud_resize() { canvas_setPosition() }
 
         // --DRAW
-        function draw()
+        function canvas_draw()
         {
-            // const
-            // a = Math.floor(Math.random() * 150) + 150,
-            // b = Math.floor(Math.random() * 30) + 20,
-            // x = Math.random() * (width - 2 * a) + a,
-            // y = Math.random() * (height - 360) + 180
-            
-            drawCloud(a, b, x, y)
-            drawEllipse(a, b, x, y)
+            canvas_drawCloud()
+            drawEllipse(context, cloud_A, cloud_B, cloud_X, cloud_Y)
         }
 
-        function drawCloud(a, b, x, y)
+        function canvas_drawCloud()
         {
-            let
-            pX = -a + Math.random() * 20,
-            d = 1
+            let [pX, direction] = [-cloud_A + Math.random() * 20, 1]
 
             while (true)
             {
                 const
-                pY = (Math.sqrt((1 - (pX * pX) / (a * a)) * b * b) + Math.random() * 60) * d,
-                r = Math.random() * 50 + 50
+                PY = (Math.sqrt((1 - (pX * pX) / (cloud_A * cloud_A)) * cloud_B * cloud_B) + Math.random() * 60) * direction,
+                RADIUS = Math.random() * 50 + 50
 
-                draw2Circles(x + pX, y + pY, r, d)
+                canvas_draw2Circles(cloud_X + pX, cloud_Y + PY, RADIUS, direction)
 
-                pX += (r + Math.random() * 60) * d
+                pX += (RADIUS + Math.random() * 60) * direction
 
-                if (pX > a) pX = a - Math.random() * 20, d = -1
-                if (pX < -a) break
+                if (pX > cloud_A) pX = cloud_A - Math.random() * 20, direction = -1
+                if (pX < -cloud_A) break
             }
         }
 
-        function draw2Circles(x, y, r, d)
+        function canvas_draw2Circles(x, y, r, d)
         {
-            const
-            gapX = (Math.random() * 1 + 1) * d,
-            gapY = (Math.random() * 1 + 1) * d
+            const [GAPX, GAPY] = [canvas_getCircleGap(d), canvas_getCircleGap(d)]
 
             context.fillStyle = _colors.light
-            drawCircle(x + gapX, y + gapY, r + .5)
+            drawCircle(context, x + GAPX, y + GAPY, r + .5)
             context.fillStyle = _colors.dark
-            drawCircle(x, y, r)
-        }
-
-        function drawCircle(x, y, r)
-        {
-            context.beginPath()
-            context.arc(x, y, r, 0, 2 * Math.PI)
-            context.fill()
-            context.closePath()
-        }
-
-        function drawEllipse(a, b, x, y)
-        {
-            context.beginPath()
-            context.ellipse(x, y, a, b + 60, 0, 0, 2 * Math.PI)
-            context.fill()
-            context.closePath()
+            drawCircle(context, x, y, r)
         }
 
     // #CYCLE
 
-    onMount(set)
+    onMount(cloud_set)
+    onDestroy(cloud_destroy)
 </script>
 
 <!-- #HTML -->
 
 <div
 class="cloud"
-style:transform="translateX(calc((100% - {_translateX * speed}px) * {_d}))"
+style:transform="translateX(calc((100% - {_translateX * CLOUD_SPEED}px) * {_direction}))"
 >
     <canvas
-    style:transform="translate({translateX}px, {translateY}px)"
-    style:width="{width}px"
-    style:height="{height}px"
+    style:transform="translate({canvas_TRANSLATEX}px, {canvas_TRANSLATEY}px)"
+    style:width="{canvas_WIDTH}px"
+    style:height="{canvas_HEIGHT}px"
     bind:this={canvas}
     >
     </canvas>
@@ -168,10 +157,10 @@ lang="scss"
 >
     /* #USES */
 
-    @use '../../assets/scss/styles/position.scss' as *;
-    @use '../../assets/scss/styles/size.scss' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
 
-    /* #GROUP */
+    /* #CLOUD */
 
     .cloud
     {

@@ -27,12 +27,12 @@ class RouterManager
         
             event.event_scrollTo(PAGE.start)
 
-            if (PAGE.call) PAGE.call()
+            if (PAGE.call) setTimeout(PAGE.call, 100)
         }
 
         router_setSubPath(id, subPath) { this.router_PAGES[id].subPath = subPath ? '/' + subPath : undefined }
 
-        // --UPDATE
+        // --UPDATES
         router_update()
         {
             const PAGES = this.router_PAGES
@@ -40,6 +40,8 @@ class RouterManager
             for (let i = PAGES.length - 1; i >= 0; i--)
                 if (PAGES[i].start <= event.main_scrollTop) return history.pushState({}, '', location.origin + '/' + PAGES[i].name + (PAGES[i].subPath ?? ''))
         }
+
+        router_updatePageStart(id, start) { this.router_PAGES[id].start = start }
 
         // --DESTROY
         router_destroy() { event.event_remove('scroll', this.router_scroll.bind(this)) }

@@ -13,13 +13,7 @@
         _desc,
         _img
 
-        // --BIND
-        export function update(value)
-        {
-            [translateZ, scale, ] = value ? [_radius, 2] : [0, 1]
- 
-            on = value
-        }
+        // BIND card_update
 
     // #IMPORTS
 
@@ -35,17 +29,23 @@
     // #VARIABLES
 
         // --ELEMENT-CARD
-        let on = false
-
-        // --ELEMENT-BUTTON
         let
-        translateZ = 0,
-        scale = 1
+        card_ON = false,
+        card_TRANSLATEZ = 0,
+        card_SCALE = 1
 
-    // #FUNCTION
+    // #FUNCTIONS
+
+        // --UPDATE
+        export function card_update(value)
+        {
+            [card_TRANSLATEZ, card_SCALE] = value ? [_radius, 2] : [0, 1]
+
+            card_ON = value
+        }
 
         // --EVENT
-        function card_click() { dispatch('click', { id: _id, on: !on }) }
+        function card_click() { dispatch('click', { id: _id, on: !card_ON }) }
 </script>
 
 <!-- #HTML -->
@@ -56,21 +56,25 @@ style:transform="translateX({_translateX ?? 0}px) translateZ({_translateZ ?? 0}p
 >
     <button
     type="button"
-    style:transform="translateZ({translateZ}px) scale({scale})"
+    style:transform="translateZ({card_TRANSLATEZ}px) scale({card_SCALE})"
     on:click={card_click}
     >
         <section
         class="content"
         >
-            {#if _img}
-                <img
-                src={$page.url.origin + _img.src}
-                alt={_img.alt}
-                style:transform="scale({1 / scale})"
-                style:width={_img.width ?? 'auto'}
-                style:height={_img.height ?? 'auto'}
-                >
-            {/if}
+            <div
+            class="title"
+            >
+                {#if _img}
+                    <img
+                    src={$page.url.origin + _img.src}
+                    alt={_img.alt}
+                    style:transform="scale({1 / card_SCALE})"
+                    style:width={_img.width ?? 'auto'}
+                    style:height={_img.height ?? 'auto'}
+                    >
+                {/if}
+            </div>
 
             <p>{_desc ?? ''}</p>
         </section>
@@ -84,13 +88,13 @@ lang="scss"
 >
     /* #USES */
 
-    @use '../../assets/scss/styles/flex.scss' as *;
-    @use '../../assets/scss/styles/position.scss' as *;
-    @use '../../assets/scss/styles/size.scss' as *;
-    @use '../../assets/scss/styles/background.scss' as *;
-    @use '../../assets/scss/styles/font.scss' as *;
+    @use '../../assets/scss/styles/flex' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/background' as *;
+    @use '../../assets/scss/styles/font' as *;
 
-    /* #GROUPS */
+    /* #CARD */
 
     .card
     {
@@ -122,20 +126,29 @@ lang="scss"
 
         .content
         {
-            @include flex;
+            @include f-center(true);
             @include f-column;
-            @include f-a-center;
             @include any;
-
-            justify-content: flex-end;
 
             gap: 20px;
 
-            padding-bottom: 18%;
+            .title
+            {
+                @include flex;
+                @include f-j-center;
+                @include any-w;
 
-            box-sizing: border-box;
+                align-items: flex-end;
+    
+                height: 60px;
+            }
 
-            img { transition: transform .4s; }
+            img
+            {
+                max-width: 80%;
+    
+                transition: transform .4s;
+            }
 
             p
             {

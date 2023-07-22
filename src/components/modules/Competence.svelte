@@ -26,7 +26,9 @@
     // #CONSTANTES
 
         // --ELEMENT-COMPETENCE
-        const COMPETENCE_DURATION = 900
+        const
+        COMPETENCE_ID = 2,
+        COMPETENCE_DURATION = 900
 
         // --ELEMENT-ORBIT
         const ORBIT_ORBITS =
@@ -146,7 +148,7 @@
     // #REACTIVE
 
             // --ELEMENT-SPACE
-            $: space_SCALE = die_NUMBER / 6 * space_RATIO
+            $: space_$SCALE = die_NUMBER / 6 * space_RATIO
 
             // --ELEMENT-ORBIT
             $: orbit_animation(orbit_ANIMATE)
@@ -165,11 +167,7 @@
 
         function competence_setCommand() { app.app_add('space_dimension', space_dimension, true) }
 
-        function competence_setEvent()
-        {
-            event.event_add('scroll', competence_scroll)
-            event.event_add('resize', competence_resize)
-        }
+        function competence_setEvent() { event.event_addSeveral({ scroll: competence_scroll, resize: competence_resize }) }
 
         function competence_setEventDesktop()
         {
@@ -185,12 +183,7 @@
             competence_MOBILE = true
         }
 
-        function competence_setRouter()
-        {
-            const start = competence.parentNode.offsetTop
-    
-            router.router_add(2, 'competence', start)
-        }
+        function competence_setRouter() { router.router_add(COMPETENCE_ID, 'competence', competence_OFFSETTOP) }
 
         function orbit_set()
         {
@@ -243,7 +236,7 @@
         // --RESET
         function competence_reset()
         {
-            competence_OFFSETTOP = competence.getBoundingClientRect().top + document.querySelector('main').scrollTop
+            competence_OFFSETTOP = competence.parentNode.offsetTop
             competence_HEIGHT = competence.offsetHeight + window.innerHeight / 2
 
             orbit_set()
@@ -372,6 +365,8 @@
         async function competence_resize()
         {
             competence_reset()
+
+            router.router_updatePageStart(COMPETENCE_ID, competence_OFFSETTOP)
 
             if (orbit_TARGET != undefined) content_destroy()
         }
@@ -561,7 +556,7 @@ on:touchstart={competence_touchStart}
             <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
             <div
             class="space"
-            style:transform="scale({space_SCALE}) translateY({space_TRANSLATEY}%)"
+            style:transform="scale({space_$SCALE}) translateY({space_TRANSLATEY}%)"
             >
                 <Moon
                 {_colors}
@@ -582,6 +577,14 @@ on:touchstart={competence_touchStart}
                     />
                 {/each}
             </div>
+
+            {#if orbit_TARGET != undefined}
+                <p
+                class="info"
+                >
+                    SCROLL
+                </p>
+            {/if}
 
             <p
             class="section-info"
@@ -650,6 +653,7 @@ lang="scss"
 
                 height: 100vh;
 
+                .info { @include p-info(top); }
                 .section-info { @include p-info; }
             }
 
