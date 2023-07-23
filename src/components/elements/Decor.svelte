@@ -11,7 +11,7 @@
     // #IMPORTS
 
         // --JS
-        import { drawTriangle } from '../../assets/js/utils/canvas'
+        import { clearCanvas, drawTriangle } from '../../assets/js/utils/canvas'
         import { rgb } from '../../assets/js/utils/color'
 
         // --CONTEXTS
@@ -43,7 +43,7 @@
 
             canvas_set()
     
-            if (!wwindow.window_testSmallScreen()) canvas_draw()
+            if (!wwindow.window_testSmallScreen() && !wwindow.window_testMobile()) canvas_draw()
         }
 
         function decor_setEvent() { event.event_add('resize', decor_resize) }
@@ -65,7 +65,8 @@
         // --EVENT
         async function decor_resize(smallScreen)
         {
-            if (canvas_WIDTH < window.innerWidth && !smallScreen)
+            if (smallScreen || wwindow.window_MOBILE) clearCanvas(context, canvas_WIDTH, canvas_HEIGHT)
+            else if (canvas_WIDTH < window.innerWidth)
                 canvas_set(),
                 canvas_draw()
         }
@@ -251,11 +252,11 @@ lang="scss"
                 {
                     @include any-w;
 
-                    bottom: -60vh;
+                    bottom: 0;
 
-                    height: 70vh;
+                    height: 5vh;
 
-                    background: linear-gradient(0deg, transparent 0%, $dark 20% 80%, transparent 100%);
+                    background: linear-gradient(0deg, $dark -10%, transparent 100%);
                 }
             }
         }

@@ -10,7 +10,7 @@
 
         // --JS
         import { rgba } from '../../assets/js/utils/color'
-        import { drawCircle } from '../../assets/js/utils/canvas'
+        import { clearCanvas, drawCircle } from '../../assets/js/utils/canvas'
 
         // --CONTEXT
         import { event } from '../field/Main.svelte'
@@ -79,7 +79,12 @@
         function moon_destroy() { event.event_remove('resize', moon_resize) }
 
         // --EVENT
-        async function moon_resize() { moon_reset() }
+        async function moon_resize()
+        {
+            clearCanvas(context, canvas_SIZE)
+
+            moon_reset()
+        }
 
         // --DRAW
         async function canvas_draw()

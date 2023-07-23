@@ -33,7 +33,10 @@ class WindowManager
             this.window_setCommand()
         }
 
-        window_setCommand() { app.app_add('format', this.window_format.bind(this), true)}
+        window_setCommand() { app.app_add('format', this.window_format.bind(this))}
+
+        // --GET
+        window_getRatio() { return window.innerWidth / window.innerHeight }
 
         // --DESTROY
         window_destroy() { try { window.removeEventListener('resize', this.window_RESIZE) } catch {} }

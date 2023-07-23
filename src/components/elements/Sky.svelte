@@ -22,7 +22,7 @@
     // #CONSTANTE
 
         // --ELEMENT-CLOUD
-        const CLOUDS = []
+        const CLOUD_CLOUDS = []
 
     // #FUNCTIONS
 
@@ -39,18 +39,22 @@
         // --UPDATE
         function cloud_update(smallScreen)
         {
-            const MAX = 30, COUNT = smallScreen ? 10 : MAX
+            const [MIN, MAX] = [10, 30]
     
-            if (CLOUDS.length === MAX) return
-
-            for (let i = CLOUDS.length; i < COUNT; i++) CLOUDS.push(i % 2 === 0 ? -1 : 1)
+            if (CLOUD_CLOUDS.length === MAX)
+            {
+                if (smallScreen || wwindow.window_MOBILE)
+                    for (let i = CLOUD_CLOUDS.length - 1; i >= MIN; i--) CLOUD_CLOUDS.pop()
+            }
+            else
+                for (let i = CLOUD_CLOUDS.length; i < (smallScreen || wwindow.window_testMobile() ? MIN : MAX); i++) CLOUD_CLOUDS.push(i % 2 === 0 ? -1 : 1)
         }
 
         // --DESTROY
         function sky_destroy() { event.event_remove('resize', sky_resize) }
 
         // --EVENT
-        function sky_resize(smallScreen) { cloud_update(smallScreen) }
+        async function sky_resize(smallScreen) { cloud_update(smallScreen) }
 
     // #CYCLES
 
@@ -63,7 +67,7 @@
 <div
 class="sky"
 >
-    {#each CLOUDS as direction}
+    {#each CLOUD_CLOUDS as direction}
         <Cloud
         _direction={direction}
         _translateX={_translateX}
@@ -91,11 +95,9 @@ lang="scss"
         @include any-w;
         @include no-event;
 
-        bottom: 0;
+        bottom: -50vh;
         left: 0;
 
-        transform: translateY(20%);
-
-        height: 100vh;
+        height: 150vh;
     }
 </style>

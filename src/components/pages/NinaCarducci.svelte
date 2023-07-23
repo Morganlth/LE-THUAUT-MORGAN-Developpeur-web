@@ -917,6 +917,8 @@ lang="scss"
 
         width: 100vw;
         height: 100vh;
+
+        background-color: white;
     }
 
     .body
@@ -924,11 +926,10 @@ lang="scss"
         overflow: hidden scroll;
     
         max-width: 1920px;
+        width: 100%;
         height: 100%;
 
         margin: auto;
-
-        background-color: white;
 
         font-family: 'Inter', sans-serif;
 

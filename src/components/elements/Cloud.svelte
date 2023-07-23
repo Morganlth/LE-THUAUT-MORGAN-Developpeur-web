@@ -15,7 +15,7 @@
         import { drawCircle, drawEllipse } from '../../assets/js/utils/canvas'
 
         // --CONTEXT
-        import { event } from '../field/Main.svelte'
+        import { event, wwindow } from '../field/Main.svelte'
 
         // --SVELTE
         import { onMount, onDestroy } from 'svelte'
@@ -52,7 +52,7 @@
             cloud_setEvent()
     
             canvas_set()
-            canvas_setPosition()
+            canvas_setPosition(wwindow.window_testSmallScreen())
             canvas_draw()
         }
 
@@ -81,7 +81,7 @@
         function canvas_setPosition()
         {
             canvas_TRANSLATEX = Math.random() * (window.innerWidth + canvas_WIDTH) - canvas_WIDTH
-            canvas_TRANSLATEY = Math.random() * window.innerHeight
+            canvas_TRANSLATEY = Math.random() * (window.innerHeight * 1.5 - canvas_HEIGHT)
         }
 
         // --GET

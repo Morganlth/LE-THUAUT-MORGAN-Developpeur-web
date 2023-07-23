@@ -24,8 +24,11 @@
         import SophieBluel from '../pages/SophieBluel.svelte'
         import NinaCarducci from '../pages/NinaCarducci.svelte'
 
+        // --COMPONENT-COVER
+        import Card from '../covers/Card.svelte'
+
         // --COMPONENT-ELEMENT
-        import Card from '../elements/Card.svelte'
+        import CardContent from '../elements/CardContent.svelte'
 
     // #CONSTANTE
 
@@ -82,7 +85,9 @@
         // --ELEMENT-PROJECT
         let
         project,
-        project_OFFSETTOP
+        project_OFFSETTOP,
+        project_LAST = +new Date(),
+        project_MOBILE
 
         // --ELEMENT-CANVAS
         let
@@ -116,10 +121,15 @@
         cardcontainer_HEIGHT,
         cardcontainer_RADIUS,
         cardcontainer_TRANSLATEZ,
-        cardcontainer_ROTATEY = 0
+        cardcontainer_ROTATEY = 0,
+        cardcontainer_LASTX,
+        cardcontainer_LAST = +new Date()
 
         // --ELEMENT-CARD
         let
+        card_RATIO,
+        card_SHOW,
+        card_SCALE = 1,
         card_TARGET = 0,
         card_TIMEOUT
 
@@ -131,9 +141,9 @@
         function project_set()
         {
             project_setVar()
+            project_setChildren()
             project_setEvent()
             project_setRouter()
-            project_setChildren()
 
             canvas_setParticles()
             cardcontainer_setDecagon()
@@ -149,7 +159,21 @@
             canvas_SIZE_DIV_2 = canvas_SIZE / 2
         }
 
-        function project_setEvent() { event.event_addSeveral({ wheel: project_wheel, resize: project_resize }) }
+        function project_setEvent() { event.event_addSeveral({ scroll: project_scroll, resize: project_resize }) }
+
+        function project_setEventDesktop()
+        {
+            event.event_add('wheel', project_wheel)
+
+            project_MOBILE = false
+        }
+
+        function project_setEventMobile()
+        {
+            event.event_add('touchMove', project_touchMove)
+    
+            project_MOBILE = true
+        }
 
         function project_setRouter()
         {
@@ -182,17 +206,19 @@
             context.shadowBlur = 16
         }
 
-        function track_set(smallScreen)
+        function track_set(off)
         {
-            [track_ROTATE, track_TRANSLATEX, track_TRANSLATEY] = smallScreen ??  wwindow.window_testSmallScreen()
+            [track_ROTATE, track_TRANSLATEX, track_TRANSLATEY] = off ?? (wwindow.window_testSmallScreen() || wwindow.window_getRatio() < 1.875)
             ? [0, 0, 0]
             : [Math.atan(window.innerHeight / window.innerWidth) / Math.PI * 180, (canvas_SIZE - window.innerWidth) / 2, -50]
         }
 
         function cardcontainer_set()
         {
-            cardcontainer_WIDTH = window.innerWidth * .52
-            cardcontainer_HEIGHT = window.innerHeight * .5
+            card_RATIO = wwindow.window_getRatio() < 1 ? .8 : .5
+
+            cardcontainer_WIDTH = window.innerWidth * (card_RATIO + .02)
+            cardcontainer_HEIGHT = window.innerHeight * card_RATIO
 
             cardcontainer_RADIUS = cardcontainer_WIDTH / 2 / Math.tan(18 * Math.PI / 180)
             cardcontainer_TRANSLATEZ = cardcontainer_RADIUS
@@ -200,7 +226,7 @@
 
         function canvas_setParticles()
         {
-            for (let i = 0; i < 100; i++)
+            for (let i = 0; i < (wwindow.window_testMobile() ? 30 : 100); i++)
             {
                 const
                 X = Math.random() * canvas_SIZE - canvas_SIZE_DIV_2,
@@ -233,6 +259,8 @@
         // --UPDATE
         function project_update(on)
         {
+            [container_OVERFLOWX, container_OVERFLOWY] = on ? ['hidden', 'scroll'] : ['visible', 'visible']
+
             CARD_CARDS[card_TARGET].on = on
             CARD_CARDS[card_TARGET].update(on)
 
@@ -249,9 +277,16 @@
 
         function project_destroyEvent()
         {
-            event.event_remove('wheel', project_wheel)
+            event.event_remove('scroll', project_scroll)
             event.event_remove('resize', project_resize)
+
+            project_destroyEventDesktop()
+            project_destroyEventMobile()
         }
+
+        function project_destroyEventDesktop() { event.event_remove('wheel', project_wheel) }
+
+        function project_destroyEventMobile() { event.event_remove('touchMove', project_touchMove) }
 
         function project_destroyFrame()
         {
@@ -263,19 +298,23 @@
         }
 
         // --EVENTS
-        async function project_wheel(deltaY)
+        async function project_scroll()
         {
-            if (event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE)
-            {
-                if (!canvas_FRAMEID) canvas_animation()
+            const NOW = +new Date()
 
-                if (deltaY > 0 && event.main_scrollTop >= project_OFFSETTOP) cardcontainer_move()
-            }
-            else project_destroyFrame(), cardcontainer_reset()
+            if (NOW > project_LAST + 200)
+                event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE
+                ? project_start()
+                : project_end(),
+                project_LAST = NOW
         }
+
+        async function project_wheel(deltaY) { if (deltaY > 0 && event.main_scrollTop >= project_OFFSETTOP) cardcontainer_move() }
 
         async function project_resize()
         {
+            if (card_SHOW) card_click({ detail: { id: card_TARGET, on: false }})
+
             project_setVar()
             project_setChildren()
             canvas_setParticles()
@@ -283,6 +322,24 @@
 
             router.router_updatePageStart(PROJECT_ID, project_OFFSETTOP)
         }
+
+        async function project_touchMove(clientX)
+        {
+            const NOW = +new Date()
+    
+            if (NOW > cardcontainer_LAST + 300 && event.main_scrollTop >= project_OFFSETTOP)
+            {
+                const DIF = cardcontainer_LASTX - clientX
+
+                if (Math.abs(DIF) > 10)
+                    cardcontainer_move(DIF < 0 ? -1 : 1),
+                    cardcontainer_LAST = NOW
+
+                cardcontainer_LASTX = clientX
+            }
+        }
+
+        async function project_touchStart(e) { cardcontainer_LASTX = e.changedTouches[0].clientX }
 
         function card_click({detail})
         {
@@ -297,7 +354,7 @@
         }
 
         // --ROUTER-CALL
-        function project_call() { project_wheel() }
+        function project_call() { project_start() }
 
         // --DRAW
         function canvas_draw()
@@ -351,14 +408,37 @@
         }
 
         // --UTILS
-        function cardcontainer_move()
+        function project_start()
+        {
+            if (!canvas_FRAMEID)
+            {
+                if (!card_SHOW)
+                    wwindow.window_MOBILE
+                    ? project_setEventMobile()
+                    : project_setEventDesktop()
+    
+                canvas_animation()
+            }
+        }
+
+        function project_end()
+        {
+            if (canvas_FRAMEID)
+                project_MOBILE
+                ? project_destroyEventMobile() 
+                : project_destroyEventDesktop(),
+                project_destroyFrame(),
+                cardcontainer_reset()
+        }
+
+        function cardcontainer_move(direction = 1)
         {
             const NOW = +new Date()
 
             if (NOW > canvas_LAST + 200)
             {
                 canvas_LAST = NOW
-                cardcontainer_ROTATEY += 36
+                cardcontainer_ROTATEY += 36 * direction
                 card_TARGET = cardcontainer_ROTATEY / 36 % 10
 
                 clearTimeout(canvas_TIMEOUT), canvas_TIMEOUT = setTimeout(() => canvas_TIMEOUT = null, 400)
@@ -367,13 +447,14 @@
 
         function card_show()
         {
-            project_destroyEvent()
+            [card_SHOW, card_SCALE] = [true, 1 / card_RATIO]
 
-            ;[track_ROTATE, track_TRANSLATEX, track_TRANSLATEY] = [0, 0, 0]
+            project_MOBILE ? project_destroyEventMobile()  : project_destroyEventDesktop()
+            track_set(true)
 
             card_TIMEOUT = setTimeout(() =>
             {
-                [cardcontainer_TRANSLATEZ, container_OVERFLOWX, container_OVERFLOWY] = [1, 'hidden', 'scroll']
+                cardcontainer_TRANSLATEZ = 1
     
                 project_update(true)
             }, 400)
@@ -381,11 +462,16 @@
 
         function card_hide()
         {
-            [cardcontainer_TRANSLATEZ, container_OVERFLOWX, container_OVERFLOWY] = [cardcontainer_RADIUS, 'visible', 'visible']
+            [card_SHOW, card_SCALE, cardcontainer_TRANSLATEZ] = [false, 1, cardcontainer_RADIUS]
 
             project_update(false)
     
-            card_TIMEOUT = setTimeout(() => { track_set(), project_setEvent() }, 400)
+            card_TIMEOUT = setTimeout(() =>
+            {
+                track_set()
+
+                wwindow.window_MOBILE ? project_setEventMobile() : project_setEventDesktop()
+            }, 400)
         }
 
     // #CYCLES
@@ -399,13 +485,18 @@
 <div
 id="project"
 bind:this={project}
+on:touchstart={project_touchStart}
 >
-    <canvas
+    <div
+    class="canvas-container"
     style:width="{canvas_SIZE}px"
     style:height="{canvas_SIZE}px"
-    bind:this={canvas}
     >
-    </canvas>
+        <canvas
+        bind:this={canvas}
+        >
+        </canvas>
+    </div>
 
     <div
     class="container"
@@ -432,11 +523,18 @@ bind:this={project}
                     _translateZ={card.translateZ}
                     _rotateY={card.rotateY}
                     _radius={cardcontainer_RADIUS}
-                    _desc={card.desc}
-                    _img={card.img}
+                    _scale={card.on ? card_SCALE : 1}
                     bind:card_update={card.update}
                     on:click={card_click}
-                    />
+                    >
+                        {#if !card.on}
+                            <CardContent
+                            _img={card.img}
+                            _desc={card.desc}
+                            _color={_colors.sLight}
+                            />
+                        {/if}
+                    </Card>
                 {/each}
             </div>
         </div>
@@ -446,6 +544,16 @@ bind:this={project}
         >
             {#each CARD_CARDS as card}
                 {#if card.on && card.component}
+                    <div
+                    class="card"
+                    >
+                        <CardContent
+                        _img={card.img}
+                        _desc={card.desc}
+                        _color={_colors.light}
+                        />
+                    </div>
+
                     <svelte:component
                     this={card.component}
                     >
@@ -455,7 +563,7 @@ bind:this={project}
         </div>
     </div>
 
-    <p>INFINITY</p>
+    <p>PROJETS</p>
 </div>
 
 <!-- #STYLE -->
@@ -485,7 +593,7 @@ lang="scss"
 
         overflow: clip;
 
-        canvas
+        .canvas-container
         {
             @include absolute;
 
@@ -493,6 +601,23 @@ lang="scss"
             left: 50%;
 
             transform: translate(-50%, -50%);
+
+            canvas { @include any; }
+
+            &::after
+            {
+                @include absolute;
+                @include any-w;
+                
+                content: '';
+
+                top: -1px;
+                left: 0;
+
+                height: 10%;
+
+                background: linear-gradient(0deg, transparent 0%, $dark 90%);
+            }
         }
 
         .container
@@ -535,11 +660,20 @@ lang="scss"
 
         .content
         {
+            @include relative;
             @include any-w;
 
-            display: contents;
+            .card
+            {
+                @include absolute;
+                @include any-w;
+                @include no-event;
 
-            height: 200%;
+                top: -100vh;
+                left: 0;
+
+                height: 100vh;
+            }
         }
 
         &>p { @include p-info; }

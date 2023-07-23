@@ -43,7 +43,7 @@ bind:this={scene}
         bind:number={number}
         />
 
-        <p>CE DÉ NE SERT ABSOLUMENT A RIEN. <br> (EN COURS DE DÉVELOPPEMENT)</p>
+        <p>CE DÉ NE SERT ABSOLUMENT A RIEN. <br> ( SECTION EN COURS DE DÉVELOPPEMENT )</p>
     </div>
 </div>
 

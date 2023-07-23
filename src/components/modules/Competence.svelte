@@ -194,7 +194,7 @@
         function land_set()
         {
             land_START = land.offsetTop - window.innerHeight * .7
-            land_END = land.scrollHeight + land_START - window.innerHeight
+            land_END = land.scrollHeight + land_START - window.innerHeight * 1.75
         }
 
         function content_setSubtitle() { this.subtitle = [...this.elements.subtitle.querySelectorAll('.char')] }
@@ -250,20 +250,31 @@
         }
 
         // --UPDATE
-        function competence_update()
+        function competence_update(now, scroll)
+        {
+            const GAP = competence_updateElement()
+    
+            orbit_ANIMATE = !scroll && GAP > 0 && GAP < competence_HEIGHT
+
+            competence_LAST = now
+        }
+
+        function competence_updateElement()
         {
             const GAP = event.main_scrollTop - competence_OFFSETTOP
     
-            ;[space_RATIO, space_TRANSLATEY, scene_SCALE, orbit_Y, orbit_ANIMATE] = GAP > 0
+            ;[space_RATIO, space_TRANSLATEY, scene_SCALE, orbit_Y] = GAP > 0
             ?   GAP < competence_HEIGHT
                 ? [...(GAP >= land_START
                     ? [.3, -100, 1]
                     : [1, 0, 1.5])
-                  , GAP / competence_HEIGHT * 5, true]
-                : [.3, -100, 1, 5, false]
-            : [1, 0, 1.5, 0, false]
+                  , GAP / competence_HEIGHT * 5]
+                : [.3, -100, 1, 5]
+            : [1, 0, 1.5, 0]
 
             sky_TRANSLATEX = GAP > land_END ? GAP - land_END : 0
+
+            return GAP
         }
 
         function orbit_update(on)
@@ -275,7 +286,7 @@
                 wwindow.window_MOBILE
                 ? competence_setEventMobile()
                 : competence_setEventDesktop())
-            : competence_update())
+            : competence_updateElement())
         }
 
         function orbit_updateLetter(e, x, y, z) { e.style.transform = `translate3d(${x ?? 0}px, ${y ?? 0}px, ${z ?? 0}px)` }
@@ -339,12 +350,13 @@
         // --EVENTS
         async function competence_scroll()
         {
-            const now = +new Date()
+            const NOW = +new Date()
 
             clearTimeout(competence_TIMEOUT)
 
-            if (now > competence_LAST + 100) competence_update(), competence_LAST = now
-            else competence_TIMEOUT = setTimeout(competence_update, 100)
+            NOW > competence_LAST + 100
+            ? competence_update(NOW, true)
+            : competence_TIMEOUT = setTimeout(competence_update.bind(null, +new Date(), false), 130)
         }
 
         async function competence_wheel(deltaY) { content_update(deltaY) }
