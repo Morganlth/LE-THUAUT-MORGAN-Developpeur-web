@@ -291,6 +291,7 @@
 
         function project_destroyEvent()
         {
+            console.log('remove in destroy')
             event.event_remove('scroll', project_scroll)
             event.event_remove('resize', project_resize)
 
@@ -315,13 +316,13 @@
         async function project_scroll()
         {
             console.log(event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE)
-            const NOW = +new Date()
+            // const NOW = +new Date()
 
-            if (NOW > project_LAST + 200)
-                event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE
-                ? project_start()
-                : project_end(),
-                project_LAST = NOW
+            // if (NOW > project_LAST + 200)
+            //     event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE
+            //     ? project_start()
+            //     : project_end(),
+            //     project_LAST = NOW
         }
 
         async function project_wheel(deltaY) { if (deltaY > 0 && event.main_scrollTop >= project_OFFSETTOP) cardcontainer_move() }
