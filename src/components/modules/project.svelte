@@ -156,8 +156,6 @@
 
             canvas_setParticles()
             cardcontainer_setDecagon()
-
-            console.log('okk set')
         }
 
         function project_setVar()
@@ -251,6 +249,7 @@
 
         function cardcontainer_setDecagon()
         {
+            console.log('set decagon')
             let [tZ, tX, rY] = [-cardcontainer_RADIUS, 0, 0]
 
             for (let i = 0; i < CARD_CARDS.length; i++)
@@ -313,12 +312,13 @@
         {
             const NOW = +new Date()
 
+            console.log('scroll')
+
             if (NOW > project_LAST + 200)
                 event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE
                 ? project_start()
                 : project_end(),
-                project_LAST = NOW,
-                console.log('ok')
+                project_LAST = NOW
         }
 
         async function project_wheel(deltaY) { if (deltaY > 0 && event.main_scrollTop >= project_OFFSETTOP) cardcontainer_move() }
