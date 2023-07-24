@@ -46,12 +46,12 @@ body
 {
     height: 100vh;
 
-    background-color: black;
+    /* background-color: black; */
 }
 
 #app
 {
-    opacity: 0;
+    /* opacity: 0; */
 
     transition: opacity .2s;
 }
