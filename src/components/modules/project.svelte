@@ -291,8 +291,6 @@
 
             project_destroyEventDesktop()
             project_destroyEventMobile()
-
-            console.log('destroy')
         }
 
         function project_destroyEventDesktop() { event.event_remove('wheel', project_wheel) }
@@ -311,6 +309,7 @@
         // --EVENTS
         async function project_scroll()
         {
+            console.log(event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE)
             const NOW = +new Date()
 
             if (NOW > project_LAST + 200)
