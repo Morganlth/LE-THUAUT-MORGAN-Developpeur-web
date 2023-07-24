@@ -315,7 +315,8 @@
                 event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE
                 ? project_start()
                 : project_end(),
-                project_LAST = NOW
+                project_LAST = NOW,
+                console.log('ok')
         }
 
         async function project_wheel(deltaY) { if (deltaY > 0 && event.main_scrollTop >= project_OFFSETTOP) cardcontainer_move() }
