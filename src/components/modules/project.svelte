@@ -56,7 +56,7 @@
                 desc: 'Créez la page d\'accueil d\'une agence de voyage avec HTML & CSS',
                 img:
                 {
-                    src: '/src/assets/images/projects/booki/logo/booki.png',
+                    src: '/images/projects/booki/logo/booki.png',
                     alt: 'projet Booki OpenClassrooms',
                     width: 'auto',
                     height: 'auto'
@@ -68,7 +68,7 @@
                 desc: 'Créez une page web dynamique avec JavaScript',
                 img:
                 {
-                    src: '/src/assets/images/projects/sophiebluel/logo/sophie-bluel.svg',
+                    src: '/images/projects/sophiebluel/logo/sophie-bluel.svg',
                     alt: 'projet Sophie Bluel / JavaScript OpenClassrooms',
                     width: null,
                     height: '100%'
@@ -80,7 +80,7 @@
                 desc: 'Débuggez et optimisez un site de photographe',
                 img:
                 {
-                    src: '/src/assets/images/projects/ninacarducci/logo/nina-carducci.svg',
+                    src: '/images/projects/ninacarducci/logo/nina-carducci.svg',
                     alt: 'projet Nina Carducci / Optimisation OpenClassrooms',
                     width: null,
                     height: '100%'

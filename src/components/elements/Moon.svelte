@@ -61,7 +61,7 @@
             {
                 const img = new Image()
 
-                img.src = $page.url.origin + '/src/assets/images/glitch.jpg'
+                img.src = $page.url.origin + '/images/glitch.jpg'
 
                 img.addEventListener('load', () => resolve(img))
             })

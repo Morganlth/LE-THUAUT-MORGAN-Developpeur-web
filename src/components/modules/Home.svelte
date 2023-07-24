@@ -48,7 +48,7 @@ id="home"
     <div>
         <div
         class="bg"
-        style:--url="url({$page.url.origin}/src/assets/images/glitch_1920.jpg)"
+        style:--url="url({$page.url.origin}/images/glitch_1920.jpg)"
         >
         </div>
 
@@ -57,7 +57,7 @@ id="home"
         >
             <img
             class="me"
-            src="{$page.url.origin}/src/assets/images/me.png"
+            src="{$page.url.origin}/images/me.png"
             alt="LE THUAUT Morgan"
             >
 
