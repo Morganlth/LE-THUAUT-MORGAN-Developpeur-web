@@ -168,12 +168,7 @@
             canvas_SIZE_DIV_2 = canvas_SIZE / 2
         }
 
-        function project_setEvent() { event.event_addSeveral({ scroll: project_scroll, resize: project_resize, scroll: project_scroll }); console.log('set event3') }
-
-        function test()
-        {
-            console.log('test')
-        }
+        function project_setEvent() { event.event_addSeveral({ resize: project_resize, scroll: project_scroll }); console.log('set event4') }
 
         function project_setEventDesktop()
         {
