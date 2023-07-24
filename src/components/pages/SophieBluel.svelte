@@ -35,7 +35,7 @@ id="sophie-bluel"
                     <li>projets</li>
                     <li>contact</li>
                     <li id="login">login</li>
-                    <li><img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/icons/instagram.png" alt="Instagram"></li>
+                    <li><img src="{$page.url.origin}/images/projects/sophiebluel/icons/instagram.png" alt="Instagram"></li>
                 </ul>
             </nav>
         </header>
@@ -43,7 +43,7 @@ id="sophie-bluel"
         <main>
             <section id="introduction">
                 <figure>
-                    <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/sophie-bluel.png" alt="Sophie Bluel">
+                    <img src="{$page.url.origin}/images/projects/sophiebluel/sophie-bluel.png" alt="Sophie Bluel">
 
                     <!--* Ajout d'une ancre pour les éléments d'édition -->
         
@@ -83,57 +83,57 @@ id="sophie-bluel"
         
                 <div class="gallery">
                     <figure data-work-id="1">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/abajour-tahina1651286843956.png" alt="Abajour Tahina" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/abajour-tahina1651286843956.png" alt="Abajour Tahina" crossorigin="">
                         <figcaption>Abajour Tahina</figcaption>
                     </figure>
                     
                     <figure data-work-id="2">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/appartement-paris-v1651287270508.png" alt="Appartement Paris V" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/appartement-paris-v1651287270508.png" alt="Appartement Paris V" crossorigin="">
                         <figcaption>Appartement Paris V</figcaption>
                     </figure>
                     
                     <figure data-work-id="3">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/restaurant-sushisen-londres1651287319271.png" alt="Restaurant Sushisen - Londres" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/restaurant-sushisen-londres1651287319271.png" alt="Restaurant Sushisen - Londres" crossorigin="">
                         <figcaption>Restaurant Sushisen - Londres</figcaption>
                     </figure>
                     
                     <figure data-work-id="4">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/la-balisiere1651287350102.png" alt="Villa “La Balisiere” - Port Louis" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/la-balisiere1651287350102.png" alt="Villa “La Balisiere” - Port Louis" crossorigin="">
                         <figcaption>Villa “La Balisiere” - Port Louis</figcaption>
                     </figure>
                     
                     <figure data-work-id="5">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/structures-thermopolis1651287380258.png" alt="Structures Thermopolis" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/structures-thermopolis1651287380258.png" alt="Structures Thermopolis" crossorigin="">
                         <figcaption>Structures Thermopolis</figcaption>
                     </figure>
                     
                     <figure data-work-id="6">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/appartement-paris-x1651287435459.png" alt="Appartement Paris X" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/appartement-paris-x1651287435459.png" alt="Appartement Paris X" crossorigin="">
                         <figcaption>Appartement Paris X</figcaption>
                     </figure>
                     
                     <figure data-work-id="7">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/le-coteau-cassis1651287469876.png" alt="Pavillon “Le coteau” - Cassis" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/le-coteau-cassis1651287469876.png" alt="Pavillon “Le coteau” - Cassis" crossorigin="">
                         <figcaption>Pavillon “Le coteau” - Cassis</figcaption>
                     </figure>
                     
                     <figure data-work-id="8">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/villa-ferneze1651287511604.png" alt="Villa Ferneze - Isola d’Elba" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/villa-ferneze1651287511604.png" alt="Villa Ferneze - Isola d’Elba" crossorigin="">
                         <figcaption>Villa Ferneze - Isola d’Elba</figcaption>
                     </figure>
         
                     <figure data-work-id="9">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/appartement-paris-xviii1651287541053.png" alt="Appartement Paris XVIII" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/appartement-paris-xviii1651287541053.png" alt="Appartement Paris XVIII" crossorigin="">
                         <figcaption>Appartement Paris XVIII</figcaption>
                     </figure>
                     
                     <figure data-work-id="10">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/bar-lullaby-paris1651287567130.png" alt="Bar “Lullaby” - Paris" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/bar-lullaby-paris1651287567130.png" alt="Bar “Lullaby” - Paris" crossorigin="">
                         <figcaption>Bar “Lullaby” - Paris</figcaption>
                     </figure>
                     
                     <figure data-work-id="11">
-                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/hotel-first-arte-new-delhi1651287605585.png" alt="Hotel First Arte - New Delhi" crossorigin="">
+                        <img src="{$page.url.origin}/images/projects/sophiebluel/gallery/hotel-first-arte-new-delhi1651287605585.png" alt="Hotel First Arte - New Delhi" crossorigin="">
                         <figcaption>Hotel First Arte - New Delhi</figcaption>
                     </figure>
                 </div>
