@@ -168,7 +168,7 @@
             canvas_SIZE_DIV_2 = canvas_SIZE / 2
         }
 
-        function project_setEvent() { event.event_addSeveral({ resize: project_resize, scroll: project_scroll }); console.log('set event 5') }
+        function project_setEvent() { event.event_addSeveral({ resize: project_resize, scroll: project_scroll }); console.log('set event 6') }
 
         function project_setEventDesktop()
         {
@@ -313,10 +313,13 @@
             const NOW = +new Date()
 
             if (NOW > project_LAST + 200)
+            {
                 event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE
                 ? project_start()
-                : project_end(),
+                : project_end()
+
                 project_LAST = NOW
+            }
         }
 
         async function project_wheel(deltaY) { if (deltaY > 0 && event.main_scrollTop >= project_OFFSETTOP) cardcontainer_move() }
