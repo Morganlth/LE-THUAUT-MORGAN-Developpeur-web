@@ -156,6 +156,8 @@
 
             canvas_setParticles()
             cardcontainer_setDecagon()
+
+            console.log('okk set')
         }
 
         function project_setVar()
