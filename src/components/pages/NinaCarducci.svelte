@@ -341,7 +341,7 @@
         Photographe - Photographies Bordeaux - Saisissez ces merveilleux moments au travers de mon regard et de ma technique.
         Rendez les intemporels grâce à la photo, pour se les remémorer.">
         <meta property="og:locale" content="fr_FR">
-        <meta property="og:image" content="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina-meta.png">
+        <meta property="og:image" content="{$page.url.origin}/images/projects/ninacarducci/nina-meta.png">
         <meta property="og:image:type" content="image/png">
         <meta property="og:image:width" content="1200">
         <meta property="og:image:height" content="627">
@@ -354,7 +354,7 @@
         <meta name="twitter:description" content="
         Photographe - Photographies Bordeaux - Saisissez ces merveilleux moments au travers de mon regard et de ma technique.
         Rendez les intemporels grâce à la photo, pour se les remémorer.">
-        <meta name="twitter:image" content="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina-meta.png">
+        <meta name="twitter:image" content="{$page.url.origin}/images/projects/ninacarducci/nina-meta.png">
     
     <!-- #FONT -->
 
@@ -420,7 +420,7 @@ id="nina-carducci"
                         target="_blank"
                         >
                             <img
-                            src="{$page.url.origin}/src/assets/images/projects/ninacarducci/instagram.png"
+                            src="{$page.url.origin}/images/projects/ninacarducci/instagram.png"
                             alt="Instagram"
                             width="20"
                             height="20"
@@ -459,13 +459,13 @@ id="nina-carducci"
                         >
                             <img
                             srcset="
-                            {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1920.jpg 1920w,
-                            {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1440.jpg 1440w,
-                            {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1024.jpg 1024w,
-                            {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-768.jpg 768w,
-                            {$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-425.jpg 425w"
+                            {$page.url.origin}/images/projects/ninacarducci/slider/{item.src}-1920.jpg 1920w,
+                            {$page.url.origin}/images/projects/ninacarducci/slider/{item.src}-1440.jpg 1440w,
+                            {$page.url.origin}/images/projects/ninacarducci/slider/{item.src}-1024.jpg 1024w,
+                            {$page.url.origin}/images/projects/ninacarducci/slider/{item.src}-768.jpg 768w,
+                            {$page.url.origin}/images/projects/ninacarducci/slider/{item.src}-425.jpg 425w"
                             sizes="(min-width: 1441px) 1920px, (min-width: 1025px) 1440px, (min-width: 769px) 1024px, (min-width: 426px) 768px, 425px"
-                            src="{$page.url.origin}/src/assets/images/projects/ninacarducci/slider/{item.src}-1920.jpg"
+                            src="{$page.url.origin}/images/projects/ninacarducci/slider/{item.src}-1920.jpg"
                             alt={item.alt}
                             width="1920"
                             height="888"
@@ -480,7 +480,7 @@ id="nina-carducci"
                     on:click={slider_click.bind('p')}
                     >
                         <img
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/icons/carousel-control-prev-icon.svg"
+                        src="{$page.url.origin}/images/projects/ninacarducci/icons/carousel-control-prev-icon.svg"
                         alt="prev button"
                         width="16"
                         height="27"
@@ -493,7 +493,7 @@ id="nina-carducci"
                     on:click={slider_click.bind('n')}
                     >
                         <img
-                        src="{$page.url.origin}/src/assets/images/projects/ninacarducci/icons/carousel-control-next-icon.svg"
+                        src="{$page.url.origin}/images/projects/ninacarducci/icons/carousel-control-next-icon.svg"
                         alt="next button"
                         width="16" 
                         height="27"
@@ -508,26 +508,26 @@ id="nina-carducci"
                 <picture>
                     <source
                     media="(min-width: 1180px)"
-                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina.png 560w"
+                    srcset="{$page.url.origin}/images/projects/ninacarducci/nina.png 560w"
                     sizes="560px"
                     >
                     <source
                     media="(min-width: 650px)"
-                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina-420.png 420w"
+                    srcset="{$page.url.origin}/images/projects/ninacarducci/nina-420.png 420w"
                     sizes="420px"
                     >
                     <source
                     media="(max-width: 650px)"
-                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina-224.png 224w"
+                    srcset="{$page.url.origin}/images/projects/ninacarducci/nina-224.png 224w"
                     sizes="224px"
                     >
                     <img
                     srcset="
-                    {$page.url.origin}/src/assets/images/projects/ninacarducci/nina.png 560w,
-                    {$page.url.origin}/src/assets/images/projects/ninacarducci/nina-420.png 420w,
-                    {$page.url.origin}/src/assets/images/projects/ninacarducci/nina-224.png 224w"
+                    {$page.url.origin}/images/projects/ninacarducci/nina.png 560w,
+                    {$page.url.origin}/images/projects/ninacarducci/nina-420.png 420w,
+                    {$page.url.origin}/images/projects/ninacarducci/nina-224.png 224w"
                     sizes="(min-width: 1180px) 559px, (min-width: 650px) 419px, 223px"
-                    src="{$page.url.origin}/src/assets/images/projects/ninacarducci/nina.png"
+                    src="{$page.url.origin}/images/projects/ninacarducci/nina.png"
                     alt="moi - Nina Carducci"
                     width="560"
                     height="558"
@@ -599,13 +599,13 @@ id="nina-carducci"
                                 >
                                     <img
                                     srcset="
-                                    {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}-424.jpg 424w,
-                                    {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}-364.jpg 364w,
-                                    {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}-304.jpg 304w,
-                                    {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}-224.jpg 224w,
-                                    {$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}-254.jpg 254w"
+                                    {$page.url.origin}/images/projects/ninacarducci/gallery/{item.src}-424.jpg 424w,
+                                    {$page.url.origin}/images/projects/ninacarducci/gallery/{item.src}-364.jpg 364w,
+                                    {$page.url.origin}/images/projects/ninacarducci/gallery/{item.src}-304.jpg 304w,
+                                    {$page.url.origin}/images/projects/ninacarducci/gallery/{item.src}-224.jpg 224w,
+                                    {$page.url.origin}/images/projects/ninacarducci/gallery/{item.src}-254.jpg 254w"
                                     sizes="(min-width: 1400px) 423px, (min-width: 1200px) 363px, (min-width: 992px) 303px, (min-width: 768px) 223px, (min-width: 576px) 253px, 423px"
-                                    src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{item.src}.jpg"
+                                    src="{$page.url.origin}/images/projects/ninacarducci/gallery/{item.src}.jpg"
                                     alt={item.tag + ' ' + item.alt}
                                     width="424"
                                     height="424"
@@ -628,7 +628,7 @@ id="nina-carducci"
                         transition:scale
                         >
                             <img
-                            src="{$page.url.origin}/src/assets/images/projects/ninacarducci/gallery/{GALLERY_ITEMS[gallery_ELEMENT_TARGET].src}.jpg"
+                            src="{$page.url.origin}/images/projects/ninacarducci/gallery/{GALLERY_ITEMS[gallery_ELEMENT_TARGET].src}.jpg"
                             alt={GALLERY_ITEMS[gallery_ELEMENT_TARGET].alt}
                             width="498"
                             />
@@ -804,25 +804,25 @@ id="nina-carducci"
                 <picture>
                     <source
                     media="(min-width: 1180px)"
-                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png 419w"
+                    srcset="{$page.url.origin}/images/projects/ninacarducci/camera.png 419w"
                     sizes="419px"
                     >
                     <source media="(min-width: 650px)"
-                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-279.png 279w"
+                    srcset="{$page.url.origin}/images/projects/ninacarducci/camera-279.png 279w"
                     sizes="279px"
                     >
                     <source
                     media="(max-width: 650px)"
-                    srcset="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera-159.png 159w"
+                    srcset="{$page.url.origin}/images/projects/ninacarducci/camera-159.png 159w"
                     sizes="159px"
                     >
                     <img
                     srcset="
-                    {$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png 419w,
-                    {$page.url.origin}/src/assets/images/projects/ninacarducci/camera-279.png 279w,
-                    {$page.url.origin}/src/assets/images/projects/ninacarducci/camera-159.png 159w"
+                    {$page.url.origin}/images/projects/ninacarducci/camera.png 419w,
+                    {$page.url.origin}/images/projects/ninacarducci/camera-279.png 279w,
+                    {$page.url.origin}/images/projects/ninacarducci/camera-159.png 159w"
                     sizes="(min-width: 1180px) 418px, (min-width: 650px) 279px, 158px"
-                    src="{$page.url.origin}/src/assets/images/projects/ninacarducci/camera.png"
+                    src="{$page.url.origin}/images/projects/ninacarducci/camera.png"
                     alt="Caméra"
                     width="419"
                     height="418"
