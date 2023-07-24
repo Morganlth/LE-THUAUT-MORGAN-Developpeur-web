@@ -249,7 +249,6 @@
 
         function cardcontainer_setDecagon()
         {
-            console.log('set decagon')
             let [tZ, tX, rY] = [-cardcontainer_RADIUS, 0, 0]
 
             for (let i = 0; i < CARD_CARDS.length; i++)
@@ -292,6 +291,8 @@
 
             project_destroyEventDesktop()
             project_destroyEventMobile()
+
+            console.log('destroy')
         }
 
         function project_destroyEventDesktop() { event.event_remove('wheel', project_wheel) }
@@ -311,8 +312,6 @@
         async function project_scroll()
         {
             const NOW = +new Date()
-
-            console.log('scroll')
 
             if (NOW > project_LAST + 200)
                 event.main_scrollTop >= project_OFFSETTOP - canvas_SIZE
