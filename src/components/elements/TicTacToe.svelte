@@ -236,10 +236,10 @@ lang="scss"
     {
         @include grid(calc(100% / 3), calc(100% / 3), 3, 3);
 
-        --icon-size: 20px;
+        --icon-size: 18px;
 
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
 
         border-right: solid 1px;
         border-bottom: solid 1px;
@@ -248,10 +248,10 @@ lang="scss"
 
         @include media-min(375px, 325px)
         {
-            --icon-size: 25px;
+            --icon-size: 24px;
 
-            width: 150px;
-            height: 150px;
+            width: 140px;
+            height: 140px;
         }
         @include media-min(425px, 585px)
         {

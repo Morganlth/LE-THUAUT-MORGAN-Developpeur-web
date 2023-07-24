@@ -36,7 +36,6 @@
         // --ELEMENT-PRESENTATION
         const
         PRESENTATION_ID = 1,
-        PRESENTATION_BLOCKSIZE = 40,
         PRESENTATION_PARAMS =
         [
             {
@@ -60,13 +59,6 @@
         ],
         PRESENTATION_MODES =
         [
-            {
-                on: false,
-                name: 'none',
-                text: false,
-                snake: false,
-                content: 'AUCUN'
-            },
             {
                 on: false,
                 name: 'read',
@@ -127,7 +119,9 @@
         let event_GRABBING = event.event_GRABBING
 
         // --ELEMENT-PRESENTATION
-        let presentation
+        let
+        presentation,
+        presentation_BLOCKSIZE = 40
 
         // --ELEMENT-TAG
         let
@@ -176,6 +170,7 @@
         {
             tag_set()
     
+            presentation_setVar()
             presentation_setCommand()
             presentation_setEvent()
             presentation_setRouter()
@@ -196,6 +191,8 @@
                 })
             })
         }
+
+        function presentation_setVar() { presentation_BLOCKSIZE = wwindow.window_testSmallScreen() ? 30 : presentation_BLOCKSIZE }
 
         function presentation_setCommand()
         {
@@ -251,7 +248,7 @@
 
         function tag_getGap()
         {
-            const HEIGHT = window.innerHeight - PRESENTATION_BLOCKSIZE * 3
+            const HEIGHT = window.innerHeight - presentation_BLOCKSIZE * 3
 
             return (HEIGHT - TAG_ELEMENTS.reduce((a, tag) => a += tag.height, 0)) / (TAG_ELEMENTS.length - 1)
         }
@@ -279,6 +276,18 @@
         }
 
         // --UPDATE
+        function presentation_updateVar(smallScreen)
+        {
+            const SIZE = smallScreen ? 30 : 40
+
+            if (presentation_BLOCKSIZE !== SIZE)
+            {
+                if (localStorage.getItem('snake_size') == presentation_BLOCKSIZE) app.app_COMMANDS['snake_size'](SIZE)
+
+                presentation_BLOCKSIZE = SIZE
+            }
+        }
+
         function presentation_updateParam(name, on)
         {
             const PARAM = presentation_getParam(name)
@@ -451,12 +460,14 @@
         {
             if (this !== 'fps')
             {
-                const MODE = presentation_getMode(...(this === 'text' ? [!presentation_$TEXT] : [null, !presentation_$SNAKE]))
-        
-                presentation_updateMode(MODE, false)
+                const [TEXT_ON, SNAKE_ON] = this === 'text'
+                ? [!presentation_$TEXT, !presentation_$TEXT ? presentation_$SNAKE : true]
+                : [!presentation_$SNAKE ? presentation_$TEXT : true, !presentation_$SNAKE]
+
+                presentation_updateMode(presentation_getMode(TEXT_ON, SNAKE_ON), false)
+                presentation_updateParamPair(TEXT_ON, SNAKE_ON)
             }
-    
-            presentation_updateParam(this)
+            else presentation_updateParam(this)
         }
 
         async function presentation_click_mode()
@@ -466,12 +477,13 @@
             presentation_updateMode(this, true)
         }
 
-        async function presentation_resize()
+        async function presentation_resize(smallScreen)
         {
             router.router_updatePageStart(PRESENTATION_ID, presentation_getOffset())
 
             tag_reset()
 
+            presentation_updateVar(smallScreen)
             presentation_updateText(presentation_$TEXT)
 
             if (snake_test()) snake_updateEvent(true)
@@ -519,10 +531,10 @@
         // --TESTS
         function tag_testPosition(size, tagSize, coord)
         {
-            if (coord < PRESENTATION_BLOCKSIZE) coord = PRESENTATION_BLOCKSIZE
+            if (coord < presentation_BLOCKSIZE) coord = presentation_BLOCKSIZE
             else
             {
-                const TOTAL = coord + tagSize + PRESENTATION_BLOCKSIZE
+                const TOTAL = coord + tagSize + presentation_BLOCKSIZE
 
                 if (TOTAL > size) coord -= TOTAL - size
             }
@@ -539,11 +551,11 @@
         {
             const GAP = tag_getGap()
 
-            let y = PRESENTATION_BLOCKSIZE * 1.5
+            let y = presentation_BLOCKSIZE * 1.5
 
             for (const TAG of TAG_ELEMENTS)
             {
-                const X = Math.random() * (window.innerWidth - TAG.width - PRESENTATION_BLOCKSIZE * 2) + PRESENTATION_BLOCKSIZE
+                const X = Math.random() * (window.innerWidth - TAG.width - presentation_BLOCKSIZE * 2) + presentation_BLOCKSIZE
         
                 TAG.show(X, y)
 
@@ -558,8 +570,8 @@
             for (const TAG of TAG_ELEMENTS)
             {
                 const
-                X = (window.innerWidth - TAG.width - PRESENTATION_BLOCKSIZE * 2) / 2 + window.innerWidth * i++,
-                Y = Math.random() * (window.innerHeight - TAG.height - PRESENTATION_BLOCKSIZE * 4) + PRESENTATION_BLOCKSIZE * 2
+                X = (window.innerWidth - TAG.width - presentation_BLOCKSIZE * 2) / 2 + window.innerWidth * i++,
+                Y = Math.random() * (window.innerHeight - TAG.height - presentation_BLOCKSIZE * 4) + presentation_BLOCKSIZE * 2
         
                 TAG.show(X, Y)
             }
@@ -607,8 +619,8 @@ on:click={presentation_click}
         {#if tag_FONTCHARGED}
             {#each TAG_ELEMENTS as tag}
                 <Tag
-                _blockSize={PRESENTATION_BLOCKSIZE}
-                _max_width="calc(100vw - {PRESENTATION_BLOCKSIZE * 3}px)"
+                _blockSize={presentation_BLOCKSIZE}
+                _max_width="calc(100vw - {presentation_BLOCKSIZE * 3}px)"
                 _dark={_colors.dark}
                 bind:width={tag.width}
                 bind:height={tag.height}
@@ -632,7 +644,7 @@ on:click={presentation_click}
             class="super-tag"
             >
                 <Tag
-                _blockSize={PRESENTATION_BLOCKSIZE}
+                _blockSize={presentation_BLOCKSIZE}
                 _center={true}
                 _dark={_colors.dark}
                 bind:tag_reset={TAG_GAMEOVER.reset}
@@ -653,7 +665,7 @@ on:click={presentation_click}
             class="super-tag"
             >
                 <Tag
-                _blockSize={PRESENTATION_BLOCKSIZE}
+                _blockSize={presentation_BLOCKSIZE}
                 _center={true}
                 _dark={_colors.dark}
                 bind:tag_reset={TAG_MOBILE.reset}
@@ -676,7 +688,7 @@ on:click={presentation_click}
     _challenge={presentation_$CHALLENGE}
     _gameover={{ on: TAG_GAMEOVER.on, update: gameover_update }}
     _invincible={snake_INVINCIBLE}
-    _blockSize={PRESENTATION_BLOCKSIZE}
+    _blockSize={presentation_BLOCKSIZE}
     {_colors}
     bind:snake_SCORE={snake_SCORE}
     bind:snake_TAIL={snake_TAIL}
@@ -688,7 +700,7 @@ on:click={presentation_click}
 
     <div
     class="frame"
-    style:padding="30px {PRESENTATION_BLOCKSIZE}px"
+    style:padding="30px {presentation_BLOCKSIZE}px"
     >
         <p
         class="score"
@@ -710,7 +722,6 @@ on:click={presentation_click}
             on:click={options_click}
             >
                 <Icon
-                _size="18px"
                 _color={_colors.sLight}
                 >
                     <Side />
@@ -723,7 +734,6 @@ on:click={presentation_click}
                 on:click={mobile_clickCross}
                 >
                     <Icon
-                    _size="18px"
                     _color={_colors.sLight}
                     >
                         <Cross />
@@ -736,7 +746,7 @@ on:click={presentation_click}
         <div
         class="options"
         style:transform="translateX({frame_TRANSLATEX}%)"
-        style:padding="{PRESENTATION_BLOCKSIZE * 2}px {PRESENTATION_BLOCKSIZE}px"
+        style:padding="{presentation_BLOCKSIZE * 2}px {presentation_BLOCKSIZE}px"
         on:mouseleave={options_mouseLeave}
         >
             <nav>
@@ -832,21 +842,20 @@ lang="scss"
                 letter-spacing: 10vh;
             }
 
-            h2
-            {
-                @include h-2($o-primary);
-
-                padding-right: 30px;
-
-                white-space: nowrap;
-            }
+            h2 { @include h-2($o-primary, 1.4); }
 
             .content
             {
-                margin: 10px 0 0 30px;
-                padding: 10px 0 0 30px;
+                margin-left: 10px;
+                padding: 4px 0 0 10px;
 
                 border-top: solid 1px $o-primary;
+
+                @include media-min(425px)
+                {
+                    margin-left: 30px;
+                    padding: 10px 0 0 30px;
+                }
             }
 
             p
@@ -854,7 +863,6 @@ lang="scss"
                 @include p-content;
 
                 color: $light;
-                user-select: none;
             }
         }
 
@@ -891,6 +899,8 @@ lang="scss"
             {
                 @include flex;
                 @include any-h;
+
+                --icon-size: 14px;
 
                 flex-direction: column-reverse;
                 justify-content: space-between;
@@ -944,8 +954,13 @@ lang="scss"
                 ul { @include any-w; }
 
                 li { margin-bottom: 10px; }
+            }
 
-                @include media-min(768px, 650px)
+            @include media-min(768px, 650px)
+            {
+                .container { --icon-size: 18px; }
+
+                .options
                 {
                     width: auto;
 

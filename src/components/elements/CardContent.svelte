@@ -5,6 +5,9 @@
 
         // --PROPS
         export let
+        _in = null,
+        _out = null,
+        _width,
         _img,
         _desc,
         _color
@@ -13,12 +16,35 @@
 
         // --SVELTE
         import { page } from '$app/stores'
+
+    // #VARIABLES
+
+        // --ELEMENT-CARD-CONTENT
+        let
+        cardcontent_IN = _in ? cardcontent_transition : () => {},
+        cardcontent_OUT = _out ? cardcontent_transition : () => {}
+
+    // #FUNCTION
+
+        // --TRANSITION
+        function cardcontent_transition()
+        {
+            const VALUES = _in ? [0, 1] : [1, 0]
+
+            return {
+                duration: 400,
+                css: (t) => `opacity: ${VALUES[Math.floor(t)]}`
+            }
+        }
 </script>
 
 <!-- #HTML -->
 
 <section
 class="card-content"
+style:width={_width}
+in:cardcontent_IN
+out:cardcontent_OUT
 >
     <div>
         {#if _img}
@@ -48,6 +74,7 @@ lang="scss"
     @use '../../assets/scss/styles/flex' as *;
     @use '../../assets/scss/styles/size' as *;
     @use '../../assets/scss/styles/font' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #CARD-CONTENT */
 
@@ -55,9 +82,8 @@ lang="scss"
     {
         @include f-center(true);
         @include f-column;
-        @include any;
 
-        gap: 20px;
+        gap: 10px;
 
         &>div
         {
@@ -67,11 +93,29 @@ lang="scss"
 
             align-items: flex-end;
 
-            height: 60px;
+            height: 25px;
         }
 
-        img { max-width: 70%; }
+        img
+        {
+            max-width: 70%;
+            max-height: 100%;
+        }
 
-        p { @include p-content; }
+        p
+        {
+            @include p-content;
+
+            padding-inline: 10px;
+
+            text-align: center;
+        }
+
+        @include media-min(768px, 475px)
+        {
+            gap: 20px;
+
+            &>div { height: 50px; }
+        }
     }
 </style>

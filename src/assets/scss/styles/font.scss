@@ -39,24 +39,19 @@ $h-1-sizes: (375px: 36px, 425px: 46px, 768px: 60px, 1024px: 72px, 1440px: 86px);
     @include media-min-map(font-size, $h-1-sizes, 325px);
 }
 
-@mixin h-2($color: $light)
+@mixin h-2($color: $light, $line-height: 1)
 {
-    @include h-($color, 18px);
+    @include h-($color, 18px, $line-height);
 
     @include media-min(768px) { font-size: 24px; }
     @include media-min(1024px) { font-size: 36px; }
 }
 
-@mixin h-3($color: $light)
+@mixin h-3($color: $light, $line-height: 1)
 {
-    @include h-($color, 18px);
+    @include h-($color, 18px, $line-height);
 
     @include media-min(768px) { font-size: 24px; }
-}
-
-@mixin h-4($color: $light)
-{
-    // @include h($color, 24px, 24px);
 }
 
 @mixin p-interact($color: $s-light)
@@ -69,7 +64,7 @@ $h-1-sizes: (375px: 36px, 425px: 46px, 768px: 60px, 1024px: 72px, 1440px: 86px);
     letter-spacing: 1px;
     user-select: none;
 
-    @include media-min(425px, 325px) { font-size: 18px };
+    @include media-min(768px, 425px) { font-size: 18px };
 }
 
 @mixin a-interact
@@ -95,7 +90,7 @@ $h-1-sizes: (375px: 36px, 425px: 46px, 768px: 60px, 1024px: 72px, 1440px: 86px);
     line-height: 1;
 
     @include media-min(425px) { font-size: 18px; }
-    @include media-min(768px) { font-size: 24px; }
+    @include media-min(768px, 475px) { font-size: 24px; }
 }
 
 @mixin p-info($position: bottom)

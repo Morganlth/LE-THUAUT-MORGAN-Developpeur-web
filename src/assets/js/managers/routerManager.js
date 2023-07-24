@@ -5,6 +5,7 @@ class RouterManager
     // #VARIABLES
 
         // --CONTEXT-ROUTER
+        router_TITLE = 'LE THUAUT MORGAN - Développeur Web'
         router_LAST = +new Date()
         router_TIMEOUT = null
         router_PAGES = []
@@ -30,7 +31,12 @@ class RouterManager
             if (PAGE.call) setTimeout(PAGE.call, 100)
         }
 
-        router_setSubPath(id, subPath) { this.router_PAGES[id].subPath = subPath ? '/' + subPath : undefined }
+        router_setSubPath(id, subPath)
+        {
+            this.router_PAGES[id].subPath = subPath ? '/' + subPath : undefined
+
+            document.title = subPath ? subPath.toUpperCase() : this.router_TITLE
+        }
 
         // --UPDATES
         router_update()

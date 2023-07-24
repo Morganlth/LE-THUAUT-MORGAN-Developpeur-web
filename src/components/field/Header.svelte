@@ -10,18 +10,14 @@
 
     // #IMPORTS
 
-        // --SCSS
-        import '../../assets/scss/components/header.scss'
-
         // --SVELTE
         import { page } from '$app/stores'
 
         // --COMPONENT-COVER
         import Icon from '../covers/Icon.svelte'
 
-        // --COMPONENT-ICONS
+        // --COMPONENT-ICON
         import Logo from '../icons/Logo.svelte'
-        import LinkedIn from '../icons/LinkedIn.svelte'
 </script>
 
 <!-- #HTML -->
@@ -33,7 +29,6 @@ style:transform="translateY(-{_translateY ?? 0}%)"
     data-sveltekit-reload
     >
         <Icon
-        _size="30px"
         _href={$page.url.origin}
         _alt="home"
         _color={_iconColor}
@@ -47,15 +42,6 @@ style:transform="translateY(-{_translateY ?? 0}%)"
             . LE THUAUT MORGAN
         </p>
     </div>
-
-    <Icon
-    _size="30px"
-    _href="https://www.linkedin.com/in/le-thuaut-morgan/"
-    _alt="link to my linkedIn profile"
-    _color={_iconColor}
-    >
-        <LinkedIn />
-    </Icon>
 </header>
 
 <!-- #STYLE -->
@@ -81,6 +67,8 @@ lang="scss"
         @include absolute;
         @include any-w;
         @include no-event;
+
+        --icon-size: 25px;
 
         justify-content: space-between;
 
@@ -123,6 +111,7 @@ lang="scss"
             font-weight: 900;
         }
 
-        @include media-min(768px) { padding-inline: 60px; }
+        @include media-min(425px, 650px) { --icon-size: 30px; }
+        @include media-min(768px, 475px) { padding-inline: 60px; }
     }
 </style>

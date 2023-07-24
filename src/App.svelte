@@ -13,10 +13,11 @@
         import './assets/scss/app.scss'
 
         // --CONTEXTS
-        import { app, spring } from './components/field/Main.svelte'
+        import { app, router, spring } from './components/field/Main.svelte'
 
         // --SVELTE
         import { onMount } from 'svelte'
+        import { fade } from 'svelte/transition'
 
         // --COMPONENT-FIELDS
         import Header from './components/field/Header.svelte'
@@ -33,7 +34,9 @@
     // #VARIABLES
 
         // --APP-CONTEXT
-        let app_FREEZE = app.app_FREEZE
+        let
+        app_TRANSITION = app.app_TRANSITION,
+        app_FREEZE = app.app_FREEZE
 
         // --ELEMENT-SPRING
         let
@@ -78,8 +81,8 @@
         function app_testPerformance()
         {
             const MODE = localStorage.getItem('mode')
-            
-            if (MODE !== 'eco' && performance.now() - APP_START > 300) ecopopup_ECO = true
+
+            if (MODE !== 'eco' && performance.now() - APP_START > 400) ecopopup_ECO = true
         }
 
     // #CYCLE
@@ -88,6 +91,10 @@
 </script>
 
 <!-- #HTML -->
+
+<svelte:head>
+    <title>{router.router_TITLE}</title>
+</svelte:head>
 
 <slot>
     <Header
@@ -112,6 +119,14 @@
 
     {#if ecopopup_ECO}
         <EcoPopup />
+    {/if}
+    
+    {#if $app_TRANSITION}
+        <div
+        class="background-transition"
+        transition:fade={{ duration: 300 }}
+        >
+        </div>
     {/if}
 </slot>
 
@@ -139,5 +154,17 @@ lang="scss"
         mix-blend-mode: difference;
 
         circle { fill: $light; }
+    }
+
+    .background-transition
+    {
+        @include xy-start;
+        @include any;
+
+        position: fixed;
+
+        z-index: 4;
+
+        background-color: $dark;
     }
 </style>

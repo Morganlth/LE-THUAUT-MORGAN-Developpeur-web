@@ -35,6 +35,7 @@ lang="scss"
     @use '../../assets/scss/styles/size' as *;
     @use '../../assets/scss/styles/font' as *;
     @use '../../assets/scss/styles/cursor' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #TOGGLE */
 
@@ -67,8 +68,8 @@ lang="scss"
         {
             @include relative;
 
-            width: 30px;
-            height: 16px;
+            width: 24px;
+            height: 12px;
 
             background-color: $dark;
 
@@ -89,6 +90,12 @@ lang="scss"
                 background-color: $secondary;
 
                 transition: transform .4s;
+            }
+
+            @include media-min(768px, 425px)
+            {
+                width: 30px;
+                height: 16px;
             }
         }
     }

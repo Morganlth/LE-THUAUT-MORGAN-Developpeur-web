@@ -6,26 +6,8 @@
         // --SCSS
         import '../../assets/scss/projects/sophiebluel/style.scss'
 
-        // --JS
-        import { filter } from '../../assets/js/projects/sophiebluel/modules/filter'
-        import { login } from '../../assets/js/projects/sophiebluel/modules/login'
-
         // --SVELTE
-        import { onMount } from 'svelte'
         import { page } from '$app/stores'
-
-    // #FUNCTION
-
-        // --SET
-        function set()
-        {
-            filter.set()
-            login.set()
-        }
-
-    // #CYCLE
-
-    onMount(set)
 </script>
 
 <!-- #HTML -->
@@ -34,8 +16,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap" rel="stylesheet">
-
-    <title>Sophie Bluel - Architecte d'intérieur</title>
 </svelte:head>
 
 <div
@@ -93,12 +73,70 @@ id="sophie-bluel"
                 <!--* Ajout d'une liste contenant l'ensemble des filtres -->
 
                 <ul id="js-filter-module" class="flex js-module">
-                    <li><button data-action-id="0" class="active" type="button">Tous</button></li>
+					<li><button data-action-id="0" class="active" type="button">Tous</button></li>
+				    <li><button data-action-id="1" type="button">Objets</button></li>
+                    <li><button data-action-id="2" type="button">Appartements</button></li>
+                    <li><button data-action-id="3" type="button">Hotels &amp; restaurants</button></li>
                 </ul>
 
                 <!--* Suppression des éléments présent dans la gallery => import via le serveur -->
         
-                <div class="gallery"></div>
+                <div class="gallery">
+                    <figure data-work-id="1">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/abajour-tahina1651286843956.png" alt="Abajour Tahina" crossorigin="">
+                        <figcaption>Abajour Tahina</figcaption>
+                    </figure>
+                    
+                    <figure data-work-id="2">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/appartement-paris-v1651287270508.png" alt="Appartement Paris V" crossorigin="">
+                        <figcaption>Appartement Paris V</figcaption>
+                    </figure>
+                    
+                    <figure data-work-id="3">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/restaurant-sushisen-londres1651287319271.png" alt="Restaurant Sushisen - Londres" crossorigin="">
+                        <figcaption>Restaurant Sushisen - Londres</figcaption>
+                    </figure>
+                    
+                    <figure data-work-id="4">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/la-balisiere1651287350102.png" alt="Villa “La Balisiere” - Port Louis" crossorigin="">
+                        <figcaption>Villa “La Balisiere” - Port Louis</figcaption>
+                    </figure>
+                    
+                    <figure data-work-id="5">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/structures-thermopolis1651287380258.png" alt="Structures Thermopolis" crossorigin="">
+                        <figcaption>Structures Thermopolis</figcaption>
+                    </figure>
+                    
+                    <figure data-work-id="6">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/appartement-paris-x1651287435459.png" alt="Appartement Paris X" crossorigin="">
+                        <figcaption>Appartement Paris X</figcaption>
+                    </figure>
+                    
+                    <figure data-work-id="7">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/le-coteau-cassis1651287469876.png" alt="Pavillon “Le coteau” - Cassis" crossorigin="">
+                        <figcaption>Pavillon “Le coteau” - Cassis</figcaption>
+                    </figure>
+                    
+                    <figure data-work-id="8">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/villa-ferneze1651287511604.png" alt="Villa Ferneze - Isola d’Elba" crossorigin="">
+                        <figcaption>Villa Ferneze - Isola d’Elba</figcaption>
+                    </figure>
+        
+                    <figure data-work-id="9">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/appartement-paris-xviii1651287541053.png" alt="Appartement Paris XVIII" crossorigin="">
+                        <figcaption>Appartement Paris XVIII</figcaption>
+                    </figure>
+                    
+                    <figure data-work-id="10">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/bar-lullaby-paris1651287567130.png" alt="Bar “Lullaby” - Paris" crossorigin="">
+                        <figcaption>Bar “Lullaby” - Paris</figcaption>
+                    </figure>
+                    
+                    <figure data-work-id="11">
+                        <img src="{$page.url.origin}/src/assets/images/projects/sophiebluel/gallery/hotel-first-arte-new-delhi1651287605585.png" alt="Hotel First Arte - New Delhi" crossorigin="">
+                        <figcaption>Hotel First Arte - New Delhi</figcaption>
+                    </figure>
+                </div>
             </section>
     
             <section id="contact">

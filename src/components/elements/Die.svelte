@@ -446,10 +446,18 @@ lang="scss"
 >
     /* #USE */
 
+    @use 'sass:math';
+
     @use '../../assets/scss/styles/grid' as *;
     @use '../../assets/scss/styles/flex' as *;
     @use '../../assets/scss/styles/size' as *;
     @use '../../assets/scss/styles/cursor' as *;
+    @use '../../assets/scss/styles/media' as *;
+
+    /* #VARIABLES */
+
+    $die-size-min: 60px;
+    $die-size-max: 90px;
 
     /* #DIE */
 
@@ -460,8 +468,8 @@ lang="scss"
 
         z-index: 3;
 
-        width: 90px;
-        height: 90px;
+        width: $die-size-min;
+        height: $die-size-min;
 
         padding: 15px;
 
@@ -491,29 +499,23 @@ lang="scss"
                 font-size: 30px;
                 user-select: none;
             }
-            .side:nth-child(1)
+            .side:nth-child(1) { transform: translateZ(math.div($die-size-min, 2)); }
+            .side:nth-child(2) { transform: translateY(-150%) rotateX(-90deg); }
+            .side:nth-child(3) { transform: translate(-50%, -200%) rotateY(90deg); }
+            .side:nth-child(4) { transform: translateY(-250%) rotateX(90deg); }
+            .side:nth-child(5) { transform: translate(50%, -400%) rotateY(-90deg); }
+            .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$die-size-min, 2)); }
+        }
+
+        @include media-min(768px)
+        {
+            width: $die-size-max;
+            height: $die-size-max;
+
+            .die-3d
             {
-                transform: translateZ(45px);
-            }
-            .side:nth-child(2)
-            {
-                transform: translateY(-150%) rotateX(-90deg);
-            }
-            .side:nth-child(3)
-            {
-                transform: translate(-50%, -200%) rotateY(90deg);
-            }
-            .side:nth-child(4)
-            {
-                transform: translateY(-250%) rotateX(90deg);
-            }
-            .side:nth-child(5)
-            {
-                transform: translate(50%, -400%) rotateY(-90deg);
-            }
-            .side:nth-child(6)
-            {
-                transform: translateY(-500%) translateZ(-45px);
+                .side:nth-child(1) { transform: translateZ(math.div($die-size-max, 2)); }
+                .side:nth-child(6) { transform: translateY(-500%) translateZ(math.div(-$die-size-max, 2)); }
             }
         }
     }

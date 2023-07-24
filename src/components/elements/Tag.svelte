@@ -149,7 +149,7 @@ lang="scss"
 >
     /* #USE */
 
-    @use '../../assets/scss/styles/position.scss' as *;
+    @use '../../assets/scss/styles/position' as *;
 
     /* #TAG */
 
@@ -158,8 +158,6 @@ lang="scss"
         @include absolute;
 
         display: inline-block;
-
-        padding: 10px 20px;
 
         transition: transform .1s;
 

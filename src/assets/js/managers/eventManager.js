@@ -116,7 +116,7 @@ class EventManager
 
         event_run() { for (const func of this) func(...arguments) }
 
-        event_scrollTo(top) { this.main.scrollTo({ top: top, behavior: 'instant' }) }
+        event_scrollTo(top) { (this.main ?? document.querySelector('main')).scrollTo({ top: top, behavior: 'instant' }) }
 }
 
 // #IMPORT

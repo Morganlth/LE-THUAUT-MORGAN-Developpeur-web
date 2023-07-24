@@ -5,6 +5,7 @@ class AppManager
     // #VARIABLES
 
         // --APP-CONTEXT
+        app_TRANSITION
         app_FREEZE
         app_KEYWORDS = ['reset', 'success', 'error', 'fps', 'effect', 'eco']
         app_KEYSTORAGE = ['effect']
@@ -15,6 +16,7 @@ class AppManager
 
     constructor()
     {
+        this.app_TRANSITION = writable(false)
         this.app_FREEZE = writable(false)
 
         this.app_set()

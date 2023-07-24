@@ -8,9 +8,10 @@
         _transform = '',
         _opacity = 1,
         _size = null,
+        _color = '#FFF',
         _href = null,
         _alt = null,
-        _color = '#FFF',
+        _title= null,
         _spring = true
 
     // #IMPORTS
@@ -83,6 +84,7 @@ style:opacity={_opacity}
 style:width={_size ?? 'var(--icon-size, auto)'}
 style:height={_size ?? 'var(--icon-size, auto)'}
 {...(_href ? { href: _href, alt: _alt } : {})}
+{...(_title ? { title: _title } : {})}
 bind:this={icon}
 >
     <slot />
@@ -102,6 +104,8 @@ lang="scss"
     .icon
     {
         @include f-center(true);
+
+        box-sizing: border-box;
 
         transition: opacity .3s;
 

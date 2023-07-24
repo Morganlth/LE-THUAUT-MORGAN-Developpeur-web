@@ -1,24 +1,28 @@
 <!-- #SCRIPT -->
 
 <script>
-    // #IMPORT
+    // #IMPORTS
 
-        // --CONTEXT
-        import { app } from '../field/Main.svelte'
+        // --CONTEXTS
+        import { app, spring } from '../field/Main.svelte'
 
     // #VARIABLES
+
+        // --SPRING-CONTEXT
+        let spring_ON = spring.spring_ON
 
         // --ELEMENT-POPUP
         let
         ecopopup_POPUP,
-        ecopopup_OPACITY = 1,
-        ecopopup_BLUR = 20
+        ecopopup_OPACITY = 1
 
     // #FUNCTIONS
 
         // --SET
         function ecopopup_setMode()
         {
+            if (!this) spring.spring_ON = spring_ON
+    
             app.app_eco(this)
             
             ecopopup_clear()
@@ -28,76 +32,62 @@
         function ecopopup_clear()
         {
             ecopopup_OPACITY = 0
-            ecopopup_BLUR = 0
 
             setTimeout(() => ecopopup_POPUP.remove(), 1000)
         }
+
+    // #CODE
+
+        // --SPRING-CONTEXT
+        spring.spring_ON = false
 </script>
 
 <!-- #HTML -->
 
 <div
 class="eco-popup"
-style:--blur="blur({ecopopup_BLUR}px)"
 style:opacity={ecopopup_OPACITY}
 bind:this={ecopopup_POPUP}
 >
     <section>
         <h3>
-            RESSOURCES LIMITÉES :/
+            RESSOURCES LIMITÉES
         </h3>
 
         <figure
         class="content"
         >
-            <p>Votre machine ne permet pas une expérience optimale.</p>
-        <br>
-            <p>
-                Je vous conseille de passer en mode <strong>économique</strong>.
-                <br>
-                Certains paramètres seront désactivées pour amméliorer les performances de la page.
-                <br>
-                Si vous passer en mode <strong>économique</strong>, ce message d'alerte ne s'affichera plus lors de vos prochains passages.
-            </p>
-        <br>
-            <p>
-                Vous pouvez retrouver les paramètres modifier dans la Console.
-                <br>
-                La commande
-    
-                <strong
-                class="command"
-                >
-                    <span>app</span>
-                    <span>clear</span>
-                </strong>
+            <section>
+                <h4>- MODE ÉCONOMIQUE</h4>
 
-                est automatiquement écrite pour vous permettre de nettoyer rapidement la Console.
-                <br>
-                Pour éxécuter la commande
-                
-                <strong
-                class="command"
-                >
-                    <span>app</span>
-                    <span>clear</span>
-                </strong>
+                <p>Votre machine ne permet pas une expérience optimale.</p>
     
-                faites un click droit sur la texte et appuyez sur la touche Entrée.
-            </p>
-        <br>
-            <p>
-                Si vous souhaitez redéfinir les paramètres par défaut, vous pouvez passer par la commandes
-                
-                <strong
-                class="command"
-                >
-                    <span>app</span>
-                    <span>reset</span></strong>.
-                <br>
-                Vous retrouvez la liste des commandes dans la section <strong>commande</strong> de la Console.
-            </p>
-        <br>
+                <p>
+                    Je vous conseille de passer en mode <strong>économique</strong>.
+                    <br>
+                    Certains paramètres seront désactivés pour améliorer les performances de la page.
+                    <br>
+                    Si vous passez en mode <strong>économique</strong>, ce message d'alerte ne s'affichera plus lors de vos prochains passages.
+                </p>
+    
+                <h4>- LA CONSOLE</h4>
+    
+                <p>
+                    Si vous souhaitez redéfinir les paramètres par défaut, vous pouvez passer par la commande
+                    
+                    <strong
+                    class="command"
+                    >
+                        <span>app</span>
+                        <span>reset</span>
+                    </strong>
+                    
+                    dans la <strong>Console</strong> (selon les tailles d'écrans la <strong>Console</strong> n'est pas toujours affichée).
+                    <br>
+                    Vous retrouvez la liste des commandes dans la section <strong>commande</strong> de la <strong>Console</strong>.
+                </p>
+            </section>
+
             <figcaption>- LE THUAUT MORGAN -</figcaption>
         </figure>
 
@@ -136,55 +126,62 @@ lang="scss"
     @use '../../assets/scss/styles/background' as *;
     @use '../../assets/scss/styles/font' as *;
     @use '../../assets/scss/styles/cursor' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #ECOPOPUP */
 
     .eco-popup
     {
-        @include flex;
+        @include f-center(true);
         @include f-column;
-        @include f-center;
         @include xy-start;
         @include any;
-        @include black-glass(var(--blur));
+        @include black-glass(hue-rotate(180deg) blur(20px));
 
         position: fixed;
 
-        transition: backdrop-filter 1s, opacity 1s;
+        padding-top: 40px;
 
-        section
+        box-sizing: border-box;
+
+        transition: backdrop-filter .2s, opacity .4s;
+
+        &>section { width: 95%; }
+
+        h3
         {
-            width: 70%;
+            @include h-($secondary, 18px, 1.2);
 
-            padding: 50px 60px;
-
-            box-sizing: border-box;
+            text-align: right;
         }
 
-        h3 { @include h-($light, 48px, 48px); }
+        h4 { @include h-($light, 16px, 1.2); }
 
-        .content
-        {
-            margin: 50px 0 40px 5%;
-            padding: 0 50px;
+        .content { margin-block: 8px; }
     
+        .content>section
+        {
+            padding-inline: 15px;
+
             border-left: solid $secondary 2px;
 
             box-sizing: border-box;
         }
 
-        p,
-        figcaption
+        p, figcaption
         {
             @include f-content;
 
-            font-size: 18px;
+            font-size: 11px;
             font-weight: 100;
-            line-height: 22px;
+            line-height: 1.2;
+            text-align: justify;
         }
         p
         {
             @include f-content;
+
+            margin-bottom: 8px;
 
             color: $light;
         }
@@ -209,11 +206,14 @@ lang="scss"
             @include p-interact;
             @include pointer;
     
-            padding: 8px 15px;
+            margin-bottom: 8px;
+            padding: 4px 8px;
     
             background-color: transparent;
 
             box-sizing: border-box;
+
+            @include media-min(425px, 325px) { padding: 8px 15px; }
         }
         button:nth-child(1)
         {
@@ -228,6 +228,55 @@ lang="scss"
             border: solid $secondary 1px;
     
             &:hover { color: $secondary; }
+        }
+
+        @include media-min(false, 375px)
+        {
+            h3
+            {
+                font-size: 24px;
+                line-height: 1.3;
+                text-align: left;
+            }
+
+            h4 { margin-bottom: 6px; }
+        }
+        @include media-min(375px, 768px)
+        {
+            &>section { width: 90%; }
+
+            h3 { font-size: 34px; }
+
+            h4
+            {
+                @include h-3($light);
+
+                margin-bottom: 8px;
+            }
+
+            p, figcaption
+            {
+                font-size: 18px;
+                line-height: 1.3;
+            }
+        }
+        @include media-min(768px, 768px)
+        {
+            h3 { font-size: 48px; }
+
+            p { margin-bottom: 15px; }
+
+            .content
+            {
+                margin-block: 50px 40px;
+                margin-left: 5%;
+            }
+
+            .content>section { padding-inline: 50px; }
+        }
+        @include media-min(1440px, 768px)
+        {
+            &>section { width: 50%; }
         }
     }
 </style>

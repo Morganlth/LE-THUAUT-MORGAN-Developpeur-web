@@ -15,20 +15,29 @@
 
         // --CONTEXTS
         import { app, event, wwindow, router } from '../field/Main.svelte'
+        import { orbit_custom } from './Competence.svelte'
 
         // --SVELTE
-        import { onMount, onDestroy } from 'svelte'
+        import { page } from '$app/stores'
+        import { onMount, onDestroy, tick } from 'svelte'
+        import { fade } from 'svelte/transition'
 
         // --COMPONENT-PAGES
         import Booki from '../pages/Booki.svelte'
         import SophieBluel from '../pages/SophieBluel.svelte'
         import NinaCarducci from '../pages/NinaCarducci.svelte'
 
-        // --COMPONENT-COVER
+        // --COMPONENT-COVERS
         import Card from '../covers/Card.svelte'
+        import Cell from '../covers/Cell.svelte'
+        import Icon from '../covers/Icon.svelte'
 
         // --COMPONENT-ELEMENT
         import CardContent from '../elements/CardContent.svelte'
+
+        // --COMPONENT-ICONS
+        import Molecule from '../icons/Molecule.svelte'
+        import Github from '../icons/Github.svelte'
 
     // #CONSTANTE
 
@@ -347,10 +356,22 @@
             {
                 clearTimeout(card_TIMEOUT)
     
-                app.app_FREEZE.set(detail.on)
+                tick().then(() => app.app_FREEZE.set(detail.on))
 
                 detail.on ? card_show() : card_hide()
             }
+        }
+
+        function content_clickCompetence()
+        {
+            app.app_TRANSITION.set(true)
+
+            setTimeout(() =>
+            {
+                orbit_custom(this.subPath)
+
+                app.app_TRANSITION.set(false)
+            }, 400)
         }
 
         // --ROUTER-CALL
@@ -449,6 +470,8 @@
         {
             [card_SHOW, card_SCALE] = [true, 1 / card_RATIO]
 
+            event.event_scrollTo(project_OFFSETTOP)
+
             project_MOBILE ? project_destroyEventMobile()  : project_destroyEventDesktop()
             track_set(true)
 
@@ -529,6 +552,8 @@ on:touchstart={project_touchStart}
                     >
                         {#if !card.on}
                             <CardContent
+                            _in={true}
+                            _width="100%"
                             _img={card.img}
                             _desc={card.desc}
                             _color={_colors.sLight}
@@ -547,7 +572,40 @@ on:touchstart={project_touchStart}
                     <div
                     class="card"
                     >
+                        <div
+                        class="card-info"
+                        transition:fade={{ duration: 200 }}
+                        >
+                            <nav>
+                                <Cell
+                                _style="border: none; cursor: pointer;"
+                                on:click={content_clickCompetence.bind(card)}
+                                >
+                                    <Icon
+                                    _color={_colors.light}
+                                    _title="Voir les compétences associées..."
+                                    >
+                                        <Molecule />
+                                    </Icon>
+                                </Cell>
+
+                                <Icon
+                                _href={'#'}
+                                _alt="#"
+                                >
+                                    <Github />
+                                </Icon>
+                            </nav>
+
+                            <p>
+                                Ce projet est issue de la Formation OpenClassrooms, la version ci-dessous est une adaptation de ce projet pour se greffer au site [{$page.url.hostname}],
+                                vous retrouverez le code original en lien sur mon github.
+                            </p>
+                        </div>
+        
                         <CardContent
+                        _out={true}
+                        _width="calc({cardcontainer_WIDTH}px - 2vw)"
                         _img={card.img}
                         _desc={card.desc}
                         _color={_colors.light}
@@ -578,6 +636,7 @@ lang="scss"
     @use '../../assets/scss/styles/size' as *;
     @use '../../assets/scss/styles/font' as *;
     @use '../../assets/scss/styles/cursor' as *;
+    @use '../../assets/scss/styles/media' as *;
 
     /* #PROJECT */
 
@@ -665,6 +724,7 @@ lang="scss"
 
             .card
             {
+                @include f-center(true);
                 @include absolute;
                 @include any-w;
                 @include no-event;
@@ -674,8 +734,61 @@ lang="scss"
 
                 height: 100vh;
             }
+
+            .card-info
+            {
+                @include flex;
+                @include f-column;
+                @include xy-start(true);
+                @include any;
+
+                --icon-size: 25px;
+
+                justify-content: space-between;
+                align-items: flex-end;
+
+                gap: 20px;
+
+                padding: 20px;
+
+                box-sizing: border-box;
+
+                nav
+                {
+                    @include flex;
+                    @include any-w;
+
+                    justify-content: space-between;
+                    align-items: flex-end;
+                }
+    
+                p
+                {
+                    @include f-content;
+
+                    width: 50%;
+    
+                    color: $s-light;
+                    font-size: 12px;
+                    text-align: justify;
+
+                    pointer-events: auto;
+
+                    &:hover { color: $light; }
+
+                    @include media-min(768px, 475px)
+                    {
+                        width: 10%;
+        
+                        font-size: 18px;
+                    }
+                }
+
+                @include media-min(425px, 650px) { --icon-size: 30px; }
+                @include media-min(768px, 475px) { padding-inline: 60px; }
+            }
         }
 
-        &>p { @include p-info; }
+        &>p { @include p-info }
     }
 </style>

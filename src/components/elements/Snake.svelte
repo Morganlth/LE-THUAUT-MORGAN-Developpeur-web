@@ -108,7 +108,7 @@
 
         function snake_setCommand() { app.app_add('snake_size', snake_size, true) }
 
-        function snake_setEvent() { event.event_add('resize', snake_resize) }
+        function snake_setEvent() { event.event_addSeveral({ mouseDown: snake_mouseDown, resize: snake_resize }) }
 
         function snake_setEventDesktop() { event.event_addSeveral({ scroll: snake_scroll, mouseMove: snake_mouseMove }) }
 
@@ -248,6 +248,7 @@
         // --DESTROY
         function snake_destroy()
         {
+            event.event_remove('mouseDown', snake_mouseDown)
             event.event_remove('resize', snake_resize)
 
             snake_destroyEventDesktop()
@@ -289,7 +290,16 @@
             snake_move()
         }
 
-        function snake_mouseLeave(e)
+        async function snake_mouseDown({clientX, clientY})
+        {
+            if (snake_ON || snake_MOBILE) return
+    
+            ;[window_CLIENTX, window_CLIENTY] = [clientX, clientY]
+
+            snake_updateCoords()
+        }
+
+        async function snake_mouseLeave(e)
         {
             const target = e.relatedTarget
     

@@ -47,7 +47,8 @@
                     for (let i = CLOUD_CLOUDS.length - 1; i >= MIN; i--) CLOUD_CLOUDS.pop()
             }
             else
-                for (let i = CLOUD_CLOUDS.length; i < (smallScreen || wwindow.window_testMobile() ? MIN : MAX); i++) CLOUD_CLOUDS.push(i % 2 === 0 ? -1 : 1)
+                for (let i = CLOUD_CLOUDS.length; i < (smallScreen || wwindow.window_testMobile() ? MIN : MAX); i++)
+                    CLOUD_CLOUDS.push({ key: i, value:( i % 2 === 0 ? -1 : 1) })
         }
 
         // --DESTROY
@@ -67,9 +68,9 @@
 <div
 class="sky"
 >
-    {#each CLOUD_CLOUDS as direction}
+    {#each CLOUD_CLOUDS as cloud (cloud.key)}
         <Cloud
-        _direction={direction}
+        _direction={cloud.value}
         _translateX={_translateX}
         {_colors}
         />

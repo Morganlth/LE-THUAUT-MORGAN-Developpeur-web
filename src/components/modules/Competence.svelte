@@ -1,5 +1,24 @@
 <!-- #SCRIPT -->
 
+<script
+context="module"
+>
+    // #EXPORT
+
+        // --MODULE
+        export function orbit_custom(tag) { orbit_CUSTOM.set(tag) }
+
+    // #IMPORT
+
+        // --SVELTE
+        import { writable } from 'svelte/store'
+
+    // #VARIABLE
+
+        // --ELEMENT-ORBIT
+        export let orbit_CUSTOM = writable(false)
+</script>
+
 <script>
     // #EXPORT
 
@@ -28,21 +47,50 @@
         // --ELEMENT-COMPETENCE
         const
         COMPETENCE_ID = 2,
-        COMPETENCE_DURATION = 900
+        COMPETENCE_DURATION = 900,
+        COMPETENCE_SKILLS =
+        [
+            [
+                { text: 'découper, assembler et intégrer tous les éléments d’une maquette graphique en HTML5 et CSS', tags: ['booki'] },
+                { text: 'ajouter du contenu audio et vidéo en HTML5' },
+                { text: 'animer les pages web avec CSS3' },
+                { text: 'construire un projet impliquant SCSS et SASS' }
+            ],
+            [
+                { text: 'faire réagir la page web en fonction des actions de l’utilisateur en JavaScript' },
+                { text: 'se connecter à un service web pour exploiter des données tierces (API)' },
+                { text: 'gérer les comptes utilisateurs' },
+                { text: 'animer les pages web avec JavaScript' },
+                { text: 'concevoir un site maintenable grâce à la gestion des erreurs et exceptions' },
+                { text: 'construire des algorithmes' },
+                { text: 'utiliser le framework React' },
+                { text: 'développer un projet sous Svelte' }
+            ],
+            [
+                { text: 'créer un nouveau projet NodeJS impliquant diverses dépendances (Express, MongoDB, jsonwebtoken...)' },
+                { text: 'gérer les comptes utilisateurs' },
+                { text: 'créer, gérer et afficher le contenu d’une base de données' },
+                { text: 'créer des API (REST)' },
+                { text: 'construire un projet avec SvelteKit' }
+            ],
+            [
+                { text: 'appliquer les standards du web et les normes en vigueur', tags: ['booki'] },
+                { text: 'construire un site web fluide s’adaptant à tout type d’écran (web, smartphone et tablette)', tags: ['booki'] },
+                { text: 'améliorer le référencement naturel en utilisant les balises selon leur sémantique' },
+                { text: 'améliorer les performances et optimiser une page web' },
+                { text: 'appliquer les Schema.org' },
+                { text: 'utiliser les balises meta OPEN GRAPH des réseaux sociaux (og, twitter)' }
+            ]
+        ]
 
         // --ELEMENT-ORBIT
-        const ORBIT_ORBITS =
+        const
+        ORBIT_ORBITS =
         [
             {
                 props: { _id: 0, _rotate: -50 * Math.PI / 180, _offset: 0 },
                 title: ['FRONT', 'FORME - STYLE'],
-                texts:
-                [
-                    'découper, assembler et intégrer tous les éléments d’une maquette graphique en HTML5 et CSS',
-                    'ajouter du contenu audio et vidéo en HTML5',
-                    'animer les pages web avec CSS3',
-                    'construire un projet impliquant SCSS et SASS'
-                ],
+                skills: COMPETENCE_SKILLS[0],
                 thematic: { elements: {} },
                 content: { elements: {} }
             }
@@ -50,17 +98,7 @@
             {
                 props: { _id: 1, _rotate: 80 * Math.PI / 180, _offset: 4.71 },
                 title: ['FRONT', 'JAVASCRIPT'],
-                texts:
-                [
-                    'faire réagir la page web en fonction des actions de l’utilisateur en JavaScript',
-                    'se connecter à un service web pour exploiter des données tierces (API)',
-                    'gérer les comptes utilisateurs',
-                    'animer les pages web avec JavaScript',
-                    'concevoir un site maintenable grâce à la gestion des erreurs et exceptions',
-                    'construire des algorithmes',
-                    'utiliser le framework React',
-                    'développer un projet sous Svelte'
-                ],
+                skills: COMPETENCE_SKILLS[1],
                 thematic: { elements: {} },
                 content: { elements: {} }
             }
@@ -68,14 +106,7 @@
             {
                 props: { _id: 2, _rotate: 40 * Math.PI / 180, _offset: 3.14 },
                 title: ['BACK', 'NODE SERVER'],
-                texts:
-                [
-                    'créer un nouveau projet NodeJS impliquant diverses dépendances (Express, MongoDB, jsonwebtoken...)',
-                    'gérer les comptes utilisateurs',
-                    'créer, gérer et afficher le contenu d’une base de données',
-                    'créer des API (REST)',
-                    'construire un projet avec SvelteKit'
-                ],
+                skills: COMPETENCE_SKILLS[2],
                 thematic: { elements: {} },
                 content: { elements: {} }
             }
@@ -83,19 +114,12 @@
             {
                 props: { _id: 3, _rotate: 10 * Math.PI / 180, _offset: 1.57 },
                 title: ['ADAPTABILITÉ', 'RÉFÉRENCEMENT'],
-                texts:
-                [
-                    'appliquer les standards du web et les normes en vigueur',
-                    'construire un site web fluide s’adaptant à tout type d’écran (web, smartphone et tablette)',
-                    'améliorer le référencement naturel en utilisant les balises selon leur sémantique',
-                    'améliorer les performances et optimiser une page web',
-                    'appliquer les Schema.org',
-                    'utiliser les balises meta OPEN GRAPH des réseaux sociaux (og, twitter)'
-                ],
+                skills: COMPETENCE_SKILLS[3],
                 thematic: { elements: {} },
                 content: { elements: {} }
             }
         ]
+
 
     // #VARIABLES
 
@@ -152,6 +176,7 @@
 
             // --ELEMENT-ORBIT
             $: orbit_animation(orbit_ANIMATE)
+            $: orbit_setCustom($orbit_CUSTOM)
 
     // #FUNCTIONS
 
@@ -191,10 +216,36 @@
             orbit_Y = .01 /* set orbits positions */
         }
 
+        function orbit_setCustom(tag)
+        {
+            if (!tag) return
+
+            const ID = ORBIT_ORBITS.length
+    
+            ORBIT_ORBITS.push(
+            {
+                props: { _id: ID, _rotate: -20 * Math.PI / 180, _offset: .7 },
+                title: [tag.toUpperCase()],
+                skills: comeptence_getSkills(tag),
+                thematic: { elements: {} },
+                content: { elements: {} }
+            }
+            )
+
+            orbit_focus(ID)
+        }
+
         function land_set()
         {
             land_START = land.offsetTop - window.innerHeight * .7
             land_END = land.scrollHeight + land_START - window.innerHeight * 1.75
+        }
+
+        function content_set()
+        {
+            orbit_setList.call(ORBIT_ORBITS[orbit_TARGET].content)
+        
+            wwindow.window_MOBILE ? competence_setEventMobile() : competence_setEventDesktop()
         }
 
         function content_setSubtitle() { this.subtitle = [...this.elements.subtitle.querySelectorAll('.char')] }
@@ -223,7 +274,7 @@
 
             this.elements.lis = []
 
-            for (let i = 0; i < ORBIT_ORBITS[orbit_TARGET].texts.length; i++)
+            for (let i = 0; i < ORBIT_ORBITS[orbit_TARGET].skills.length; i++)
             {
                 const [TRANSLATEX, SPEED] = [Math.random() * WIDTH + WIDTH, Math.random() * 1.5 + .8]
 
@@ -231,6 +282,18 @@
 
                 content_MAX = Math.max(content_MAX, (TRANSLATEX + WIDTH + LIS[i].offsetWidth + 100) / SPEED)
             }
+        }
+
+        // --GET
+        function comeptence_getSkills(tag)
+        {
+            const SKILLS = []
+    
+            for (const ARRAYOFSKILLS of COMPETENCE_SKILLS)
+                for (const SKILL of ARRAYOFSKILLS)
+                    if (SKILL.tags && SKILL.tags.includes(tag)) SKILLS.push(SKILL)
+
+            return SKILLS
         }
 
         // --RESET
@@ -279,14 +342,9 @@
 
         function orbit_update(on)
         {
-            on ? (app.app_FREEZE.set(true), space_RATIO = .3) : (app.app_FREEZE.set(false), space_RATIO = 1)
+            on ? (app.app_FREEZE.set(true), space_RATIO = .3) : app.app_FREEZE.set(false)
 
-            tick().then(() => on
-            ? (orbit_setList.call(ORBIT_ORBITS[orbit_TARGET].content),
-                wwindow.window_MOBILE
-                ? competence_setEventMobile()
-                : competence_setEventDesktop())
-            : competence_updateElement())
+            tick().then(() => on ? content_set() : content_destroy())
         }
 
         function orbit_updateLetter(e, x, y, z) { e.style.transform = `translate3d(${x ?? 0}px, ${y ?? 0}px, ${z ?? 0}px)` }
@@ -304,7 +362,7 @@
 
             content_TRANSLATEX += value
 
-            if (content_TRANSLATEX > content_MAX || content_TRANSLATEX < 0) content_destroy()
+            if (content_TRANSLATEX > content_MAX || content_TRANSLATEX < 0) orbit_click({ detail: { id: null } })
         }
 
         function content_updateMobile(now, clientX)
@@ -329,11 +387,28 @@
 
         function competence_destroyEventMobile() { event.event_remove('touchMove', competence_touchMove) }
 
+        function orbit_destroyCustom()
+        {
+            tick().then(() => ORBIT_ORBITS.pop())
+            
+            orbit_CUSTOM.set(false)
+
+            app.app_TRANSITION.set(true)
+
+            setTimeout(() =>
+            {
+                event.event_scrollTo(router.router_PAGES[3].start)
+
+                app.app_TRANSITION.set(false)
+                app.app_FREEZE.set(true)
+            }, 400)
+        }
+
         function content_destroy()
         {
+            competence_updateElement()
+
             competence_MOBILE ? competence_destroyEventMobile() : competence_destroyEventDesktop()
-    
-            orbit_click({ detail: { id: null } })
         }
 
         // --COMMAND
@@ -356,7 +431,7 @@
 
             NOW > competence_LAST + 100
             ? competence_update(NOW, true)
-            : competence_TIMEOUT = setTimeout(competence_update.bind(null, +new Date(), false), 130)
+            : competence_TIMEOUT = setTimeout(competence_update.bind(null, +new Date(), false), 100)
         }
 
         async function competence_wheel(deltaY) { content_update(deltaY) }
@@ -380,7 +455,7 @@
 
             router.router_updatePageStart(COMPETENCE_ID, competence_OFFSETTOP)
 
-            if (orbit_TARGET != undefined) content_destroy()
+            if (orbit_TARGET != undefined) orbit_click({ detail: { id: null } })
         }
 
         function orbit_click({detail})
@@ -473,6 +548,21 @@
             content_animationWriting.call(this, LENGTH - 1, LENGTH - 2, 0, 0, false)
         }
 
+        function content_outroend(custom) { if (custom && orbit_TARGET == undefined) orbit_destroyCustom() }
+
+        // --UTIL
+        function orbit_focus(id)
+        {
+            app.app_FREEZE.set(false)
+            event.event_scrollTo(competence_OFFSETTOP + window.innerHeight)
+
+            setTimeout(() =>
+            {
+                ORBIT_ORBITS[id].on = true
+                orbit_click({ detail: { id: id, on: true } })
+            }, 50)
+        }
+
     // #CYCLES
 
     onMount(competence_set)
@@ -492,13 +582,14 @@ on:touchstart={competence_touchStart}
         <div
         style:--duration="{COMPETENCE_DURATION}ms"
         >
-            {#each ORBIT_ORBITS as orbit}
+            {#each ORBIT_ORBITS as orbit (orbit.props._id)}
                 {#if orbit.on}
                     <div
                     class="content"
                     transition:content_fade
                     on:introstart={content_introstart.bind(orbit.content)}
                     on:outrostart={content_outrostart.bind(orbit.content)}
+                    on:outroend={content_outroend.bind(null, $orbit_CUSTOM)}
                     >
                         <section>
                             <h2
@@ -533,13 +624,13 @@ on:touchstart={competence_touchStart}
                             <ul
                             bind:this={orbit.content.elements.list}
                             >
-                                {#each orbit.texts as content, i}
+                                {#each orbit.skills as skill, i}
                                     <li
                                     style:transform="translateX({orbit.content.elements.lis
                                     ? orbit.content.elements.lis[i].translateX - content_TRANSLATEX * orbit.content.elements.lis[i].speed
                                     : -content_TRANSLATEX}px)"
                                     >
-                                        <p>{content}</p>
+                                        <p>{skill.text}</p>
                                     </li>
                                 {/each}
                             </ul>
@@ -547,7 +638,7 @@ on:touchstart={competence_touchStart}
                     </div>
                 {/if}
 
-                {#if orbit.focus && space_RATIO === 1}
+                {#if !$orbit_CUSTOM && orbit.focus && space_RATIO === 1}
                     <p
                     class="thematic"
                     bind:this={orbit.thematic.elements.subtitle}

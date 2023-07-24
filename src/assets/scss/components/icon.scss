@@ -6,7 +6,7 @@
 
 .icon>svg
 {
-    @include any-h;
+    @include any;
 
     pointer-events: none;
 }

@@ -53,6 +53,7 @@ style:transform="translateX({_translateX ?? 0}px) translateZ({_translateZ ?? 0}p
 >
     <button
     type="button"
+    title="click pour {card_ON ? 'masquer' : 'afficher'}"
     style:transform="translateZ({card_TRANSLATEZ}px) scale({_scale})"
     on:click={card_click}
     >
