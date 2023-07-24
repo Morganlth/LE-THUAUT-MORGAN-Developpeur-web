@@ -19,6 +19,7 @@
         // BIND snake_resetSize
         // BIND snake_resetGame
         // BIND snake_animation
+        // BIND canvas_updateClientRect
 
     // #IMPORTS
 
@@ -243,7 +244,7 @@
             if (!spring.spring_LOCK) spring.spring_mouseEnter()
         }
 
-        function canvas_updateClientRect() { clientRect = canvas.getBoundingClientRect() }
+        export function canvas_updateClientRect() { clientRect = canvas.getBoundingClientRect() }
 
         // --DESTROY
         function snake_destroy()

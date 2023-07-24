@@ -140,7 +140,8 @@
         snake_resetSize,
         snake_resetGame,
         snake_updateEvent,
-        snake_animation
+        snake_animation,
+        snake_updateClientRect
 
         // --ELEMENT-FRAME
         let
@@ -522,11 +523,7 @@
         }
 
         // --ROUTER-CALL
-        function presentation_call()
-        {
-            if (presentation_$SNAKE && wwindow.window_MOBILE === false && event.event_contain('scroll', 'snake_scroll') > -1)
-                event.event_MANAGER.scroll.find(f => f.name === 'snake_scroll')()
-        }
+        function presentation_call() { if (presentation_$SNAKE && wwindow.window_MOBILE === false) snake_updateClientRect() }
 
         // --TESTS
         function tag_testPosition(size, tagSize, coord)
@@ -696,6 +693,7 @@ on:click={presentation_click}
     bind:snake_resetGame={snake_resetGame}
     bind:snake_updateEvent={snake_updateEvent}
     bind:snake_animation={snake_animation}
+    bind:canvas_updateClientRect={snake_updateClientRect}
     />
 
     <div
