@@ -290,7 +290,6 @@
 
         function project_destroyEvent()
         {
-            console.log('remove in destroy')
             event.event_remove('scroll', project_scroll)
             event.event_remove('resize', project_resize)
 
