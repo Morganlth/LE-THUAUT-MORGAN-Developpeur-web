@@ -35,14 +35,9 @@ li { list-style: none; }
 
 /* #BODY */
 
-html
-{
-    overflow: hidden;
-}
+html, body { overflow: hidden; }
 body
 {
-    overflow: hidden;
-
     height: 100vh;
 
     background-color: black;

@@ -223,8 +223,6 @@ lang="scss"
 
         transform-style: preserve-3d;
 
-        transition: transform .3s;
-
         .gravity-area
         {
             @include f-center(true);
