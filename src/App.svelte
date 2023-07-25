@@ -13,95 +13,91 @@
         import './assets/scss/app.scss'
 
         // --CONTEXTS
-        // import { app, router, spring } from './components/field/Main.svelte'
+        import { app, router, spring } from './components/field/Main.svelte'
 
         // --SVELTE
-        // import { onMount } from 'svelte'
-        // import { fade } from 'svelte/transition'
+        import { onMount } from 'svelte'
+        import { fade } from 'svelte/transition'
 
         // --COMPONENT-FIELDS
-        // import Header from './components/field/Header.svelte'
-        // import Main from './components/field/Main.svelte'
+        import Header from './components/field/Header.svelte'
+        import Main from './components/field/Main.svelte'
 
         // --COMPONENT-ELEMENT
-        // import EcoPopup from './components/elements/EcoPopup.svelte'
-
-        import TicTacToe from './components/elements/TicTacToe.svelte'
+        import EcoPopup from './components/elements/EcoPopup.svelte'
 
     // #CONSTANTE
 
         // --ELEMENT-APP
-        // const APP_START = performance.now()
+        const APP_START = performance.now()
 
     // #VARIABLES
 
         // --APP-CONTEXT
-        // let
-        // app_TRANSITION = app.app_TRANSITION,
-        // app_FREEZE = app.app_FREEZE
+        let
+        app_TRANSITION = app.app_TRANSITION,
+        app_FREEZE = app.app_FREEZE
 
         // --ELEMENT-SPRING
-        // let
-        // spring_COORDS = spring.spring_COORDS,
-        // spring_SIZE = spring.spring_SIZE
+        let
+        spring_COORDS = spring.spring_COORDS,
+        spring_SIZE = spring.spring_SIZE
     
         // --ELEMENT-ECOPOPUP
-        // let ecopopup_ECO = false
+        let ecopopup_ECO = false
 
     // #REACTIVE
 
         // --ELEMENT-HEADER
-        // $: header_TRANSLATEY = $app_FREEZE ? 100 : 0
-
-        console.log('version test mobile bug 03')
+        $: header_TRANSLATEY = $app_FREEZE ? 100 : 0
 
     // #FUNCTIONS
 
         // --SET
-        // function app_set()
-        // {
-        //     app_restore()
-        //     app_testPerformance()
+        function app_set()
+        {
+            app_restore()
+            app_testPerformance()
 
-        //     document.getElementById('app').style.opacity = 1
-        // }
+            document.getElementById('app').style.opacity = 1
+        }
 
         // --RESTORE
-        // function app_restore()
-        // {
-        //     const KEYSTORAGE = app.app_KEYSTORAGE
+        function app_restore()
+        {
+            const KEYSTORAGE = app.app_KEYSTORAGE
     
-        //     for (let i = 0; i < KEYSTORAGE.length; i++)
-        //     {
-        //         const [KEY, VALUE] = [KEYSTORAGE[i], localStorage.getItem(KEYSTORAGE[i])]
+            for (let i = 0; i < KEYSTORAGE.length; i++)
+            {
+                const [KEY, VALUE] = [KEYSTORAGE[i], localStorage.getItem(KEYSTORAGE[i])]
 
-        //         try { app.app_COMMANDS[KEY](VALUE ?? 'd') } catch { localStorage.removeItem(KEY) }
-        //     }
+                try { app.app_COMMANDS[KEY](VALUE ?? 'd') } catch { localStorage.removeItem(KEY) }
+            }
 
-        //     if (app.app_KEYWORDS.includes('clear')) app.app_COMMANDS.clear()
-        // }
+            if (app.app_KEYWORDS.includes('clear')) app.app_COMMANDS.clear()
+        }
 
         // --TEST
-        // function app_testPerformance()
-        // {
-        //     const MODE = localStorage.getItem('mode')
+        function app_testPerformance()
+        {
+            const MODE = localStorage.getItem('mode')
 
-        //     if (MODE !== 'eco' && performance.now() - APP_START > 400) ecopopup_ECO = true
-        // }
+            if (MODE !== 'eco' && performance.now() - APP_START > 400) ecopopup_ECO = true
+        }
 
     // #CYCLE
 
-    // onMount(app_set)
+    onMount(app_set)
 </script>
 
 <!-- #HTML -->
 
-<!-- <svelte:head>
+<svelte:head>
     <title>{router.router_TITLE}</title>
-</svelte:head> -->
+</svelte:head>
 
-<!-- <slot> -->
-    <!-- <Header
+<slot>
+    <Header
     _translateY={header_TRANSLATEY}
     _iconColor={colors.light}
     />
@@ -109,13 +105,9 @@
     <Main
     _colors={colors}
     {_page}
-    /> -->
-
-    <TicTacToe
-    _colors={colors}
     />
 
-    <!-- <svg
+    <svg
     class="spring"
     >
 	    <circle
@@ -135,8 +127,8 @@
         transition:fade={{ duration: 300 }}
         >
         </div>
-    {/if} -->
-<!-- </slot> -->
+    {/if}
+</slot>
 
 <!-- #STYLE -->
 
@@ -145,13 +137,13 @@ lang="scss"
 >
     /* #USES */
 
-    /* @use './assets/scss/styles/position.scss' as *;
+    @use './assets/scss/styles/position.scss' as *;
     @use './assets/scss/styles/size.scss' as *;
-    @use './assets/scss/styles/cursor.scss' as *; */
+    @use './assets/scss/styles/cursor.scss' as *;
 
     /* #APP */
 
-    /* .spring
+    .spring
     {
         @include xy-start(true);
         @include any;
@@ -174,5 +166,5 @@ lang="scss"
         z-index: 4;
 
         background-color: $dark;
-    } */
+    }
 </style>
