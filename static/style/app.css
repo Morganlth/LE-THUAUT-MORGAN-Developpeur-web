@@ -51,6 +51,8 @@ body
 
 #app
 {
+    overflow: hidden;
+
     opacity: 0;
 
     transition: opacity .2s;
