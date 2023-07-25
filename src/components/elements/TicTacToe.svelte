@@ -65,8 +65,7 @@
             border: solid ${_colors.sLight} 1px;
             border-top: none;
             border-left: none;
-        `
-        // .trim().replaceAll(/((?<=;)\s*[!^\s]|\n)/gm, '')
+        `.trim().replaceAll(/((?<=;)\s*[!^\s]|\n)/gm, '')
 
     // #FUNCTIONS
 
