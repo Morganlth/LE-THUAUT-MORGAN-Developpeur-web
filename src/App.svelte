@@ -20,8 +20,8 @@
         import { fade } from 'svelte/transition'
 
         // --COMPONENT-FIELDS
-        import Header from './components/field/Header.svelte'
-        import Main from './components/field/Main.svelte'
+        // import Header from './components/field/Header.svelte'
+        // import Main from './components/field/Main.svelte'
 
         // --COMPONENT-ELEMENT
         import EcoPopup from './components/elements/EcoPopup.svelte'
@@ -50,6 +50,8 @@
 
         // --ELEMENT-HEADER
         $: header_TRANSLATEY = $app_FREEZE ? 100 : 0
+
+        console.log('version test mobile bug 02')
 
     // #FUNCTIONS
 
@@ -97,7 +99,7 @@
 </svelte:head>
 
 <slot>
-    <Header
+    <!-- <Header
     _translateY={header_TRANSLATEY}
     _iconColor={colors.light}
     />
@@ -105,7 +107,7 @@
     <Main
     _colors={colors}
     {_page}
-    />
+    /> -->
 
     <svg
     class="spring"
