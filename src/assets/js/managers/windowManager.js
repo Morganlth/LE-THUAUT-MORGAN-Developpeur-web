@@ -95,7 +95,7 @@ class WindowManager
 
             const SMALLSCREEN = this.window_testSmallScreen()
 
-            event.event_resize(SMALLSCREEN)
+            tick().then(event.event_resize.bind(event, SMALLSCREEN))
         }
 }
 
@@ -104,6 +104,9 @@ class WindowManager
     // --CONTEXTS
     import app from './appManager'
     import event from './eventManager'
+
+    // --SVELTE
+    import { tick } from 'svelte'
 
 // #EXPORT
 

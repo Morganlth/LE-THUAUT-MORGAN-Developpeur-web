@@ -122,8 +122,7 @@
 
         function snake_getModel(pre, current, next)
         {
-            const
-            [X, Y] = [Math.abs(current[0]), Math.abs(current[1])]
+            const [X, Y] = [Math.abs(current[0]), Math.abs(current[1])]
             
             return [pre ? snake_getPosition(pre, X, Y) : null, snake_getPosition(next, X, Y)]
         }
@@ -225,7 +224,7 @@
             if (snake_MOBILE) snake_destroyEventMobile()
     
             on
-            ? snake_setEventDesktop()
+            ? (snake_setEventDesktop(), canvas_updateClientRect())
             : snake_destroyEventDesktop()
         }
 
@@ -293,19 +292,11 @@
 
         async function snake_mouseDown({clientX, clientY})
         {
-            if (snake_ON || snake_MOBILE) return
+            if (snake_ON) return
     
             ;[window_CLIENTX, window_CLIENTY] = [clientX, clientY]
 
             snake_updateCoords()
-        }
-
-        async function snake_mouseLeave(e)
-        {
-            const target = e.relatedTarget
-    
-            if (spring.spring_LOCK) spring.spring_mouseLeave()
-            if (target && target.classList.contains('icon')) return
         }
 
         async function snake_resize()
@@ -316,18 +307,6 @@
         }
 
         async function snake_touchMove(clientX, clientY) { snake_mouseMove(clientX, clientY) }
-
-        async function snake_touchStart(e)
-        {
-            if (snake_ON) return
-
-            const TOUCH = e.changedTouches[0]
-    
-            ;[window_CLIENTX, window_CLIENTY] = [TOUCH.clientX, TOUCH.clientY]
-
-            canvas_updateClientRect()
-            snake_updateCoords()
-        }
 
         // --TEST
         function snake_test()
@@ -495,8 +474,6 @@
 class="snake-game"
 style:height="{height}px"
 style:margin="{snake_OFFSET_Y / 2}px {snake_OFFSET_X / 2}px"
-on:mouseleave={snake_mouseLeave}
-on:touchstart={snake_touchStart}
 >
     <canvas
     style:width="{width}px"
@@ -513,14 +490,16 @@ lang="scss"
 >
     /* #USES */
 
-    @use '../../assets/scss/styles/position.scss' as *;
-    @use '../../assets/scss/styles/size.scss' as *;
+    @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/size' as *;
+    @use '../../assets/scss/styles/cursor' as *;
 
     /* #SNAKE */
 
     .snake-game
     {
         @include xy-start(true);
+        @include no-event;
 
         &::after
         {

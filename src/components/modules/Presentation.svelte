@@ -95,11 +95,11 @@
             },
             {
                 title: 'PROFESSION',
-                content: ['Développeur Web - FULL STACK']
+                content: ['Développeur Web', 'Objectif suivant: FULL STACK', 'Objectif futur: aucune limite tant que j\'ai la soif d\'apprendre']
             },
             {
                 title: 'LOCALITÉ',
-                content: ['Morbihan - FRANCE']
+                content: ['Bretagne - FRANCE']
             },
             {
                 title: 'ÉTUDES - FORMATIONS',
@@ -107,7 +107,7 @@
             },
             {
                 title: 'CONTACT',
-                content: ['Tel:  06 09 23 72 08', 'Email:  lethuaut.morgan@gmail.com']
+                content: ['Tel:  06 09 23 72 08', 'Email:  lethuaut.morgan@gmail.com', { label: 'LinkedIn', link: 'https://www.linkedin.com/in/le-thuaut-morgan/' }]
             }
         ],
         TAG_GAMEOVER = { on: false },
@@ -452,10 +452,19 @@
         // --EVENTS
         async function presentation_click(e)
         {
-            if (e.target.classList.contains('snake-game'))
+            if (e.target.classList.contains('screen-shield'))
                 if (TAG_GAMEOVER.on) gameover_setGame()
                 else if (TAG_MOBILE.on) mobile_setGame()
         }
+
+        async function presentation_touchStart(e)
+        {
+            if (snake_test()) return
+
+            snake_updateClientRect()
+        }
+
+        async function presentation_mouseLeave() { if (spring.spring_LOCK) spring.spring_mouseLeave() }
 
         async function presentation_click_param()
         {
@@ -597,6 +606,8 @@
 id="presentation"
 bind:this={presentation}
 on:click={presentation_click}
+on:mouseleave={presentation_mouseLeave}
+on:touchstart={presentation_touchStart}
 >
     <div
     class="tag-container"
@@ -604,6 +615,11 @@ on:click={presentation_click}
     style:overflow-x={tag_Z ? 'scroll' : 'hidden'}
     bind:this={tag_CONTAINER}
     >
+        <div
+        class="screen-shield"
+        >
+        </div>
+
         {#if tag_Z}
             <span
             class="tag-scroll"
@@ -631,7 +647,17 @@ on:click={presentation_click}
                     class="content"
                     >
                         {#each tag.content as text}
-                            <p>{text}</p>
+                            {#if text instanceof Object}
+                                <a
+                                href={text.link}
+                                alt={text.label}
+                                target="_blank"
+                                >
+                                    {text.label + ': ' + text.link}
+                                </a>
+                            {:else}
+                                <p>{text}</p>
+                            {/if}
                         {/each}
                     </div>
                 </Tag>
@@ -643,6 +669,7 @@ on:click={presentation_click}
                 <Tag
                 _blockSize={presentation_BLOCKSIZE}
                 _center={true}
+                _z={-1}
                 _dark={_colors.dark}
                 bind:tag_reset={TAG_GAMEOVER.reset}
                 bind:tag_show={TAG_GAMEOVER.show}
@@ -664,6 +691,7 @@ on:click={presentation_click}
                 <Tag
                 _blockSize={presentation_BLOCKSIZE}
                 _center={true}
+                _z={-1}
                 _dark={_colors.dark}
                 bind:tag_reset={TAG_MOBILE.reset}
                 bind:tag_show={TAG_MOBILE.show}
@@ -827,6 +855,12 @@ lang="scss"
 
             overflow-y: hidden;
 
+            .screen-shield
+            {
+                @include relative;
+                @include any;
+            }
+
             .tag-scroll
             {
                 @include absolute;
@@ -856,7 +890,7 @@ lang="scss"
                 }
             }
 
-            p
+            p, a
             {
                 @include p-content;
 

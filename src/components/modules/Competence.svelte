@@ -57,9 +57,9 @@ context="module"
                 { text: 'construire un projet impliquant SCSS et SASS' }
             ],
             [
-                { text: 'faire réagir la page web en fonction des actions de l’utilisateur en JavaScript' },
-                { text: 'se connecter à un service web pour exploiter des données tierces (API)' },
-                { text: 'gérer les comptes utilisateurs' },
+                { text: 'faire réagir la page web en fonction des actions de l’utilisateur en JavaScript', tags: ['sophiebluel'] },
+                { text: 'se connecter à un service web pour exploiter des données tierces (API)', tags: ['sophiebluel'] },
+                { text: 'gérer les comptes utilisateurs', tags: ['sophiebluel'] },
                 { text: 'animer les pages web avec JavaScript' },
                 { text: 'concevoir un site maintenable grâce à la gestion des erreurs et exceptions' },
                 { text: 'construire des algorithmes' },
@@ -74,12 +74,12 @@ context="module"
                 { text: 'construire un projet avec SvelteKit' }
             ],
             [
-                { text: 'appliquer les standards du web et les normes en vigueur', tags: ['booki'] },
+                { text: 'appliquer les standards du web et les normes en vigueur', tags: ['booki', 'ninacarducci'] },
                 { text: 'construire un site web fluide s’adaptant à tout type d’écran (web, smartphone et tablette)', tags: ['booki'] },
-                { text: 'améliorer le référencement naturel en utilisant les balises selon leur sémantique' },
-                { text: 'améliorer les performances et optimiser une page web' },
-                { text: 'appliquer les Schema.org' },
-                { text: 'utiliser les balises meta OPEN GRAPH des réseaux sociaux (og, twitter)' }
+                { text: 'améliorer le référencement naturel en utilisant les balises selon leur sémantique', tags: ['ninacarducci'] },
+                { text: 'améliorer les performances et optimiser une page web', tags: ['ninacarducci'] },
+                { text: 'appliquer les Schema.org', tags: ['ninacarducci'] },
+                { text: 'utiliser les balises meta OPEN GRAPH des réseaux sociaux (og, twitter)', tags: ['ninacarducci'] }
             ]
         ]
 

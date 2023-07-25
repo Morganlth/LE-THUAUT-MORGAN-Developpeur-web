@@ -7,6 +7,7 @@
         export let
         _blockSize = 0,
         _center = false,
+        _z = 0,
         _max_width = null,
         _dark
 
@@ -100,8 +101,8 @@
         export async function tag_show(x, y, delay)
         {
             if (x != undefined || y != undefined) [tag_TRANSLATEX, tag_TRANSLATEY] = [x, y]
-
-            tag_Z = 0
+            
+            tag_Z = 0 + _z
         
             tag_TIMEOUT = setTimeout(tag_animation.bind(null, 'clearRect'), delay ?? 0)
         }
@@ -109,7 +110,7 @@
         export async function tag_hide()
         {
             context.fillStyle = _dark
-            tag_Z = -1
+            tag_Z = -1 + _z
 
             clearTimeout(tag_TIMEOUT)
     
@@ -147,9 +148,10 @@ bind:this={tag}
 <style
 lang="scss"
 >
-    /* #USE */
+    /* #USES */
 
     @use '../../assets/scss/styles/position' as *;
+    @use '../../assets/scss/styles/cursor' as *;
 
     /* #TAG */
 
@@ -159,8 +161,14 @@ lang="scss"
 
         display: inline-block;
 
+        user-select: none;
+
         transition: transform .1s;
 
-        canvas { @include xy-start(true); }
+        canvas
+        {
+            @include xy-start(true);
+            @include no-event;
+        }
     }
 </style>
