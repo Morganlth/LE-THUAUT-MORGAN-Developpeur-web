@@ -18,7 +18,7 @@
         import { page } from '$app/stores'
 
         // --COMPONENT-ELEMENTS
-        // import TicTacToe from '../elements/TicTacToe.svelte'
+        import TicTacToe from '../elements/TicTacToe.svelte'
         import Console from '../elements/Console.svelte'
 
         // --COMPONENT-COVER
@@ -118,9 +118,9 @@ id="home"
                     </h1>
                 </section>
 
-                <!-- <TicTacToe
+                <TicTacToe
                 {_colors}
-                /> -->
+                />
             </div>
 
             <div
