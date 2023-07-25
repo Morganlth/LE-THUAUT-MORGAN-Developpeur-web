@@ -38,9 +38,9 @@ context="module"
 
         // --COMPONENT-MODULES
         import Home from '../modules/Home.svelte'
-        import Presentation from '../modules/Presentation.svelte'
-        import Competence from '../modules/Competence.svelte'
-        import Project from '../modules/project.svelte'
+        // import Presentation from '../modules/Presentation.svelte'
+        // import Competence from '../modules/Competence.svelte'
+        // import Project from '../modules/project.svelte'
 
     // #VARIABLES
 
@@ -67,6 +67,8 @@ context="module"
             main_setWrapper()
             main_setCommand()
             main_setEvent()
+
+                    console.log('version test mobile bug 01')
         }
 
         function main_setWrapper() { wrapper_MAX = main.firstChild.offsetHeight - window.innerHeight * 1.4 }
@@ -162,21 +164,21 @@ class:freeze={$main_FREEZE}
             {_colors}
             />
 
-            <Presentation
+            <!-- <Presentation
             {_colors}
-            />
+            /> -->
         </div>
     </div>
 
     <div>
-        <Competence
+        <!-- <Competence
         {_colors}
         />
 
         <Project
         _subPath={_page.subPath}
         {_colors}
-        />
+        /> -->
     </div>
 </main>
 
