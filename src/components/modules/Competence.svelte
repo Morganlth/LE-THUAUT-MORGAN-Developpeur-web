@@ -51,44 +51,76 @@ context="module"
         COMPETENCE_SKILLS =
         [
             [
-                { text: 'découper, assembler et intégrer tous les éléments d’une maquette graphique en HTML5 et CSS', tags: ['booki'] },
-                { text: 'ajouter du contenu audio et vidéo en HTML5' },
-                { text: 'animer les pages web avec CSS3' },
-                { text: 'construire un projet impliquant SCSS et SASS' }
+                { text: 'Découper, assembler et intégrer tous les éléments d’une maquette graphique en HTML5 et CSS', tags: ['booki'] },
+                { text: 'Ajouter du contenu audio et vidéo en HTML5' },
+                { text: 'Animer les pages web avec CSS3' },
+                { text: 'Intégrer Sass / Scss dans un projet' },
+                { text: 'Déclarer des variables Sass / Scss' },
+                { text: 'Utiliser la logique de Scss / Sass (if, each, for...)' },
+                { text: 'Importer d\'autre fichier Sass / Scss avec la use directive' },
+                { text: 'Créer des fonctions utilitaires avec les mixins de Sass / Scss' },
+                { text: 'Importer et utiliser les modules Sass / Scss (sass:math, sass:list...)' }
             ],
             [
-                { text: 'faire réagir la page web en fonction des actions de l’utilisateur en JavaScript', tags: ['sophiebluel'] },
-                { text: 'se connecter à un service web pour exploiter des données tierces (API)', tags: ['sophiebluel'] },
-                { text: 'gérer les comptes utilisateurs', tags: ['sophiebluel'] },
-                { text: 'animer les pages web avec JavaScript' },
-                { text: 'concevoir un site maintenable grâce à la gestion des erreurs et exceptions' },
-                { text: 'construire des algorithmes' },
-                { text: 'utiliser le framework React' },
-                { text: 'développer un projet sous Svelte' }
+                { text: 'Faire réagir la page web en fonction des actions de l’utilisateur en JavaScript', tags: ['sophiebluel'] },
+                { text: 'Se connecter à un service web pour exploiter des données tierces (API)', tags: ['sophiebluel'] },
+                { text: 'Gérer les comptes utilisateurs (coté client)', tags: ['sophiebluel'] },
+                { text: 'Animer les pages web avec JavaScript' },
+                { text: 'Concevoir un site maintenable grâce à la gestion des erreurs et exceptions' },
+                { text: 'Construire des algorithmes' },
+                { text: 'Utiliser le framework React', tags: ['kasa'] },
+                { text: 'Configurer la navigation entre les pages de l\'application avec React Router', tags: ['kasa'] },
+                { text: 'Initialiser une application avec Create React App', tags: ['kasa'] },
+                { text: 'Développer des éléments de l\'interface d\'un site web grâce à des composants React', tags: ['kasa'] },
+                { text: 'Développer et initialiser une application avec Svelte et SvelteKit' },
+                { text: 'Utiliser le système de routage de SvelteKit' },
+                { text: 'Développer des composants Svelte' },
+                { text: 'Intégrer des animations / transitions avec Svelte' },
+                { text: 'Déclarer et manipuler les variables réactives, le binding, les props et les Stores de Svelte' },
+                { text: 'Incorporer la logique de Svelte (if, else, each...)' },
+                { text: 'Manipuler les fonctions de Lifecycle proposer par Svelte pour la gestion de composants' },
+                { text: 'Utiliser les évènements Svelte, les modificateurs et la propagation' },
+                { text: 'Ajouter Sass / Scss à Svelte' },
+                { text: 'Récupérer les données utilisateurs dans le JavaScript via des formulaires', tags: ['sophiebluel'] },
+                { text: 'Manipuler les éléments du DOM avec JavaScript', tags: ['sophiebluel'] }
             ],
             [
-                { text: 'créer un nouveau projet NodeJS impliquant diverses dépendances (Express, MongoDB, jsonwebtoken...)' },
-                { text: 'gérer les comptes utilisateurs' },
-                { text: 'créer, gérer et afficher le contenu d’une base de données' },
-                { text: 'créer des API (REST)' },
-                { text: 'construire un projet avec SvelteKit' }
+                { text: 'Créer un nouveau projet NodeJS impliquant diverses dépendances (Express, MongoDB, jsonwebtoken...)', tags: ['monvieuxgrimoire'] },
+                { text: 'Gérer les comptes utilisateurs (coté serveur)', tags: ['monvieuxgrimoire'] },
+                { text: 'Créer, gérer et afficher le contenu d’une base de données', tags: ['monvieuxgrimoire'] },
+                { text: 'Créer des API (REST)', tags: ['monvieuxgrimoire'] },
+                { text: 'Implémenter un modèle logique de données conformément à la réglementation', tags: ['monvieuxgrimoire'] },
+                { text: 'Mettre en œuvre des opérations CRUD de manière sécurisée', tags: ['monvieuxgrimoire'] },
+                { text: 'Stocker des données de manière sécurisée', tags: ['monvieuxgrimoire'] }
             ],
             [
-                { text: 'appliquer les standards du web et les normes en vigueur', tags: ['booki', 'ninacarducci'] },
-                { text: 'construire un site web fluide s’adaptant à tout type d’écran (web, smartphone et tablette)', tags: ['booki'] },
-                { text: 'améliorer le référencement naturel en utilisant les balises selon leur sémantique', tags: ['ninacarducci'] },
-                { text: 'améliorer les performances et optimiser une page web', tags: ['ninacarducci'] },
-                { text: 'appliquer les Schema.org', tags: ['ninacarducci'] },
-                { text: 'utiliser les balises meta OPEN GRAPH des réseaux sociaux (og, twitter)', tags: ['ninacarducci'] }
+                { text: 'Appliquer les standards du web et les normes en vigueur', tags: ['booki', 'ninacarducci'] },
+                { text: 'Construire un site web fluide s’adaptant à tout type d’écran (web, smartphone et tablette)', tags: ['booki'] },
+                { text: 'Améliorer le référencement naturel en utilisant les balises selon leur sémantique', tags: ['ninacarducci'] },
+                { text: 'Améliorer les performances et optimiser une page web', tags: ['ninacarducci'] },
+                { text: 'Appliquer les Schema.org', tags: ['ninacarducci'] },
+                { text: 'Utiliser les balises meta OPEN GRAPH des réseaux sociaux (og, twitter)', tags: ['ninacarducci'] },
+                { text: 'Débugger un site web grâce aux Chrome DevTools', tags: ['ninacarducci'] },
+                { text: 'Rédiger un cahier de recette pour tester un site', tags: ['ninacarducci'] }
+            ],
+            [
+                { text: 'Suivre le déroulement du projet grâce à un outil de gestion de projet' },
+                { text: 'Rédiger les spécifications techniques d\'un projet web à partir de besoins fonctionnels' },
+                { text: 'Découper une fonctionnalités en tâches pour préparer le développement' },
+                { text: 'Présenter la solution technique' },
+                { text: 'Mettre en place une méthode de veille technologique' },
+                { text: 'Versionner son projet avec Git et Github' },
+                { text: 'Installer un environnement de développement front-end' },
+                { text: 'Utiliser le logiciel Notion' },
+                { text: 'Déployer un site statique en ligne' }
             ]
         ]
 
         // --ELEMENT-ORBIT
-        const
-        ORBIT_ORBITS =
+        const ORBIT_ORBITS =
         [
             {
-                props: { _id: 0, _rotate: -50 * Math.PI / 180, _offset: 0 },
+                props: { _id: 0, _rotate: 30 * Math.PI / 180, _offset: 0 },
                 title: ['FRONT', 'FORME - STYLE'],
                 skills: COMPETENCE_SKILLS[0],
                 thematic: { elements: {} },
@@ -96,7 +128,7 @@ context="module"
             }
         ,
             {
-                props: { _id: 1, _rotate: 80 * Math.PI / 180, _offset: 4.71 },
+                props: { _id: 1, _rotate: 60 * Math.PI / 180, _offset: 4.2 },
                 title: ['FRONT', 'JAVASCRIPT'],
                 skills: COMPETENCE_SKILLS[1],
                 thematic: { elements: {} },
@@ -104,7 +136,7 @@ context="module"
             }
         ,
             {
-                props: { _id: 2, _rotate: 40 * Math.PI / 180, _offset: 3.14 },
+                props: { _id: 2, _rotate: 90 * Math.PI / 180, _offset: 3.15 },
                 title: ['BACK', 'NODE SERVER'],
                 skills: COMPETENCE_SKILLS[2],
                 thematic: { elements: {} },
@@ -112,9 +144,17 @@ context="module"
             }
         ,
             {
-                props: { _id: 3, _rotate: 10 * Math.PI / 180, _offset: 1.57 },
+                props: { _id: 3, _rotate: 120 * Math.PI / 180, _offset: 2.1 },
                 title: ['ADAPTABILITÉ', 'RÉFÉRENCEMENT'],
                 skills: COMPETENCE_SKILLS[3],
+                thematic: { elements: {} },
+                content: { elements: {} }
+            }
+        ,
+            {
+                props: { _id: 4, _rotate: 150 * Math.PI / 180, _offset: 1.05 },
+                title: ['GESTION', 'OUTILS'],
+                skills: COMPETENCE_SKILLS[4],
                 thematic: { elements: {} },
                 content: { elements: {} }
             }
@@ -224,7 +264,7 @@ context="module"
     
             ORBIT_ORBITS.push(
             {
-                props: { _id: ID, _rotate: -20 * Math.PI / 180, _offset: .7 },
+                props: { _id: ID, _rotate: 0, _offset: 5.25 },
                 title: [tag.toUpperCase()],
                 skills: comeptence_getSkills(tag),
                 thematic: { elements: {} },
@@ -331,8 +371,8 @@ context="module"
                 ? [...(GAP >= land_START
                     ? [.3, -100, 1]
                     : [1, 0, 1.5])
-                  , GAP / competence_HEIGHT * 5]
-                : [.3, -100, 1, 5]
+                  , GAP / competence_HEIGHT * 4.7]
+                : [.3, -100, 1, 4.7]
             : [1, 0, 1.5, 0]
 
             sky_TRANSLATEX = GAP > land_END ? GAP - land_END : 0
@@ -738,7 +778,7 @@ lang="scss"
         z-index: 1;
 
         width: 100vw;
-        height: calc(100% / 11 * 9);
+        height: calc(100% / 12 * 10);
 
         .track
         {

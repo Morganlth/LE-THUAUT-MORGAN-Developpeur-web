@@ -655,7 +655,7 @@ lang="scss"
         align-items: flex-end;
 
         width: 100vw;
-        height: calc(100% / 11 * 2);
+        height: calc(100% / 12 * 2);
 
         overflow: clip;
 

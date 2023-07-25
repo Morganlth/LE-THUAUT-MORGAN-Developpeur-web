@@ -222,7 +222,7 @@ lang="scss"
 
                 @include media-min(768px) { height: calc(140vh + 200vw); }
             }
-            &:nth-child(2) { height: 1100vh; }
+            &:nth-child(2) { height: 1200vh; }
         }
 
         .wrapper
