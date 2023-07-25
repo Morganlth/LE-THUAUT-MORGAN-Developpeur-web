@@ -26,6 +26,8 @@
         // --COMPONENT-ELEMENT
         import EcoPopup from './components/elements/EcoPopup.svelte'
 
+        import TicTacToe from './components/elements/TicTacToe.svelte'
+
     // #CONSTANTE
 
         // --ELEMENT-APP
@@ -108,6 +110,10 @@
     _colors={colors}
     {_page}
     /> -->
+
+    <TicTacToe
+    _colors={colors}
+    />
 
     <svg
     class="spring"
