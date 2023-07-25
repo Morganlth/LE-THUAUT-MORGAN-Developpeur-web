@@ -54,18 +54,7 @@
         tictactoe_AIROUND = false
 
         // --ELEMENT-CELL
-        let cell_STYLE = (`
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            width: 100%;
-            height: 100%;
-
-            border: solid ${_colors.sLight} 1px;
-            border-top: none;
-            border-left: none;
-        `).trim().replaceAll(/((?<=;)\s*[!^\s]|\n)/gm, '')
+        let cell_STYLE = 'display: flex;justify-content: center;align-items: center;width: 100%;height: 100%;border: solid ${_colors.sLight} 1px;border-top: none;border-left: none;'
 
     // #FUNCTIONS
 
