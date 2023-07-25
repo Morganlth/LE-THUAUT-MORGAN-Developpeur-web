@@ -202,7 +202,7 @@ lang="scss"
 
         overflow: clip scroll;
 
-        &.freeze { overflow-y: hidden; }
+        &.freeze { overflow: hidden; }
 
         scrollbar-width: none !important;
         &::-webkit-scrollbar
