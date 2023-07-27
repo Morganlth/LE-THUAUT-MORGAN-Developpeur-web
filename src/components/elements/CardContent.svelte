@@ -46,16 +46,16 @@ style:width={_width}
 in:cardcontent_IN
 out:cardcontent_OUT
 >
-    <div>
-        {#if _img}
+    {#if _img}
+        <div>
             <img
             src={$page.url.origin + _img.src}
             alt={_img.alt}
             style:width={_img.width ?? 'auto'}
             style:height={_img.height ?? 'auto'}
             >
-        {/if}
-    </div>
+        </div>
+    {/if}
 
     <p
     style:color={_color}

@@ -613,7 +613,7 @@ id="nina-carducci"
                     </div>
                 </div>
 
-                {#if gallery_ELEMENT_TARGET !== null && gallery_ELEMENT_TARGET !== undefined}
+                {#if gallery_ELEMENT_TARGET != undefined}
                     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
                     <div
                     class="modal"
@@ -909,33 +909,19 @@ lang="scss"
 >
     #nina-carducci
     {
-        transform: scale(1); /* position fixed */
-
         width: 100vw;
-        height: 100vh;
 
         background-color: white;
     }
 
     .body
     {
-        overflow: hidden scroll;
-    
         max-width: 1920px;
         width: 100%;
-        height: 100%;
 
         margin: auto;
 
         font-family: 'Inter', sans-serif;
-
-        scrollbar-width: none !important;
-        &::-webkit-scrollbar
-        {
-            display: none !important;
-
-            width: 0 !important;
-        }
     }
 
     h1, h2, h3, h4

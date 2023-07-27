@@ -47,7 +47,6 @@
 
         // --ELEMENT-SATELLITE
         let
-        satellite,
         satellite_TRANSLATEX = 0,
         satellite_TRANSLATEZ = 0,
         satellite_ROTATEY = 0,
@@ -172,7 +171,6 @@ style:transform="rotate({_rotate}rad)"
             class="satellite"
             title={_title}
             style:transform="rotate({_rotate}rad) rotateY({satellite_ROTATEY}rad)"
-            bind:this={satellite}
             >
                 {#each [0, 1, 2, 3, 4, 5] as id}
                     <div

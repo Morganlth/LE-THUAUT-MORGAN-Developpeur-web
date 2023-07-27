@@ -39,7 +39,7 @@
         // --UPDATE
         function cloud_update(smallScreen)
         {
-            const [MIN, MAX] = [10, 30]
+            const [MIN, MAX] = [3, 30]
     
             if (CLOUD_CLOUDS.length === MAX)
             {
