@@ -60,7 +60,8 @@
                     alt: 'projet Booki OpenClassrooms',
                     width: 'auto',
                     height: 'auto'
-                }
+                },
+                github: 'https://github.com/Morganlth/Booki'
             },
             {
                 component: SophieBluel,
@@ -72,7 +73,8 @@
                     alt: 'projet Sophie Bluel / JavaScript OpenClassrooms',
                     width: null,
                     height: '100%'
-                }
+                },
+                github: 'https://github.com/Morganlth/Creez-une-page-web-dynamique-avec-JavaScript/tree/main'
             },
             {
                 component: NinaCarducci,
@@ -84,7 +86,8 @@
                     alt: 'projet Nina Carducci / Optimisation OpenClassrooms',
                     width: null,
                     height: '100%'
-                }
+                },
+                github: 'https://github.com/Morganlth/projet-5---OpenClassrooms'
             },
             {
                 desc: 'EN DÉVELOPPEMENT'
@@ -617,8 +620,8 @@ on:touchstart={project_touchStart}
                                 </Cell>
 
                                 <Icon
-                                _href={'#'}
-                                _alt="#"
+                                _href={card.github}
+                                _alt="{card.desc} lien Github"
                                 >
                                     <Github />
                                 </Icon>
