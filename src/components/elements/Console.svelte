@@ -180,7 +180,7 @@ on:mouseleave={spring.spring_mouseLeave.bind(spring)}
     <section>
         <h3>CONSOLE</h3>
 
-        <p>RECHERCHER & MODIFIER</p>
+        <p>EN DÉVELOPPEMENT</p>
     </section>
 
     <div
