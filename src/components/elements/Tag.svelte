@@ -5,7 +5,6 @@
 
         // --PROPS
         export let
-        _blockSize = 0,
         _center = false,
         _z = 0,
         _max_width = null,
@@ -26,6 +25,11 @@
         // --SVELTE
         import { onMount } from 'svelte'
 
+    // #CONSTANTE
+
+        // --ELEMENT-BLOCKSIZE
+        const TAG_BLOCKSIZE = 40
+
     // #VARIABLES
 
         // --ELEMENT-TAG
@@ -43,19 +47,19 @@
         rows,
         context,
         even
-
+    
     // #FUNCTIONS
 
         // --SET
-        function set() { tag_reset() }
+        function tag_set() { tag_reset() }
 
         function canvas_set()
         {
             canvas.width = width
             canvas.height = height
 
-            columns = width / _blockSize
-            rows = height / _blockSize
+            columns = width / TAG_BLOCKSIZE
+            rows = height / TAG_BLOCKSIZE
 
             even = columns % 2 ? false : true
 
@@ -65,8 +69,8 @@
         // --RESET
         export async function tag_reset()
         {
-            width = tag.offsetWidth + _blockSize - tag.offsetWidth % _blockSize,
-            height = tag.offsetHeight + _blockSize - tag.offsetHeight % _blockSize
+            width = tag.offsetWidth + TAG_BLOCKSIZE - tag.offsetWidth % TAG_BLOCKSIZE,
+            height = tag.offsetHeight + TAG_BLOCKSIZE - tag.offsetHeight % TAG_BLOCKSIZE
 
             canvas_set()
             tag_draw()
@@ -76,7 +80,7 @@
         function tag_draw()
         {
             context.fillStyle = _dark
-            context.fillRect(0, 0, columns * _blockSize, rows * _blockSize)
+            context.fillRect(0, 0, columns * TAG_BLOCKSIZE, rows * TAG_BLOCKSIZE)
         }
 
         // --ANIMATION
@@ -90,8 +94,8 @@
                 {
                     setTimeout(() =>
                     {
-                        context[action](x * _blockSize, y * _blockSize, _blockSize, _blockSize)
-                        context[action](((even ? columns - 1 : columns) - x) * _blockSize, (rows - y - 1) * _blockSize, _blockSize, _blockSize)
+                        context[action](x * TAG_BLOCKSIZE, y * TAG_BLOCKSIZE, TAG_BLOCKSIZE, TAG_BLOCKSIZE)
+                        context[action](((even ? columns - 1 : columns) - x) * TAG_BLOCKSIZE, (rows - y - 1) * TAG_BLOCKSIZE, TAG_BLOCKSIZE, TAG_BLOCKSIZE)
                     }, delay += 16.67)
                 }
             }
@@ -119,7 +123,7 @@
 
     // #CYCLE
 
-     onMount(set)
+     onMount(tag_set)
 </script>
 
 <!-- #HTML -->

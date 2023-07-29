@@ -802,10 +802,13 @@ lang="scss"
 
             &::after
             {
-                @include xy-start(true);
+                @include absolute;
                 @include any-w;
 
                 content: '';
+
+                top: -1px;
+                left: 0;
 
                 height: 100vh;
 

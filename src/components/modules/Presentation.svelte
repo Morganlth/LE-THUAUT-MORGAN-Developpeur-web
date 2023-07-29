@@ -185,8 +185,9 @@
 
                 tick().then(() =>
                 {
-                    if (wwindow.window_MOBILE) mobile_update(presentation_$SNAKE)
                     if (presentation_$TEXT && !presentation_$SNAKE) tag_showAll()
+
+                    mobile_update(wwindow.window_MOBILE && presentation_$SNAKE)
 
                     tag_CHARGED = true
                 })
@@ -257,7 +258,7 @@
         // --RESTORE
         function tag_restore()
         {
-            if (tag_SAVE > -1)
+            if (tag_SAVE > -1 && !TAG_MOBILE.on)
             {
                 tag_INDEX = tag_SAVE
 
@@ -632,7 +633,6 @@ on:touchstart={presentation_touchStart}
         {#if tag_FONTCHARGED}
             {#each TAG_ELEMENTS as tag}
                 <Tag
-                _blockSize={presentation_BLOCKSIZE}
                 _max_width="calc(100vw - {presentation_BLOCKSIZE * 3}px)"
                 _dark={_colors.dark}
                 bind:width={tag.width}
@@ -667,7 +667,6 @@ on:touchstart={presentation_touchStart}
             class="super-tag"
             >
                 <Tag
-                _blockSize={presentation_BLOCKSIZE}
                 _center={true}
                 _z={-1}
                 _dark={_colors.dark}
@@ -689,7 +688,6 @@ on:touchstart={presentation_touchStart}
             class="super-tag"
             >
                 <Tag
-                _blockSize={presentation_BLOCKSIZE}
                 _center={true}
                 _z={-1}
                 _dark={_colors.dark}
